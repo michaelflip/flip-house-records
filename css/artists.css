@@ -41,3 +41,17 @@ body {
     border-radius: 15px;
     box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
 }
+
+.artist-image {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.artist-image.playing {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(255, 69, 0, 0.8);
+}
