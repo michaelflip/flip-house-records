@@ -122,66 +122,72 @@
 
 <script src="https://unpkg.com/wavesurfer.js"></script>
 <script>
+document.addEventListener("DOMContentLoaded", function () {
     // Initialize Wavesurfer
     const wavesurfer = WaveSurfer.create({
-        container: '#waveform',
-        waveColor: 'white',
-        progressColor: '#ff4500',
-        cursorColor: 'red',
+        container: "#waveform",
+        waveColor: "white",
+        progressColor: "#ff4500",
+        cursorColor: "red",
         barWidth: 3,
         height: 60,
         responsive: true,
-        backend: 'mediaelement'
+        backend: "mediaelement"
     });
 
-// Check if browser supports .wav, fallback to .mp3
-const audioFile = 'audio/punkrawkslapper.wav';
-const backupFile = 'audio/punkrawkslapper.mp3';
+    // Define audio files
+    const audioFileWAV = "audio/punkrawkslapper.wav";
+    const audioFileMP3 = "audio/punkrawkslapper.mp3";
 
-// Test if the browser can play WAV
-const testAudio = document.createElement('audio');
-if (!testAudio.canPlayType('audio/wav')) {
-    wavesurfer.load(backupFile);  // Load MP3 if WAV isn't supported
-} else {
-    wavesurfer.load(audioFile);
-}
+    // Create an audio element to check browser support
+    const testAudio = document.createElement("audio");
+    let selectedFile = audioFileMP3; // Default to MP3
 
+    // Check if browser supports WAV, otherwise fallback to MP3
+    if (testAudio.canPlayType("audio/wav")) {
+        selectedFile = audioFileWAV;
+    }
 
-    // Get elements
-    const artistImage = document.getElementById('artist-image');
-    const playButton = document.getElementById('play-button');
+    // Load the best format
+    wavesurfer.load(selectedFile);
+
+    // Get elements for controls
+    const artistImage = document.getElementById("artist-image");
+    const playButton = document.getElementById("play-button");
 
     // Toggle play/pause when clicking the image
-    artistImage.addEventListener('click', () => {
+    artistImage.addEventListener("click", () => {
         if (wavesurfer.isPlaying()) {
             wavesurfer.pause();
-            artistImage.classList.remove('playing');
-            playButton.innerHTML = '🎧 Play Song';
+            artistImage.classList.remove("playing");
+            playButton.innerHTML = "🎧 Play Song";
         } else {
             wavesurfer.play();
-            artistImage.classList.add('playing');
-            playButton.innerHTML = '⏸ Pause';
+            artistImage.classList.add("playing");
+            playButton.innerHTML = "⏸ Pause";
         }
     });
 
     // Sync play button with Wavesurfer
-    playButton.addEventListener('click', () => {
+    playButton.addEventListener("click", () => {
         if (wavesurfer.isPlaying()) {
             wavesurfer.pause();
-            artistImage.classList.remove('playing');
-            playButton.innerHTML = '🎧 Play Song';
+            artistImage.classList.remove("playing");
+            playButton.innerHTML = "🎧 Play Song";
         } else {
             wavesurfer.play();
-            artistImage.classList.add('playing');
-            playButton.innerHTML = '⏸ Pause';
+            artistImage.classList.add("playing");
+            playButton.innerHTML = "⏸ Pause";
         }
     });
 
     // Reset button when audio ends
-    wavesurfer.on('finish', () => {
-        artistImage.classList.remove('playing');
-        playButton.innerHTML = '🎧 Play Song';
+    wavesurfer.on("finish", () => {
+        artistImage.classList.remove("playing");
+        playButton.innerHTML = "🎧 Play Song";
     });
+});
+
 </script>
 
 </body>
