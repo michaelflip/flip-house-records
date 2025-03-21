@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flip House Records - Artists</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap');
+
+        body {
+            background: url('file-WuaC44Upkc7DVYxczwr7C1') no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+            margin: 0;
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        nav {
+            position: absolute;
+            top: 20px;
+            display: flex;
+            gap: 1rem;
+            z-index: 10;
+        }
+
+        .nav-button {
+            background: none;
+            border: 2px solid white;
+            color: white;
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px white;
+        }
+
+        .nav-button:hover {
+            background: white;
+            color: black;
+            transform: scale(1.05);
+            box-shadow: 0 0 20px white;
+        }
+
+        .artist-section {
+            padding-top: 100px;
+            max-width: 800px;
+            text-align: center;
+            backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .artist-image {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+        }
+
+        .song-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0px 0px 10px rgba(255, 255, 255, 0.8);
+        }
+
+        .listen-button {
+            margin-top: 20px;
+            background: #ff4500;
+            border: none;
+            color: white;
+            padding: 12px 25px;
+            font-size: 1.2rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0px 0px 15px rgba(255, 69, 0, 0.8);
+        }
+
+        .listen-button:hover {
+            background: white;
+            color: black;
+            box-shadow: 0px 0px 25px rgba(255, 255, 255, 1);
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav>
+        <button class="nav-button" onclick="window.location.href='index.html'">Home</button>
+        <button class="nav-button">Artists</button>
+        <button class="nav-button">Releases</button>
+        <button class="nav-button">Contact</button>
+    </nav>
+
+    <!-- Artist Section -->
+    <div class="artist-section">
+        <img src="file-WuaC44Upkc7DVYxczwr7C1.png" alt="Automatix Band" class="artist-image">
+        <h1 class="song-title">Automatix - Punkrawkslapper</h1>
+        <button class="listen-button" onclick="window.open('https://soundcloud.com/automatixmusic/punkrawkslapper-2025', '_blank')">🎧 Listen Now</button>
+    </div>
+
+</body>
+</html>
