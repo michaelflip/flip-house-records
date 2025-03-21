@@ -134,8 +134,18 @@
         backend: 'mediaelement'
     });
 
-    // Load the song file (make sure this file exists in your project)
-    wavesurfer.load('audio/punkrawkslapper.wav');
+// Check if browser supports .wav, fallback to .mp3
+const audioFile = 'audio/punkrawkslapper.wav';
+const backupFile = 'audio/punkrawkslapper.mp3';
+
+// Test if the browser can play WAV
+const testAudio = document.createElement('audio');
+if (!testAudio.canPlayType('audio/wav')) {
+    wavesurfer.load(backupFile);  // Load MP3 if WAV isn't supported
+} else {
+    wavesurfer.load(audioFile);
+}
+
 
     // Get elements
     const artistImage = document.getElementById('artist-image');
