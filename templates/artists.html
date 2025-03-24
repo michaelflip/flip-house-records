@@ -1,24 +1,25 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Flip House Records - Artists</title>
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-	<link rel="stylesheet" href="css/artists.css">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/artists.css' %}">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap');
 
-    body {
-      background-color: black;
-      color: white;
-      margin: 0;
-      height: 100vh;
-      font-family: 'Orbitron', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
+        body {
+            background-color: black;
+            color: white;
+            margin: 0;
+            height: 100vh;
+            font-family: 'Orbitron', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
 
         nav {
             position: absolute;
@@ -97,33 +98,23 @@
 <body>
 <div class="background-overlay"></div>
 
-    <!-- Navigation -->
-    <nav>
-        <button class="nav-button" onclick="window.location.href='index.html'">Home</button>
-        <button class="nav-button" onclick="window.location.href='artists.html'">Artists</button>
-        <button class="nav-button">Releases</button>
-        <button class="nav-button">Contact</button>
-    </nav>
+<nav>
+    <button class="nav-button" onclick="window.location.href='/'">Home</button>
+    <button class="nav-button" onclick="window.location.href='/artists/'">Artists</button>
+    <button class="nav-button" onclick="window.location.href='/releases/'">Releases</button>
+    <button class="nav-button" onclick="window.location.href='/contact/'">Contact</button>
+</nav>
 
-<!-- Artist Section -->
 <div class="artist-section">
-    <!-- Clickable Image -->
-    <img id="artist-image" src="img/automatix.png" alt="Automatix Band" class="artist-image">
-
-    <!-- Song Title -->
+    <img id="artist-image" src="{% static 'img/automatix.png' %}" alt="Automatix Band" class="artist-image">
     <h1 class="song-title">Automatix - Punkrawkslapper</h1>
-
-    <!-- Wavesurfer Waveform -->
     <div id="waveform"></div>
-
-    <!-- Play/Pause Button -->
     <button id="play-button" class="listen-button">🎧 Play Song</button>
 </div>
 
 <script src="https://unpkg.com/wavesurfer.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    // Initialize Wavesurfer
     const wavesurfer = WaveSurfer.create({
         container: "#waveform",
         waveColor: "white",
@@ -135,27 +126,21 @@ document.addEventListener("DOMContentLoaded", function () {
         backend: "mediaelement"
     });
 
-    // Define audio files
-    const audioFileWAV = "audio/punkrawkslapper.wav";
-    const audioFileMP3 = "audio/punkrawkslapper.mp3";
+    const audioFileWAV = "{% static 'audio/punkrawkslapper.wav' %}";
+    const audioFileMP3 = "{% static 'audio/punkrawkslapper.mp3' %}";
 
-    // Create an audio element to check browser support
     const testAudio = document.createElement("audio");
-    let selectedFile = audioFileMP3; // Default to MP3
+    let selectedFile = audioFileMP3;
 
-    // Check if browser supports WAV, otherwise fallback to MP3
     if (testAudio.canPlayType("audio/wav")) {
         selectedFile = audioFileWAV;
     }
 
-    // Load the best format
     wavesurfer.load(selectedFile);
 
-    // Get elements for controls
     const artistImage = document.getElementById("artist-image");
     const playButton = document.getElementById("play-button");
 
-    // Toggle play/pause when clicking the image
     artistImage.addEventListener("click", () => {
         if (wavesurfer.isPlaying()) {
             wavesurfer.pause();
@@ -168,7 +153,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // Sync play button with Wavesurfer
     playButton.addEventListener("click", () => {
         if (wavesurfer.isPlaying()) {
             wavesurfer.pause();
@@ -181,13 +165,11 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // Reset button when audio ends
     wavesurfer.on("finish", () => {
         artistImage.classList.remove("playing");
         playButton.innerHTML = "🎧 Play Song";
     });
 });
-
 </script>
 
 </body>
