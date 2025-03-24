@@ -1,12 +1,14 @@
-from django.urls import path
-from . import views
+from django.contrib import admin
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 from releases.views import homepage
 
 urlpatterns = [
-    path('', views.release_list, name='release_list'),
-    path('tag/<str:tag>/', views.release_list, name='release_list_by_tag'),
-    path('upload/', views.upload_release, name='upload_release'),
     path('', homepage, name='home'),
     path('releases/', include('releases.urls')),
     path('admin/', admin.site.urls),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

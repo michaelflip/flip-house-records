@@ -1,12 +1,13 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
 
   <meta charset="UTF-8">
   <title>Flip House Records</title>
   <!-- Updated path to local Bootstrap CSS -->
-  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap');
 
@@ -83,14 +84,14 @@
 
   <!-- Navigation Buttons -->
   <nav>
-    <button class="nav-button" onclick="window.location.href='https://fliphouserecords.com'">Home</button>
-    <button class="nav-button" onclick="window.location.href='https://fliphouserecords.com/artists.html'">Artists</button>
-    <button class="nav-button">Releases</button>
-    <button class="nav-button">Contact</button>
+    <button class="nav-button" onclick="window.location.href='/'">Home</button>
+    <button class="nav-button" onclick="window.location.href='/artists.html'">Artists</button>
+    <button class="nav-button" onclick="window.location.href='/releases/'">Releases</button>
+    <button class="nav-button" onclick="window.location.href='/contact/'">Contact</button>
   </nav>
 
   <!-- Centered Logo -->
-  <img src="fliphouserecords.png" alt="Flip House Records Logo" class="logo">
+  <img src="{% static 'fliphouserecords.png' %}" alt="Flip House Records Logo" class="logo">
 
   <!-- Tagline -->
   <div class="tagline">SUMMER 2025</div>
@@ -139,8 +140,9 @@
     `;
     document.head.appendChild(style);
   </script>
-    <footer class="footer">
-        <p>&copy; 2025 Flip House Records</p>
-    </footer>
+
+  <footer class="footer">
+    <p>&copy; 2025 Flip House Records</p>
+  </footer>
 </body>
 </html>
