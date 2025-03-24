@@ -29,14 +29,14 @@
 
       {% if post.track_preview %}
         <div class="d-flex align-items-center gap-3 mt-3">
-          <button class="btn btn-outline-dark btn-sm play-btn" data-audio="{{ post.track_preview.url }}">
+          <button class="btn btn-outline-dark btn-sm play-btn" data-index="{{ forloop.counter0 }}">
             <i class="bi bi-play-fill"></i>
           </button>
           <input type="range" min="0" max="1" step="0.01"
                 value="1" class="form-range volume-slider"
-                style="width: 100px;" data-audio="{{ post.track_preview.url }}">
+                style="width: 100px;" data-index="{{ forloop.counter0 }}">
         </div>
-        <div class="waveform" data-audio="{{ post.track_preview.url }}"></div>
+        <div class="waveform" data-audio="{{ post.track_preview.url }}" data-index="{{ forloop.counter0 }}"></div>
       {% endif %}
 
       {% if post.tags %}
@@ -53,4 +53,53 @@
 {% empty %}
 <p class="text-center">No releases yet. Stay tuned!</p>
 {% endfor %}
+
+<!-- Wavesurfer integration -->
+<script src="https://unpkg.com/wavesurfer.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const players = [];
+
+    document.querySelectorAll('.waveform').forEach(function (waveformEl) {
+      const audioUrl = waveformEl.dataset.audio;
+      const index = waveformEl.dataset.index;
+
+      const container = document.createElement('div');
+      waveformEl.appendChild(container);
+
+      const wavesurfer = WaveSurfer.create({
+        container: container,
+        waveColor: '#aaa',
+        progressColor: '#f04',
+        height: 64,
+        barWidth: 2,
+        responsive: true,
+      });
+
+      wavesurfer.load(audioUrl);
+      players[index] = wavesurfer;
+    });
+
+    // Play/pause
+    document.querySelectorAll('.play-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const index = btn.dataset.index;
+        if (players[index]) {
+          players[index].playPause();
+        }
+      });
+    });
+
+    // Volume control
+    document.querySelectorAll('.volume-slider').forEach(function (slider) {
+      slider.addEventListener('input', function () {
+        const index = slider.dataset.index;
+        const volume = parseFloat(slider.value);
+        if (players[index]) {
+          players[index].setVolume(volume);
+        }
+      });
+    });
+  });
+</script>
 {% endblock %}
