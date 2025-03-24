@@ -114,3 +114,6 @@ if not DEBUG:
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+
+from storages.backends.s3boto3 import S3Boto3Storage
+default_storage = S3Boto3Storage()
