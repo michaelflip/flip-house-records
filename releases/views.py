@@ -26,3 +26,6 @@ def upload_release(request):
 
 def homepage(request):
     return render(request, "index.html")
+
+def artists(request):
+    return render(request, "artists.html")
