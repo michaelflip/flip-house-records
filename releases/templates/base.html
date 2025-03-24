@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{% load static %}
+<meta charset="UTF-8">
+<title>Flip House Records</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+<link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" />
+<link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap');
+
+  body {
+    background-color: #000;
+    color: #fff;
+    font-family: 'Orbitron', sans-serif;
+    margin: 0;
+    padding-top: 100px;
+  }
+
+  nav {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 1rem;
+    z-index: 1000;
+  }
+
+  .nav-button {
+    background: none;
+    border: 2px solid white;
+    color: white;
+    padding: 0.5rem 1.2rem;
+    border-radius: 50px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .nav-button:hover {
+    background: white;
+    color: black;
+    transform: scale(1.05);
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  .footer {
+    text-align: center;
+    color: white;
+    margin-top: 4rem;
+    padding-bottom: 2rem;
+  }
+
+  .release-box {
+    background-color: #fff;
+    color: #000;
+    border: 3px solid #333;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
+  }
+
+  .release-box img {
+    border: 2px solid #eee;
+    object-fit: cover;
+    width: 160px;
+    height: 160px;
+    border-radius: 4px;
+  }
+
+  .waveform {
+    margin-top: 0.5rem;
+  }
+</style>
+</head>
+
+<body>
+  <!-- Navigation -->
+  <nav>
+    <button class="nav-button" onclick="location.href='/'">Home</button>
+    <button class="nav-button" onclick="location.href='/artists.html'">Artists</button>
+    <button class="nav-button" onclick="location.href='/releases/'">Releases</button>
+    <button class="nav-button" onclick="location.href='/contact/'">Contact</button>
+  </nav>
+
+  <!-- Main content block -->
+  <div class="container">
+    {% block content %}
+    {% endblock %}
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2025 Flip House Records</p>
+  </footer>
+
+  <!-- Wavesurfer + Volume + Play Script -->
+  <script src="https://unpkg.com/wavesurfer.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const players = {};
+
+      document.querySelectorAll(".waveform").forEach((waveformDiv) => {
+        const audioUrl = waveformDiv.dataset.audio;
+
+        const wavesurfer = WaveSurfer.create({
+          container: waveformDiv,
+          waveColor: "#ccc",
+          progressColor: "#ff4f4f",
+          height: 60,
+          responsive: true
+        });
+
+        wavesurfer.load(audioUrl);
+        players[audioUrl] = wavesurfer;
+      });
+
+      document.querySelectorAll(".play-btn").forEach(btn => {
+        const icon = btn.querySelector("i");
+        const audioUrl = btn.dataset.audio;
+        const player = players[audioUrl];
+
+        btn.addEventListener("click", function () {
+          if (player.isPlaying()) {
+            player.pause();
+            icon.classList.remove("bi-pause-fill");
+            icon.classList.add("bi-play-fill");
+          } else {
+            Object.entries(players).forEach(([url, p]) => {
+              p.pause();
+              const otherBtnIcon = document.querySelector(`.play-btn[data-audio="${url}"] i`);
+              if (otherBtnIcon) {
+                otherBtnIcon.classList.remove("bi-pause-fill");
+                otherBtnIcon.classList.add("bi-play-fill");
+              }
+            });
+
+            player.play();
+            icon.classList.remove("bi-play-fill");
+            icon.classList.add("bi-pause-fill");
+          }
+        });
+      });
+
+      document.querySelectorAll(".volume-slider").forEach(slider => {
+        const audioUrl = slider.dataset.audio;
+        const player = players[audioUrl];
+
+        slider.addEventListener("input", function () {
+          player.setVolume(parseFloat(slider.value));
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>

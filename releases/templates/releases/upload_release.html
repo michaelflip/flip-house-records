@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">🎛 Upload a New Flip House Release</h2>
+
+    <form method="POST" enctype="multipart/form-data" class="dropzone" id="releaseDropzone">
+        {% csrf_token %}
+        <div class="form-group mb-3">
+            {{ form.title.label_tag }}<br>{{ form.title }}
+        </div>
+        <div class="form-group mb-3">
+            {{ form.body.label_tag }}<br>{{ form.body }}
+        </div>
+        <div class="form-group mb-3">
+            {{ form.tags.label_tag }}<br>{{ form.tags }}
+        </div>
+        <div class="form-group mb-3">
+            {{ form.release_datetime.label_tag }}<br>{{ form.release_datetime }}
+        </div>
+        <div class="form-group mb-3">
+            {{ form.album_art.label_tag }}<br>
+            {{ form.album_art }}
+        </div>
+        <div class="form-group mb-3">
+            {{ form.track_preview.label_tag }}<br>
+            {{ form.track_preview }}
+        </div>
+        <button type="submit" class="btn btn-primary">Upload</button>
+    </form>
+</div>
+
+<script>
+    Dropzone.options.releaseDropzone = {
+        autoProcessQueue: false,
+        uploadMultiple: false,
+        parallelUploads: 1,
+        maxFiles: 2,
+        init: function () {
+            const myDropzone = this;
+            const form = document.getElementById('releaseDropzone');
+
+            form.addEventListener("submit", function(e) {
+                e.preventDefault();
+                myDropzone.processQueue();
+            });
+
+            this.on("sending", function(file, xhr, formData) {
+                formData.append("csrfmiddlewaretoken", "{{ csrf_token }}");
+            });
+
+            this.on("success", function(file, response) {
+                window.location.href = "{% url 'release_list' %}";
+            });
+        }
+    };
+</script>
+{% endblock %}
