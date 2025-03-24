@@ -37,6 +37,7 @@ AWS_S3_FILE_OVERWRITE = False
 AWS_DEFAULT_ACL = None
 
 MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/"
+print("✅ S3 SETTINGS LOADED:", DEFAULT_FILE_STORAGE)
 
 
 # --- Installed Apps ---
