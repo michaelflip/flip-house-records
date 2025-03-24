@@ -3,7 +3,7 @@ import os
 import dj_database_url
 import mimetypes
 
-# --- Base directory ---
+# --- Base Directory ---
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # --- Secret Key ---
@@ -21,10 +21,10 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
-# Fix for MIME types on Render (especially for PNG)
+# MIME type fix for PNG on Render
 mimetypes.add_type("image/png", ".png", True)
 
-# --- Media Files (Now using Amazon S3) ---
+# --- Amazon S3 Media Storage ---
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
@@ -38,15 +38,11 @@ AWS_DEFAULT_ACL = 'public-read'
 
 MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/"
 
-# 🔍 Runtime Debug – This will show in Render logs
-print("=== AWS CONFIG CHECK ===")
-print("AWS_ACCESS_KEY_ID:", AWS_ACCESS_KEY_ID)
-print("AWS_SECRET_ACCESS_KEY:", AWS_SECRET_ACCESS_KEY[:4] + "..." if AWS_SECRET_ACCESS_KEY else "None")
-print("AWS_STORAGE_BUCKET_NAME:", AWS_STORAGE_BUCKET_NAME)
-print("AWS_S3_REGION_NAME:", AWS_S3_REGION_NAME)
-print("AWS_DEFAULT_ACL:", AWS_DEFAULT_ACL)
-print("DEFAULT_FILE_STORAGE:", DEFAULT_FILE_STORAGE)
-print("=========================")
+# --- Force Django to use S3 for all file saves ---
+from storages.backends.s3boto3 import S3Boto3Storage
+from django.core.files.storage import default_storage as django_default_storage
+default_storage = S3Boto3Storage()
+django_default_storage._wrapped = default_storage
 
 # --- Installed Apps ---
 INSTALLED_APPS = [
@@ -63,7 +59,7 @@ INSTALLED_APPS = [
 # --- Middleware ---
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Must be second
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -117,14 +113,8 @@ USE_TZ = True
 # --- Default Primary Key Field Type ---
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# --- Production Security (enabled when DEBUG is False) ---
+# --- Security Settings for Production ---
 if not DEBUG:
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-
-from storages.backends.s3boto3 import S3Boto3Storage
-from django.core.files.storage import default_storage as django_default_storage
-
-default_storage = S3Boto3Storage()
-django_default_storage._wrapped = default_storage
