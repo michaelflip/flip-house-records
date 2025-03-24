@@ -122,3 +122,9 @@ if not DEBUG:
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+
+from storages.backends.s3boto3 import S3Boto3Storage
+from django.core.files.storage import default_storage as django_default_storage
+
+default_storage = S3Boto3Storage()
+django_default_storage._wrapped = default_storage
