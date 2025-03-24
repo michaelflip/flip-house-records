@@ -25,8 +25,6 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 mimetypes.add_type("image/png", ".png", True)
 
 # --- Media Files (Now using Amazon S3) ---
-INSTALLED_APPS += ['storages']
-
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
@@ -50,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'releases',
+    'storages',
 ]
 
 # --- Middleware ---
