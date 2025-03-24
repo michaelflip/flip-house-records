@@ -37,8 +37,16 @@ AWS_S3_FILE_OVERWRITE = False
 AWS_DEFAULT_ACL = 'public-read'
 
 MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/"
-print("✅ S3 SETTINGS LOADED:", DEFAULT_FILE_STORAGE)
 
+# 🔍 Runtime Debug – This will show in Render logs
+print("=== AWS CONFIG CHECK ===")
+print("AWS_ACCESS_KEY_ID:", AWS_ACCESS_KEY_ID)
+print("AWS_SECRET_ACCESS_KEY:", AWS_SECRET_ACCESS_KEY[:4] + "..." if AWS_SECRET_ACCESS_KEY else "None")
+print("AWS_STORAGE_BUCKET_NAME:", AWS_STORAGE_BUCKET_NAME)
+print("AWS_S3_REGION_NAME:", AWS_S3_REGION_NAME)
+print("AWS_DEFAULT_ACL:", AWS_DEFAULT_ACL)
+print("DEFAULT_FILE_STORAGE:", DEFAULT_FILE_STORAGE)
+print("=========================")
 
 # --- Installed Apps ---
 INSTALLED_APPS = [
@@ -114,6 +122,3 @@ if not DEBUG:
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-
-from storages.backends.s3boto3 import S3Boto3Storage
-default_storage = S3Boto3Storage()
