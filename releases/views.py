@@ -22,3 +22,7 @@ def upload_release(request):
     else:
         form = ReleaseUploadForm()
     return render(request, 'releases/upload_release.html', {'form': form})
+    
+
+def homepage(request):
+    return render(request, "index.html")
