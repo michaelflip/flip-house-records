@@ -30,7 +30,7 @@
       {% if post.track_preview %}
         <div class="d-flex align-items-center gap-3 mt-3">
           <button class="btn btn-outline-dark btn-sm play-btn" data-index="{{ forloop.counter0 }}">
-            <i class="bi bi-play-fill"></i>
+            ▶️
           </button>
           <input type="range" min="0" max="1" step="0.01"
                 value="1" class="form-range volume-slider"
@@ -54,46 +54,10 @@
 <p class="text-center">No releases yet. Stay tuned!</p>
 {% endfor %}
 {% endblock %}
+
 <!-- Wavesurfer integration -->
 <script src="https://unpkg.com/wavesurfer.js"></script>
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const wavesurfers = [];
-
-    document.querySelectorAll(".waveform").forEach((waveformEl, index) => {
-      const audioUrl = waveformEl.dataset.audio;
-      const wavesurfer = WaveSurfer.create({
-        container: waveformEl,
-        waveColor: "#888",
-        progressColor: "#555",
-        height: 80,
-        responsive: true,
-      });
-
-      wavesurfer.load(audioUrl);
-      wavesurfers[index] = wavesurfer;
-
-      // Set up play button
-      const playBtn = waveformEl.closest(".waveform-container").querySelector(".play-btn");
-      playBtn.addEventListener("click", () => {
-        if (wavesurfer.isPlaying()) {
-          wavesurfer.pause();
-          playBtn.innerText = "▶️";
-        } else {
-          wavesurfer.play();
-          playBtn.innerText = "⏸️";
-        }
-      });
-
-      // Set up volume slider
-      const volumeSlider = waveformEl.closest(".waveform-container").querySelector(".volume-slider");
-      volumeSlider.addEventListener("input", () => {
-        wavesurfer.setVolume(volumeSlider.value);
-      });
-    });
-  });
-</script>
-
   document.addEventListener('DOMContentLoaded', function () {
     const players = [];
 
@@ -121,10 +85,8 @@
         mediaControls: false
       });
 
-      // Load the track
       wavesurfer.load(audioUrl);
 
-      // Auto-play fixes sometimes
       wavesurfer.on('ready', () => {
         wavesurfer.setVolume(1);
       });
@@ -132,17 +94,16 @@
       players[index] = wavesurfer;
     });
 
-    // Play/pause toggle
     document.querySelectorAll('.play-btn').forEach(function (btn) {
       btn.addEventListener('click', function () {
         const index = btn.dataset.index;
         if (players[index]) {
           players[index].playPause();
+          btn.innerText = players[index].isPlaying() ? '⏸️' : '▶️';
         }
       });
     });
 
-    // Volume sliders
     document.querySelectorAll('.volume-slider').forEach(function (slider) {
       slider.addEventListener('input', function () {
         const index = slider.dataset.index;
