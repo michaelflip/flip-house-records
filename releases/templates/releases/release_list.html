@@ -60,6 +60,52 @@
 <script src="https://unpkg.com/wavesurfer.js"></script>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
+    const playerMap = new Map();
+
+    document.querySelectorAll(".release-box").forEach((box) => {
+      const waveformEl = box.querySelector(".waveform");
+      const audioUrl = waveformEl?.dataset.audio;
+
+      if (!audioUrl) return;
+
+      const player = WaveSurfer.create({
+        container: waveformEl,
+        waveColor: "violet",
+        progressColor: "purple",
+        height: 80,
+        url: audioUrl,
+      });
+
+      // Store the player instance associated with this box
+      playerMap.set(box, player);
+
+      // Bind play button
+      const playBtn = box.querySelector(".play-btn");
+      if (playBtn) {
+        playBtn.addEventListener("click", () => {
+          const thisPlayer = playerMap.get(box);
+          if (thisPlayer) {
+            thisPlayer.playPause();
+            playBtn.textContent = thisPlayer.isPlaying() ? "⏸️" : "▶️";
+          }
+        });
+      }
+
+      // Bind volume slider
+      const volumeSlider = box.querySelector(".volume-slider");
+      if (volumeSlider) {
+        volumeSlider.addEventListener("input", () => {
+          const thisPlayer = playerMap.get(box);
+          if (thisPlayer) {
+            thisPlayer.setVolume(parseFloat(volumeSlider.value));
+          }
+        });
+      }
+    });
+  });
+</script>
+
+  document.addEventListener("DOMContentLoaded", function () {
     const waveforms = document.querySelectorAll(".waveform");
 
     waveforms.forEach((waveformEl) => {
