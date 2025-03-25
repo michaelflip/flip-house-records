@@ -6,8 +6,21 @@ class ReleasePost(models.Model):
     body = models.TextField(blank=True, null=True)
 
     # New fields:
-    album_art = models.ImageField(upload_to='album_art/', blank=True, null=True)
-    track_preview = models.FileField(upload_to='track_previews/', blank=True, null=True)
+from .storage_backends import MediaStorage
+
+    album_art = models.ImageField(
+        upload_to='album_art/',
+        storage=MediaStorage(),
+        blank=True,
+        null=True
+    )
+    track_preview = models.FileField(
+        upload_to='track_previews/',
+        storage=MediaStorage(),
+        blank=True,
+        null=True
+    )
+
     tags = models.CharField(max_length=200, blank=True, null=True, help_text="Comma-separated tags (e.g. boom bap, chill, 209)")
 
     # Optional custom date
