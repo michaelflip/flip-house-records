@@ -15,16 +15,12 @@ DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 # --- Allowed Hosts ---
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost').split(',')
 
-# --- Static Files ---
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# --- Static Files from Amazon S3 ---
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3StaticStorage'
+STATIC_URL = f"https://{os.environ.get('AWS_STORAGE_BUCKET_NAME')}.s3.amazonaws.com/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # still required for collectstatic
 
-# MIME type fix for PNG on Render
-mimetypes.add_type("image/png", ".png", True)
-
-# --- Amazon S3 Media Storage ---
+# --- Amazon S3 Media Files ---
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
@@ -38,11 +34,14 @@ AWS_DEFAULT_ACL = 'public-read'
 
 MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/"
 
-# --- Force Django to use S3 for all file saves ---
+# --- Force S3-backed storage behavior
 from storages.backends.s3boto3 import S3Boto3Storage
 from django.core.files.storage import default_storage as django_default_storage
 default_storage = S3Boto3Storage()
 django_default_storage._wrapped = default_storage
+
+# --- MIME type fix for PNG on Render
+mimetypes.add_type("image/png", ".png", True)
 
 # --- Installed Apps ---
 INSTALLED_APPS = [
@@ -59,7 +58,7 @@ INSTALLED_APPS = [
 # --- Middleware ---
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    # 'whitenoise.middleware.WhiteNoiseMiddleware',  # ❌ Removed - no longer needed
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -94,7 +93,7 @@ WSGI_APPLICATION = 'fliphouserecords.wsgi.application'
 # --- Database ---
 DATABASES = {
     'default': dj_database_url.config(
-        default='sqlite:///db.sqlite3',  # fallback for local dev
+        default='sqlite:///db.sqlite3',
         conn_max_age=600,
         conn_health_checks=True
     )
@@ -117,7 +116,7 @@ USE_TZ = True
 # --- Default Primary Key Field Type ---
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# --- Security Settings for Production ---
+# --- Production Security ---
 if not DEBUG:
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
