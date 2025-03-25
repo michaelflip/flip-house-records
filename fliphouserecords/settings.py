@@ -8,11 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # === Secret Key ===
 SECRET_KEY = os.environ.get('SECRET_KEY')
-
-# === Debug Mode ===
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
-
-# === Allowed Hosts ===
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost').split(',')
 
 # === Installed Apps ===
@@ -27,7 +23,7 @@ INSTALLED_APPS = [
     'storages',  # For S3 support
 ]
 
-# === Middleware (WhiteNoise removed) ===
+# === Middleware (No WhiteNoise) ===
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -37,10 +33,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
-# === URL Config ===
-ROOT_URLCONF = 'fliphouserecords.urls'
-WSGI_APPLICATION = 'fliphouserecords.wsgi.application'
 
 # === Templates ===
 TEMPLATES = [
@@ -59,7 +51,7 @@ TEMPLATES = [
     },
 ]
 
-# === Database (Render PostgreSQL or fallback to SQLite) ===
+# === Database ===
 DATABASES = {
     'default': dj_database_url.config(
         default='sqlite:///db.sqlite3',
@@ -68,22 +60,7 @@ DATABASES = {
     )
 }
 
-# === Password Validation ===
-AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
-]
-
-# === Localization ===
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
-USE_I18N = True
-USE_TZ = True
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# === AWS S3 CONFIG (STATIC + MEDIA) ===
+# === AWS S3 Config ===
 AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
@@ -91,23 +68,51 @@ AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME", "us-east-1")
 AWS_S3_ADDRESSING_STYLE = "virtual"
 AWS_S3_FILE_OVERWRITE = False
 AWS_QUERYSTRING_AUTH = False
-AWS_DEFAULT_ACL = "public-read"  # Make sure public files can be accessed
+AWS_DEFAULT_ACL = "public-read"
 
-# === STATIC FILES (JS, CSS, Images like favicon/logo) ===
-STATICFILES_STORAGE = "storages.backends.s3boto3.S3StaticStorage"
+# ✅ Define custom static and media storage backends
+class StaticStorage(S3Boto3Storage):
+    location = "static"
+    default_acl = "public-read"
+
+class MediaStorage(S3Boto3Storage):
+    location = ""
+    file_overwrite = False
+    default_acl = "public-read"
+
+# === Static Files ===
+STATICFILES_STORAGE = "fliphouserecords.settings.StaticStorage"
 STATIC_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Required for collectstatic
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
-# === MEDIA FILES (Uploaded by users/admin) ===
-DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+# === Media Files ===
+DEFAULT_FILE_STORAGE = "fliphouserecords.settings.MediaStorage"
 MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/"
 
-# === FIXES FOR S3/RENDER BUGS ===
-mimetypes.add_type("image/png", ".png", True)
-mimetypes.add_type("image/x-icon", ".ico", True)
+# === Admin, Auth, Security ===
+AUTH_PASSWORD_VALIDATORS = [
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+]
 
-# === PRODUCTION SECURITY SETTINGS ===
+LANGUAGE_CODE = "en-us"
+TIME_ZONE = "UTC"
+USE_I18N = True
+USE_TZ = True
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# === Security for Production ===
 if not DEBUG:
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+
+# === Fix MIME types for S3
+mimetypes.add_type("image/png", ".png", True)
+mimetypes.add_type("image/x-icon", ".ico", True)
+
+# === URLConf + WSGI
+ROOT_URLCONF = "fliphouserecords.urls"
+WSGI_APPLICATION = "fliphouserecords.wsgi.application"
