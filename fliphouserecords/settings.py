@@ -24,10 +24,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'releases',
-    'storages',  # Required for S3 storage
+    'storages',  # For S3 support
 ]
 
-# === Middleware (WhiteNoise Removed) ===
+# === Middleware (WhiteNoise removed) ===
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -38,7 +38,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# === URL & WSGI ===
+# === URL Config ===
 ROOT_URLCONF = 'fliphouserecords.urls'
 WSGI_APPLICATION = 'fliphouserecords.wsgi.application'
 
@@ -59,7 +59,7 @@ TEMPLATES = [
     },
 ]
 
-# === Database (uses DATABASE_URL on Render) ===
+# === Database (Render PostgreSQL or fallback to SQLite) ===
 DATABASES = {
     'default': dj_database_url.config(
         default='sqlite:///db.sqlite3',
@@ -83,32 +83,30 @@ USE_I18N = True
 USE_TZ = True
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# === AWS S3 Settings ===
-AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
-AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
-AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'us-east-1')
-
-# ✅ Ensure correct pathing for collectstatic
+# === AWS S3 CONFIG (STATIC + MEDIA) ===
+AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
+AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME", "us-east-1")
 AWS_S3_ADDRESSING_STYLE = "virtual"
-
-AWS_QUERYSTRING_AUTH = False
 AWS_S3_FILE_OVERWRITE = False
-AWS_DEFAULT_ACL = 'public-read'
+AWS_QUERYSTRING_AUTH = False
+AWS_DEFAULT_ACL = "public-read"  # Make sure public files can be accessed
 
-# === Static Files on S3 ===
-STATICFILES_STORAGE = 'storages.backends.s3boto3.S3StaticStorage'
+# === STATIC FILES (JS, CSS, Images like favicon/logo) ===
+STATICFILES_STORAGE = "storages.backends.s3boto3.S3StaticStorage"
 STATIC_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Still needed for collectstatic
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Required for collectstatic
 
-# === Media Files on S3 ===
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+# === MEDIA FILES (Uploaded by users/admin) ===
+DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/"
 
-# === MIME Type Fix (Render edge case) ===
+# === FIXES FOR S3/RENDER BUGS ===
 mimetypes.add_type("image/png", ".png", True)
+mimetypes.add_type("image/x-icon", ".ico", True)
 
-# === Production Security Settings ===
+# === PRODUCTION SECURITY SETTINGS ===
 if not DEBUG:
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
