@@ -56,64 +56,65 @@
 {% endblock %}
 
 <!-- Wavesurfer integration -->
+<!-- Wavesurfer integration -->
 <script src="https://unpkg.com/wavesurfer.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    const players = [];
+    const players = {};
 
-    document.querySelectorAll('.waveform').forEach(function (waveformEl) {
+    document.querySelectorAll('.waveform').forEach(function (waveformEl, index) {
       const audioUrl = waveformEl.dataset.audio;
-      const index = waveformEl.dataset.index;
 
-      // Create an <audio> element and hide it
+      // Create hidden <audio> element
       const audioEl = document.createElement('audio');
       audioEl.src = audioUrl;
       audioEl.controls = false;
       audioEl.style.display = 'none';
       waveformEl.appendChild(audioEl);
 
-      // Create a div for waveform
+      // Create waveform container
       const container = document.createElement('div');
       waveformEl.appendChild(container);
 
       const wavesurfer = WaveSurfer.create({
         container: container,
-        waveColor: '#aaa',
-        progressColor: '#f04',
+        waveColor: '#bbb',
+        progressColor: '#ff0040',
         height: 64,
         barWidth: 2,
         responsive: true,
         backend: 'MediaElement',
-        media: audioEl // Attach the audio element
+        media: audioEl,
       });
 
       wavesurfer.load(audioUrl);
-
-      wavesurfer.on('ready', () => {
-        wavesurfer.setVolume(1);
-      });
-
       players[index] = wavesurfer;
-    });
 
-    document.querySelectorAll('.play-btn').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        const index = btn.dataset.index;
-        if (players[index]) {
-          players[index].playPause();
-          btn.innerText = players[index].isPlaying() ? '⏸️' : '▶️';
-        }
-      });
-    });
+      // Play button
+      const playBtn = waveformEl.closest('.release').querySelector('.play-btn');
+      if (playBtn) {
+        playBtn.addEventListener('click', function () {
+          const player = players[index];
+          if (player) {
+		  console.log('Player exists?', !!player, player);
 
-    document.querySelectorAll('.volume-slider').forEach(function (slider) {
-      slider.addEventListener('input', function () {
-        const index = slider.dataset.index;
-        const volume = parseFloat(slider.value);
-        if (players[index]) {
-          players[index].setVolume(volume);
-        }
-      });
+            player.playPause();
+            playBtn.textContent = player.isPlaying() ? '⏸️' : '▶️';
+          }
+        });
+      }
+
+      // Volume slider
+      const volumeSlider = waveformEl.closest('.release').querySelector('.volume-slider');
+      if (volumeSlider) {
+        volumeSlider.addEventListener('input', function () {
+          const volume = parseFloat(volumeSlider.value);
+          const player = players[index];
+          if (player) {
+            player.setVolume(volume);
+          }
+        });
+      }
     });
   });
 </script>
