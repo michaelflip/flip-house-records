@@ -67,28 +67,40 @@
 
       if (!audioUrl || !waveformEl) return;
 
+      // Safeguard: remove old content
+      waveformEl.innerHTML = "";
+
+      // Create and load the player
       const player = WaveSurfer.create({
         container: waveformEl,
-        waveColor: "violet",
-        progressColor: "purple",
-        height: 80,
+        waveColor: "#a855f7",
+        progressColor: "#7c3aed",
+        height: 60,
+        responsive: true
       });
 
       player.load(audioUrl);
+
+      // Store player for this box
       playerMap.set(box, player);
 
-      // Play button
+      // Handle Play button
       const playBtn = box.querySelector(".play-btn");
       if (playBtn) {
         playBtn.addEventListener("click", () => {
           const thisPlayer = playerMap.get(box);
-          if (!thisPlayer) return;
+          if (!thisPlayer) {
+            console.warn("⚠️ No player found for this box");
+            return;
+          }
+
           thisPlayer.playPause();
-          playBtn.textContent = thisPlayer.isPlaying() ? "⏸️" : "▶️";
+          const isPlaying = thisPlayer.isPlaying();
+          playBtn.textContent = isPlaying ? "⏸️" : "▶️";
         });
       }
 
-      // Volume slider
+      // Handle Volume slider
       const volumeSlider = box.querySelector(".volume-slider");
       if (volumeSlider) {
         volumeSlider.addEventListener("input", () => {
@@ -101,3 +113,4 @@
     });
   });
 </script>
+
