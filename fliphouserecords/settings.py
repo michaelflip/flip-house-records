@@ -61,16 +61,19 @@ DATABASES = {
     )
 }
 
+
 # === AWS S3 Config ===
 AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
 AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME", "us-east-1")
 
-AWS_S3_ADDRESSING_STYLE = "virtual"
-AWS_S3_FILE_OVERWRITE = False
-AWS_DEFAULT_ACL = "public-read"
-AWS_QUERYSTRING_AUTH = False  # Disable signed URLs
+AWS_S3_ADDRESSING_STYLE = "virtual"  # Use virtual-hosted–style URLs
+AWS_S3_FILE_OVERWRITE = False        # Don’t overwrite files with same name
+AWS_DEFAULT_ACL = "public-read"      # Make uploaded files public
+AWS_QUERYSTRING_AUTH = False         # Don't append auth tokens to URLs
+
+
 
 # === Custom Storage Backends ===
 class StaticStorage(S3Boto3Storage):
