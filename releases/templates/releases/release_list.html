@@ -64,6 +64,57 @@
       const audioUrl = waveformEl.dataset.audio;
       const index = waveformEl.dataset.index;
 
+      // 🧹 Clean up any existing child nodes first
+      while (waveformEl.firstChild) {
+        waveformEl.removeChild(waveformEl.firstChild);
+      }
+
+      const container = document.createElement('div');
+      waveformEl.appendChild(container);
+
+      const wavesurfer = WaveSurfer.create({
+        container: container,
+        waveColor: '#aaa',
+        progressColor: '#f04',
+        height: 64,
+        barWidth: 2,
+        responsive: true,
+      });
+
+      wavesurfer.load(audioUrl);
+      players[index] = wavesurfer;
+    });
+
+    // Play/pause toggle
+    document.querySelectorAll('.play-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const index = btn.dataset.index;
+        if (players[index]) {
+          players[index].playPause();
+        }
+      });
+    });
+
+    // Volume sliders
+    document.querySelectorAll('.volume-slider').forEach(function (slider) {
+      slider.addEventListener('input', function () {
+        const index = slider.dataset.index;
+        const volume = parseFloat(slider.value);
+        if (players[index]) {
+          players[index].setVolume(volume);
+        }
+      });
+    });
+  });
+</script>
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const players = [];
+
+    document.querySelectorAll('.waveform').forEach(function (waveformEl) {
+      const audioUrl = waveformEl.dataset.audio;
+      const index = waveformEl.dataset.index;
+
       const container = document.createElement('div');
       waveformEl.appendChild(container);
 
