@@ -72,8 +72,9 @@
         height: 80,
       });
 
-      // Bind to play button
-      const playBtn = waveformEl.closest(".release").querySelector(".play-btn");
+      // Play button
+      const wrapper = waveformEl.closest(".release-box");
+      const playBtn = wrapper.querySelector(".play-btn");
       if (playBtn) {
         playBtn.addEventListener("click", function () {
           player.playPause();
@@ -82,7 +83,7 @@
       }
 
       // Volume slider
-      const volumeSlider = waveformEl.closest(".release").querySelector(".volume-slider");
+      const volumeSlider = wrapper.querySelector(".volume-slider");
       if (volumeSlider) {
         volumeSlider.addEventListener("input", function () {
           player.setVolume(parseFloat(volumeSlider.value));
