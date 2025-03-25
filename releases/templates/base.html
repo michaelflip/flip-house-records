@@ -18,7 +18,11 @@
 
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap');
-
+  /* This forces WhiteNoise to include it in the manifest */
+  .favicon-preload {
+    background-image: url("{% static 'favicon.ico' %}");
+    display: none;
+  }
   body {
     background-color: #000;
     color: #fff;
@@ -92,6 +96,8 @@
 </head>
 
 <body>
+<div class="favicon-preload"></div>
+
   <!-- Navigation -->
   <nav>
     <button class="nav-button" onclick="window.location.href='/'">Home</button>
