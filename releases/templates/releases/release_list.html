@@ -16,7 +16,7 @@
 <div class="release-box">
   <div class="d-flex flex-column flex-md-row gap-4">
     {% if post.album_art %}
-      <img src="{{ post.album_art.url }}" alt="Album Art">
+      <img src="{{ post.album_art.url }}" alt="Album Art" style="max-width: 200px;">
     {% endif %}
 
     <div class="flex-grow-1">
@@ -29,14 +29,14 @@
 
       {% if post.track_preview %}
         <div class="d-flex align-items-center gap-3 mt-3">
-          <button class="btn btn-outline-dark btn-sm play-btn" data-index="{{ forloop.counter0 }}">
+          <button class="btn btn-outline-dark btn-sm play-btn">
             ▶️
           </button>
           <input type="range" min="0" max="1" step="0.01"
                 value="1" class="form-range volume-slider"
-                style="width: 100px;" data-index="{{ forloop.counter0 }}">
+                style="width: 100px;">
         </div>
-        <div class="waveform" data-audio="{{ post.track_preview.url }}" data-index="{{ forloop.counter0 }}"></div>
+        <div class="waveform" data-audio="{{ post.track_preview.url }}"></div>
       {% endif %}
 
       {% if post.tags %}
@@ -55,7 +55,6 @@
 {% endfor %}
 {% endblock %}
 
-
 <!-- Wavesurfer integration -->
 <script src="https://unpkg.com/wavesurfer.js"></script>
 <script>
@@ -66,32 +65,30 @@
       const waveformEl = box.querySelector(".waveform");
       const audioUrl = waveformEl?.dataset.audio;
 
-      if (!audioUrl) return;
+      if (!audioUrl || !waveformEl) return;
 
       const player = WaveSurfer.create({
         container: waveformEl,
         waveColor: "violet",
         progressColor: "purple",
         height: 80,
-        url: audioUrl,
       });
 
-      // Store the player instance associated with this box
+      player.load(audioUrl);
       playerMap.set(box, player);
 
-      // Bind play button
+      // Play button
       const playBtn = box.querySelector(".play-btn");
       if (playBtn) {
         playBtn.addEventListener("click", () => {
           const thisPlayer = playerMap.get(box);
-          if (thisPlayer) {
-            thisPlayer.playPause();
-            playBtn.textContent = thisPlayer.isPlaying() ? "⏸️" : "▶️";
-          }
+          if (!thisPlayer) return;
+          thisPlayer.playPause();
+          playBtn.textContent = thisPlayer.isPlaying() ? "⏸️" : "▶️";
         });
       }
 
-      // Bind volume slider
+      // Volume slider
       const volumeSlider = box.querySelector(".volume-slider");
       if (volumeSlider) {
         volumeSlider.addEventListener("input", () => {
@@ -99,40 +96,6 @@
           if (thisPlayer) {
             thisPlayer.setVolume(parseFloat(volumeSlider.value));
           }
-        });
-      }
-    });
-  });
-</script>
-
-  document.addEventListener("DOMContentLoaded", function () {
-    const waveforms = document.querySelectorAll(".waveform");
-
-    waveforms.forEach((waveformEl) => {
-      const audioUrl = waveformEl.getAttribute("data-audio");
-      const player = WaveSurfer.create({
-        container: waveformEl,
-        waveColor: "violet",
-        progressColor: "purple",
-        url: audioUrl,
-        height: 80,
-      });
-
-      // Play button
-      const wrapper = waveformEl.closest(".release-box");
-      const playBtn = wrapper.querySelector(".play-btn");
-      if (playBtn) {
-        playBtn.addEventListener("click", function () {
-          player.playPause();
-          playBtn.textContent = player.isPlaying() ? "⏸️" : "▶️";
-        });
-      }
-
-      // Volume slider
-      const volumeSlider = wrapper.querySelector(".volume-slider");
-      if (volumeSlider) {
-        volumeSlider.addEventListener("input", function () {
-          player.setVolume(parseFloat(volumeSlider.value));
         });
       }
     });
