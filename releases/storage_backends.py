@@ -10,3 +10,8 @@ class PublicMediaStorage(S3Boto3Storage):
         if self.exists(name):
             self.delete(name)
         return name
+
+class MediaStorage(S3Boto3Storage):
+    location = ''
+    file_overwrite = False
+    default_acl = 'public-read'
