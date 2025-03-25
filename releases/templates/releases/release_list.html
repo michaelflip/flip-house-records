@@ -59,6 +59,56 @@
 <script src="https://unpkg.com/wavesurfer.js"></script>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".release-box").forEach((releaseBox) => {
+      const waveformEl = releaseBox.querySelector(".waveform");
+      const audioUrl = waveformEl.dataset.audio;
+
+      if (!audioUrl) {
+        console.warn("⚠️ No audio URL found for this release box.");
+        return;
+      }
+
+      // Init Wavesurfer
+      const wavesurfer = WaveSurfer.create({
+        container: waveformEl,
+        waveColor: "#aaa",
+        progressColor: "#f50",
+        height: 64,
+        barWidth: 3,
+        responsive: true,
+        backend: "MediaElement",
+      });
+
+      wavesurfer.load(audioUrl);
+
+      // Attach instance to DOM element
+      waveformEl.wavesurfer = wavesurfer;
+
+      // Handle play button
+      const playBtn = releaseBox.querySelector(".play-btn");
+      playBtn.addEventListener("click", () => {
+        const ws = waveformEl.wavesurfer;
+        if (ws) {
+          ws.playPause();
+          playBtn.textContent = ws.isPlaying() ? "⏸️" : "▶️";
+        } else {
+          console.error("❌ No Wavesurfer instance found for this block");
+        }
+      });
+
+      // Handle volume slider
+      const volumeSlider = releaseBox.querySelector(".volume-slider");
+      volumeSlider.addEventListener("input", () => {
+        const ws = waveformEl.wavesurfer;
+        if (ws) {
+          ws.setVolume(parseFloat(volumeSlider.value));
+        }
+      });
+    });
+  });
+</script>
+
+  document.addEventListener("DOMContentLoaded", function () {
     const playerMap = new Map();
 
     document.querySelectorAll(".release-box").forEach((box) => {
