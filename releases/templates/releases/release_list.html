@@ -57,6 +57,43 @@
 <!-- Wavesurfer integration -->
 <script src="https://unpkg.com/wavesurfer.js"></script>
 <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const wavesurfers = [];
+
+    document.querySelectorAll(".waveform").forEach((waveformEl, index) => {
+      const audioUrl = waveformEl.dataset.audio;
+      const wavesurfer = WaveSurfer.create({
+        container: waveformEl,
+        waveColor: "#888",
+        progressColor: "#555",
+        height: 80,
+        responsive: true,
+      });
+
+      wavesurfer.load(audioUrl);
+      wavesurfers[index] = wavesurfer;
+
+      // Set up play button
+      const playBtn = waveformEl.closest(".waveform-container").querySelector(".play-btn");
+      playBtn.addEventListener("click", () => {
+        if (wavesurfer.isPlaying()) {
+          wavesurfer.pause();
+          playBtn.innerText = "▶️";
+        } else {
+          wavesurfer.play();
+          playBtn.innerText = "⏸️";
+        }
+      });
+
+      // Set up volume slider
+      const volumeSlider = waveformEl.closest(".waveform-container").querySelector(".volume-slider");
+      volumeSlider.addEventListener("input", () => {
+        wavesurfer.setVolume(volumeSlider.value);
+      });
+    });
+  });
+</script>
+
   document.addEventListener('DOMContentLoaded', function () {
     const players = [];
 
