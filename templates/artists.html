@@ -112,65 +112,6 @@
     <button id="play-button" class="listen-button">🎧 Play Song</button>
 </div>
 
-<script src="https://unpkg.com/wavesurfer.js"></script>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const wavesurfer = WaveSurfer.create({
-        container: "#waveform",
-        waveColor: "white",
-        progressColor: "#ff4500",
-        cursorColor: "red",
-        barWidth: 3,
-        height: 60,
-        responsive: true,
-        backend: "mediaelement"
-    });
-
-    const audioFileWAV = "{% static 'audio/punkrawkslapper.wav' %}";
-    const audioFileMP3 = "{% static 'audio/punkrawkslapper.mp3' %}";
-
-    const testAudio = document.createElement("audio");
-    let selectedFile = audioFileMP3;
-
-    if (testAudio.canPlayType("audio/wav")) {
-        selectedFile = audioFileWAV;
-    }
-
-    wavesurfer.load(selectedFile);
-
-    const artistImage = document.getElementById("artist-image");
-    const playButton = document.getElementById("play-button");
-
-    artistImage.addEventListener("click", () => {
-        if (wavesurfer.isPlaying()) {
-            wavesurfer.pause();
-            artistImage.classList.remove("playing");
-            playButton.innerHTML = "🎧 Play Song";
-        } else {
-            wavesurfer.play();
-            artistImage.classList.add("playing");
-            playButton.innerHTML = "⏸ Pause";
-        }
-    });
-
-    playButton.addEventListener("click", () => {
-        if (wavesurfer.isPlaying()) {
-            wavesurfer.pause();
-            artistImage.classList.remove("playing");
-            playButton.innerHTML = "🎧 Play Song";
-        } else {
-            wavesurfer.play();
-            artistImage.classList.add("playing");
-            playButton.innerHTML = "⏸ Pause";
-        }
-    });
-
-    wavesurfer.on("finish", () => {
-        artistImage.classList.remove("playing");
-        playButton.innerHTML = "🎧 Play Song";
-    });
-});
-</script>
 
 </body>
 </html>

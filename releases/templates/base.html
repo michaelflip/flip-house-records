@@ -117,64 +117,6 @@
     <p>&copy; 2025 Flip House Records</p>
   </footer>
 
-  <!-- Wavesurfer + Volume + Play Script -->
-  <script src="https://unpkg.com/wavesurfer.js"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const players = {};
-
-      document.querySelectorAll(".waveform").forEach((waveformDiv) => {
-        const audioUrl = waveformDiv.dataset.audio;
-
-        const wavesurfer = WaveSurfer.create({
-          container: waveformDiv,
-          waveColor: "#ccc",
-          progressColor: "#ff4f4f",
-          height: 60,
-          responsive: true
-        });
-
-        wavesurfer.load(audioUrl);
-        players[audioUrl] = wavesurfer;
-      });
-
-      document.querySelectorAll(".play-btn").forEach(btn => {
-        const icon = btn.querySelector("i");
-        const audioUrl = btn.dataset.audio;
-        const player = players[audioUrl];
-
-        btn.addEventListener("click", function () {
-          if (player.isPlaying()) {
-            player.pause();
-            icon.classList.remove("bi-pause-fill");
-            icon.classList.add("bi-play-fill");
-          } else {
-            Object.entries(players).forEach(([url, p]) => {
-              p.pause();
-              const otherBtnIcon = document.querySelector(`.play-btn[data-audio="${url}"] i`);
-              if (otherBtnIcon) {
-                otherBtnIcon.classList.remove("bi-pause-fill");
-                otherBtnIcon.classList.add("bi-play-fill");
-              }
-            });
-
-            player.play();
-            icon.classList.remove("bi-play-fill");
-            icon.classList.add("bi-pause-fill");
-          }
-        });
-      });
-
-      document.querySelectorAll(".volume-slider").forEach(slider => {
-        const audioUrl = slider.dataset.audio;
-        const player = players[audioUrl];
-
-        slider.addEventListener("input", function () {
-          player.setVolume(parseFloat(slider.value));
-        });
-      });
-    });
-  </script>
 
 </body>
 </html>
