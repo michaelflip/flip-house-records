@@ -65,12 +65,14 @@
       const audioUrl = waveformEl.dataset.audio;
       const index = waveformEl.dataset.index;
 
-      // Clear existing children
-      while (waveformEl.firstChild) {
-        waveformEl.removeChild(waveformEl.firstChild);
-      }
+      // Create an <audio> element and hide it
+      const audioEl = document.createElement('audio');
+      audioEl.src = audioUrl;
+      audioEl.controls = false;
+      audioEl.style.display = 'none';
+      waveformEl.appendChild(audioEl);
 
-      // Add container div for waveform
+      // Create a div for waveform
       const container = document.createElement('div');
       waveformEl.appendChild(container);
 
@@ -81,8 +83,8 @@
         height: 64,
         barWidth: 2,
         responsive: true,
-        backend: 'MediaElement', // Use native audio element for playback
-        mediaControls: false
+        backend: 'MediaElement',
+        media: audioEl // Attach the audio element
       });
 
       wavesurfer.load(audioUrl);
