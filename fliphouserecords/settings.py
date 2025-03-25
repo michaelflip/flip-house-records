@@ -2,11 +2,12 @@ from pathlib import Path
 import os
 import dj_database_url
 import mimetypes
+from storages.backends.s3boto3 import S3Boto3Storage  # ✅ FIX: This was missing
 
 # === Base Directory ===
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# === Secret Key ===
+# === Secret Key / Environment Vars ===
 SECRET_KEY = os.environ.get('SECRET_KEY')
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost').split(',')
@@ -20,10 +21,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'releases',
-    'storages',  # For S3 support
+    'storages',  # for AWS S3 support
 ]
 
-# === Middleware (No WhiteNoise) ===
+# === Middleware (WhiteNoise removed) ===
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -51,7 +52,7 @@ TEMPLATES = [
     },
 ]
 
-# === Database ===
+# === Database (Render PostgreSQL or fallback to SQLite) ===
 DATABASES = {
     'default': dj_database_url.config(
         default='sqlite:///db.sqlite3',
@@ -60,17 +61,17 @@ DATABASES = {
     )
 }
 
-# === AWS S3 Config ===
+# === AWS S3 Settings ===
 AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
 AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME", "us-east-1")
 AWS_S3_ADDRESSING_STYLE = "virtual"
 AWS_S3_FILE_OVERWRITE = False
-AWS_QUERYSTRING_AUTH = False
+AWS_QUERYSTRING_AUTH = False  # ⛔ No signed URLs for static/media
 AWS_DEFAULT_ACL = "public-read"
 
-# ✅ Define custom static and media storage backends
+# === Custom S3 Storage Backends ===
 class StaticStorage(S3Boto3Storage):
     location = "static"
     default_acl = "public-read"
@@ -80,16 +81,16 @@ class MediaStorage(S3Boto3Storage):
     file_overwrite = False
     default_acl = "public-read"
 
-# === Static Files ===
+# === Static Files (served from S3) ===
 STATICFILES_STORAGE = "fliphouserecords.settings.StaticStorage"
 STATIC_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
-# === Media Files ===
+# === Media Files (uploads served from S3) ===
 DEFAULT_FILE_STORAGE = "fliphouserecords.settings.MediaStorage"
 MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/"
 
-# === Admin, Auth, Security ===
+# === Authentication, Passwords, Security ===
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -97,6 +98,7 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
+# === Locale & Timezone ===
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
@@ -109,10 +111,10 @@ if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
 
-# === Fix MIME types for S3
+# === Fix MIME types (S3 requires explicit types sometimes)
 mimetypes.add_type("image/png", ".png", True)
 mimetypes.add_type("image/x-icon", ".ico", True)
 
-# === URLConf + WSGI
+# === Routing
 ROOT_URLCONF = "fliphouserecords.urls"
 WSGI_APPLICATION = "fliphouserecords.wsgi.application"
