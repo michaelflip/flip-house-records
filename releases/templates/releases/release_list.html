@@ -55,64 +55,37 @@
 {% endfor %}
 {% endblock %}
 
-<!-- Wavesurfer integration -->
+
 <!-- Wavesurfer integration -->
 <script src="https://unpkg.com/wavesurfer.js"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const players = {};
+  document.addEventListener("DOMContentLoaded", function () {
+    const waveforms = document.querySelectorAll(".waveform");
 
-    document.querySelectorAll('.waveform').forEach(function (waveformEl, index) {
-      const audioUrl = waveformEl.dataset.audio;
-
-      // Create hidden <audio> element
-      const audioEl = document.createElement('audio');
-      audioEl.src = audioUrl;
-      audioEl.controls = false;
-      audioEl.style.display = 'none';
-      waveformEl.appendChild(audioEl);
-
-      // Create waveform container
-      const container = document.createElement('div');
-      waveformEl.appendChild(container);
-
-      const wavesurfer = WaveSurfer.create({
-        container: container,
-        waveColor: '#bbb',
-        progressColor: '#ff0040',
-        height: 64,
-        barWidth: 2,
-        responsive: true,
-        backend: 'MediaElement',
-        media: audioEl,
+    waveforms.forEach((waveformEl) => {
+      const audioUrl = waveformEl.getAttribute("data-audio");
+      const player = WaveSurfer.create({
+        container: waveformEl,
+        waveColor: "violet",
+        progressColor: "purple",
+        url: audioUrl,
+        height: 80,
       });
 
-      wavesurfer.load(audioUrl);
-      players[index] = wavesurfer;
-
-      // Play button
-      const playBtn = waveformEl.closest('.release').querySelector('.play-btn');
+      // Bind to play button
+      const playBtn = waveformEl.closest(".release").querySelector(".play-btn");
       if (playBtn) {
-        playBtn.addEventListener('click', function () {
-          const player = players[index];
-          if (player) {
-		  console.log('Player exists?', !!player, player);
-
-            player.playPause();
-            playBtn.textContent = player.isPlaying() ? '⏸️' : '▶️';
-          }
+        playBtn.addEventListener("click", function () {
+          player.playPause();
+          playBtn.textContent = player.isPlaying() ? "⏸️" : "▶️";
         });
       }
 
       // Volume slider
-      const volumeSlider = waveformEl.closest('.release').querySelector('.volume-slider');
+      const volumeSlider = waveformEl.closest(".release").querySelector(".volume-slider");
       if (volumeSlider) {
-        volumeSlider.addEventListener('input', function () {
-          const volume = parseFloat(volumeSlider.value);
-          const player = players[index];
-          if (player) {
-            player.setVolume(volume);
-          }
+        volumeSlider.addEventListener("input", function () {
+          player.setVolume(parseFloat(volumeSlider.value));
         });
       }
     });
