@@ -1,12 +1,12 @@
 from django.db import models
 from django.utils import timezone
+from .storage_backends import MediaStorage
 
 class ReleasePost(models.Model):
     title = models.CharField(max_length=100)
     body = models.TextField(blank=True, null=True)
 
-    # New fields:
-from .storage_backends import MediaStorage
+
 
     album_art = models.ImageField(
         upload_to='album_art/',
