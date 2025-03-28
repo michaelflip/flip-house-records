@@ -11,11 +11,10 @@
       <h3 class="card-title">{{ post.title }}</h3>
       <p class="card-text">{{ post.body }}</p>
 
-      {% if post.tags %}
-        <p class="text-muted"><strong>Tags:</strong>
-          {% for tag in post.tags|cut:" "|split:"," %}
-            <a href="?tag={{ tag|urlencode }}" class="badge bg-primary text-white me-1">{{ tag }}</a>
-          {% endfor %}
+{% if post.tags %}
+  <p class="text-muted"><strong>Tags:</strong> {{ post.tags }}</p>
+{% endif %}
+
         </p>
       {% endif %}
 
