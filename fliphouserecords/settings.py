@@ -79,11 +79,11 @@ AWS_QUERYSTRING_AUTH = False         # Don't append auth tokens to URLs
 
 # === Static / Media Files ===
 STATIC_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/static/"
-STATICFILES_STORAGE = "storage_backends.StaticStorage"
+STATICFILES_STORAGE = "fliphouserecords.storage_backends.StaticStorage"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/"
-DEFAULT_FILE_STORAGE = "storage_backends.MediaStorage"
+DEFAULT_FILE_STORAGE = "fliphouserecords.storage_backends.MediaStorage"
 
 # === Authentication & Passwords ===
 AUTH_PASSWORD_VALIDATORS = [
