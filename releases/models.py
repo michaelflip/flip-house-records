@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils import timezone
-from .storage_backends import MediaStorage
+from fliphouserecords.storage_backends import MediaStorage
 
 class ReleasePost(models.Model):
     title = models.CharField(max_length=100)
