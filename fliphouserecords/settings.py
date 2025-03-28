@@ -75,23 +75,15 @@ AWS_QUERYSTRING_AUTH = False         # Don't append auth tokens to URLs
 
 
 
-# === Custom Storage Backends ===
-class StaticStorage(S3Boto3Storage):
-    location = "static"
-    default_acl = "public-read"
 
-class MediaStorage(S3Boto3Storage):
-    location = ""
-    default_acl = "public-read"
-    file_overwrite = False
 
 # === Static / Media Files ===
 STATIC_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/static/"
-STATICFILES_STORAGE = "fliphouserecords.settings.StaticStorage"
+STATICFILES_STORAGE = "storage_backends.StaticStorage"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/"
-DEFAULT_FILE_STORAGE = "fliphouserecords.settings.MediaStorage"
+DEFAULT_FILE_STORAGE = "storage_backends.MediaStorage"
 
 # === Authentication & Passwords ===
 AUTH_PASSWORD_VALIDATORS = [
