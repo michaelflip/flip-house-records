@@ -1,0 +1,28 @@
+name: Fix S3 Static File Metadata
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  fix-metadata:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install dependencies
+        run: pip install boto3
+
+      - name: Run fix_static_metadata.py
+        run: python fix_static_metadata.py
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
