@@ -19,12 +19,14 @@
       <img src="{{ post.album_art.url }}" alt="{{ post.title }} album art" class="img-fluid mb-3" style="max-height: 300px;">
     {% endif %}
 
-    {% if post.track_preview %}
-      <audio controls style="width: 100%;">
-        <source src="{{ post.track_preview.url }}" type="audio/{{ post.track_preview.url|slice:"-3" }}">
-        Your browser does not support the audio element.
-      </audio>
-    {% endif %}
+
+{% if post.track_preview %}
+  <audio controls style="width: 100%;">
+    <source src="{{ post.track_preview.url }}" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+{% endif %}
+
 
     <p class="mt-3 text-muted"><strong>Released:</strong> {{ post.release_datetime|date:"F j, Y" }}</p>
   </div>
