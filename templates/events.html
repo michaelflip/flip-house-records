@@ -5,8 +5,7 @@
   <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
 
   <meta charset="UTF-8">
-  <title>Flip House Records</title>
-  <!-- Updated path to local Bootstrap CSS -->
+  <title>Events - Flip House Records</title>
   <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap');
@@ -15,12 +14,10 @@
       background-color: black;
       color: white;
       margin: 0;
-      height: 100vh;
+      min-height: 100vh;
       font-family: 'Orbitron', sans-serif;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
     }
 
     nav {
@@ -53,6 +50,13 @@
       min-width: fit-content;
     }
 
+    .nav-button:hover {
+      background: white;
+      color: black;
+      transform: scale(1.05);
+      box-shadow: 0 0 20px white;
+    }
+
     @media (min-width: 768px) {
       nav {
         gap: 1rem;
@@ -65,38 +69,65 @@
       }
     }
 
-    .nav-button:hover {
-      background: white;
-      color: black;
-      transform: scale(1.05);
-      box-shadow: 0 0 20px white;
-    }
-
-    .nav-button::after {
-      content: "";
-      background: rgba(255, 255, 255, 0.5);
-      position: absolute;
-      border-radius: 50%;
-      transform: scale(0);
-      opacity: 0;
-      transition: transform 0.4s, opacity 0.4s;
-      pointer-events: none;
-    }
-
-    .logo {
-      width: 50%;
-      max-width: 600px;
-      height: auto;
-      margin-bottom: 1rem;
-    }
-
-    .tagline {
-      font-size: 1.5rem;
-      color: white;
+    .events-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 120px 20px 80px;
       text-align: center;
-      text-shadow: 2px 2px 10px rgba(255, 255, 255, 0.3);
-      letter-spacing: 2px;
-      text-transform: uppercase;
+    }
+
+    .construction-icon {
+      font-size: 5rem;
+      margin: 40px 0;
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+
+    .events-title {
+      font-size: 3rem;
+      margin-bottom: 30px;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+      letter-spacing: 3px;
+    }
+
+    .events-message {
+      font-size: 1.5rem;
+      margin: 30px auto;
+      max-width: 700px;
+      line-height: 1.8;
+      letter-spacing: 1px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .events-message p {
+      margin: 20px 0;
+    }
+
+    footer {
+      padding: 20px;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+      .events-title {
+        font-size: 2rem;
+      }
+
+      .events-message {
+        font-size: 1.2rem;
+      }
+
+      .construction-icon {
+        font-size: 4rem;
+      }
     }
   </style>
 </head>
@@ -112,11 +143,16 @@
     <button class="nav-button" onclick="window.location.href='/contact/'">Contact</button>
   </nav>
 
-  <!-- Centered Logo -->
-  <img src="{% static 'img/fliphouserecords.png' %}" alt="Flip House Records Logo" class="logo">
-
-  <!-- Tagline -->
-<div class="tagline">Flip House Records. Michaelflip2. Automatix The Album. Adaptz. Season Premiere. 2026.</div>
+  <div class="events-content">
+    <div class="construction-icon">
+      🚧
+    </div>
+    <h1 class="events-title">EVENTS</h1>
+    <div class="events-message">
+      <p>Under construction.</p>
+      <p>Events coming soon. Stay tuned.</p>
+    </div>
+  </div>
 
   <!-- JavaScript for Ripple Effect -->
   <script>

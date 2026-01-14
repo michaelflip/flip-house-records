@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from releases.views import homepage, artists, contact, merch  # ✅ added merch
+from releases.views import homepage, artists, contact, merch, events  
 
 urlpatterns = [
     path('', homepage, name='home'),
@@ -10,7 +10,8 @@ urlpatterns = [
     path('releases/', include('releases.urls')),
     path('artists/', artists, name='artists'),
     path('contact/', contact, name='contact'),
-    path('merch/', merch, name='merch'),  # ✅ new line
+    path('merch/', merch, name='merch'),
+    path('events/', events, name='events'),  
 ]
 
 if settings.DEBUG:

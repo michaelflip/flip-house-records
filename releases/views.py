@@ -37,3 +37,6 @@ def contact(request):
     
 def merch(request):
     return render(request, 'merch.html')
+    
+def events(request):
+    return render(request, 'events.html')

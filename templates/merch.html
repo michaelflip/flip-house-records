@@ -22,26 +22,44 @@
 
     nav {
       position: absolute;
-      top: 20px;
+      top: 10px;
       left: 50%;
       transform: translateX(-50%);
       display: flex;
-      gap: 1rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
       z-index: 10;
+      padding: 0 10px;
+      justify-content: center;
+      max-width: 100%;
     }
 
     .nav-button {
       background: none;
       border: 2px solid white;
       color: white;
-      padding: 0.5rem 1.2rem;
+      padding: 0.6rem 1rem;
       border-radius: 50px;
-      font-size: 1rem;
+      font-size: 0.85rem;
       cursor: pointer;
       position: relative;
       overflow: hidden;
       transition: all 0.3s ease;
       box-shadow: 0 0 10px white;
+      white-space: nowrap;
+      min-width: fit-content;
+    }
+
+    @media (min-width: 768px) {
+      nav {
+        gap: 1rem;
+        top: 20px;
+      }
+      
+      .nav-button {
+        padding: 0.5rem 1.2rem;
+        font-size: 1rem;
+      }
     }
 
     .nav-button:hover {
@@ -116,6 +134,7 @@
     <button class="nav-button" onclick="window.location.href='/'">Home</button>
     <button class="nav-button" onclick="window.location.href='/artists/'">Artists</button>
     <button class="nav-button" onclick="window.location.href='/releases/'">Releases</button>
+    <button class="nav-button" onclick="window.location.href='/events/'">Events</button>
     <button class="nav-button" onclick="window.location.href='/merch/'">Merch</button>
     <button class="nav-button" onclick="window.location.href='/contact/'">Contact</button>
   </nav>
