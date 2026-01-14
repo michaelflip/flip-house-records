@@ -2,14 +2,15 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from releases.views import homepage, artists, contact  # ✅ added contact
+from releases.views import homepage, artists, contact, merch  # ✅ added merch
 
 urlpatterns = [
     path('', homepage, name='home'),
     path('admin/', admin.site.urls),
     path('releases/', include('releases.urls')),
     path('artists/', artists, name='artists'),
-    path('contact/', contact, name='contact'),  # ✅ new line
+    path('contact/', contact, name='contact'),
+    path('merch/', merch, name='merch'),  # ✅ new line
 ]
 
 if settings.DEBUG:
