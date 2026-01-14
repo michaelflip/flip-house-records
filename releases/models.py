@@ -6,8 +6,6 @@ class ReleasePost(models.Model):
     title = models.CharField(max_length=100)
     body = models.TextField(blank=True, null=True)
 
-
-
     album_art = models.ImageField(
         upload_to='album_art/',
         storage=MediaStorage(),
@@ -28,3 +26,43 @@ class ReleasePost(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Artist(models.Model):
+    # Required field
+    name = models.CharField(max_length=200, help_text="Artist name (required)")
+    
+    # Optional fields
+    hometown = models.CharField(max_length=200, blank=True, null=True, help_text="Hometown/Location")
+    genre = models.CharField(max_length=200, blank=True, null=True, help_text="Music genre")
+    bio = models.TextField(blank=True, null=True, help_text="Artist biography")
+    
+    # Image field for headshot/display photo
+    headshot = models.ImageField(
+        upload_to='artist_headshots/',
+        storage=MediaStorage(),
+        blank=True,
+        null=True,
+        help_text="Artist headshot or display image"
+    )
+    
+    # Optional social/music links
+    soundcloud_url = models.URLField(max_length=500, blank=True, null=True, help_text="SoundCloud profile URL")
+    linktree_url = models.URLField(max_length=500, blank=True, null=True, help_text="Linktree or other link URL")
+    
+    # Additional optional links
+    instagram_url = models.URLField(max_length=500, blank=True, null=True, help_text="Instagram profile URL")
+    spotify_url = models.URLField(max_length=500, blank=True, null=True, help_text="Spotify profile URL")
+    
+    # Order for display
+    display_order = models.IntegerField(default=0, help_text="Lower numbers appear first")
+    
+    # Timestamp
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['display_order', 'name']
+
+    def __str__(self):
+        return self.name

@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <title>Flip House Records - Artists</title>
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-    <link rel="stylesheet" href="{% static 'css/artists.css' %}">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap');
 
@@ -13,17 +12,16 @@
             background-color: black;
             color: white;
             margin: 0;
-            height: 100vh;
+            min-height: 100vh;
             font-family: 'Orbitron', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            padding-bottom: 50px;
         }
 
         nav {
-            position: absolute;
+            position: fixed;
             top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
             gap: 1rem;
             z-index: 10;
@@ -48,55 +46,139 @@
             box-shadow: 0 0 20px white;
         }
 
-        .artist-section {
-            padding-top: 100px;
-            max-width: 800px;
+        .artists-container {
+            padding-top: 120px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .page-title {
             text-align: center;
-            backdrop-filter: blur(5px);
-            background: rgba(0, 0, 0, 0.5);
-            padding: 20px;
-            border-radius: 10px;
+            font-size: 3rem;
+            margin-bottom: 50px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            letter-spacing: 3px;
         }
 
-        .artist-image {
-            width: 100%;
-            max-width: 400px;
+        .artist-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
             border-radius: 15px;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
-        }
-
-        .song-title {
-            font-size: 2rem;
-            font-weight: bold;
-            margin-top: 10px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            text-shadow: 0px 0px 10px rgba(255, 255, 255, 0.8);
-        }
-
-        .listen-button {
-            margin-top: 20px;
-            background: #ff4500;
-            border: none;
-            color: white;
-            padding: 12px 25px;
-            font-size: 1.2rem;
-            border-radius: 5px;
-            cursor: pointer;
+            padding: 30px;
+            margin-bottom: 40px;
             transition: all 0.3s ease;
-            box-shadow: 0px 0px 15px rgba(255, 69, 0, 0.8);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
         }
 
-        .listen-button:hover {
-            background: white;
-            color: black;
-            box-shadow: 0px 0px 25px rgba(255, 255, 255, 1);
-            transform: scale(1.1);
+        .artist-card:hover {
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .artist-header {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .artist-headshot {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        }
+
+        .artist-info {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .artist-name {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            letter-spacing: 2px;
+        }
+
+        .artist-detail {
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .artist-detail-label {
+            color: rgba(255, 255, 255, 0.6);
+            margin-right: 10px;
+        }
+
+        .artist-bio {
+            margin-top: 20px;
+            line-height: 1.6;
+            font-family: Arial, sans-serif;
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .artist-links {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .artist-link {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+        }
+
+        .artist-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.8);
+            color: white;
+        }
+
+        .no-artists {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-top: 100px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        @media (max-width: 768px) {
+            .artist-header {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .artist-headshot {
+                width: 150px;
+                height: 150px;
+            }
+
+            .artist-name {
+                font-size: 2rem;
+                text-align: center;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
         }
     </style>
 </head>
 <body>
-<div class="background-overlay"></div>
 
 <nav>
     <button class="nav-button" onclick="window.location.href='/'">Home</button>
@@ -105,13 +187,73 @@
     <button class="nav-button" onclick="window.location.href='/contact/'">Contact</button>
 </nav>
 
-<div class="artist-section">
-    <img id="artist-image" src="{% static 'img/automatix.png' %}" alt="Automatix Band" class="artist-image">
-    <h1 class="song-title">Automatix - Punkrawkslapper</h1>
-    <div id="waveform"></div>
-    <button id="play-button" class="listen-button">🎧 Play Song</button>
-</div>
+<div class="artists-container">
+    <h1 class="page-title">ARTISTS</h1>
 
+    {% if artists %}
+        {% for artist in artists %}
+        <div class="artist-card">
+            <div class="artist-header">
+                {% if artist.headshot %}
+                <img src="{{ artist.headshot.url }}" alt="{{ artist.name }}" class="artist-headshot">
+                {% else %}
+                <div class="artist-headshot" style="display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.1);">
+                    <span style="font-size: 3rem; color: rgba(255, 255, 255, 0.3);">♪</span>
+                </div>
+                {% endif %}
+
+                <div class="artist-info">
+                    <h2 class="artist-name">{{ artist.name }}</h2>
+                    
+                    {% if artist.hometown %}
+                    <div class="artist-detail">
+                        <span class="artist-detail-label">📍 Location:</span>
+                        <span>{{ artist.hometown }}</span>
+                    </div>
+                    {% endif %}
+
+                    {% if artist.genre %}
+                    <div class="artist-detail">
+                        <span class="artist-detail-label">🎵 Genre:</span>
+                        <span>{{ artist.genre }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if artist.bio %}
+            <div class="artist-bio">
+                {{ artist.bio|linebreaks }}
+            </div>
+            {% endif %}
+
+            {% if artist.soundcloud_url or artist.linktree_url or artist.instagram_url or artist.spotify_url %}
+            <div class="artist-links">
+                {% if artist.soundcloud_url %}
+                <a href="{{ artist.soundcloud_url }}" target="_blank" class="artist-link">🎧 SoundCloud</a>
+                {% endif %}
+
+                {% if artist.spotify_url %}
+                <a href="{{ artist.spotify_url }}" target="_blank" class="artist-link">🎵 Spotify</a>
+                {% endif %}
+
+                {% if artist.instagram_url %}
+                <a href="{{ artist.instagram_url }}" target="_blank" class="artist-link">📸 Instagram</a>
+                {% endif %}
+
+                {% if artist.linktree_url %}
+                <a href="{{ artist.linktree_url }}" target="_blank" class="artist-link">🔗 Linktree</a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="no-artists">
+            No artists added yet. Add artists through the admin panel.
+        </div>
+    {% endif %}
+</div>
 
 </body>
 </html>

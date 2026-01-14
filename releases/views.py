@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import ReleasePost
+from .models import ReleasePost, Artist
 from .forms import ReleaseUploadForm
 
 def release_list(request, tag=None):
@@ -28,4 +28,6 @@ def homepage(request):
     return render(request, "index.html")
 
 def artists(request):
-    return render(request, "artists.html")
+    # Fetch all artists from the database, ordered by display_order and name
+    artist_list = Artist.objects.all()
+    return render(request, "artists.html", {'artists': artist_list})
