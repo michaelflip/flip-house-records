@@ -31,3 +31,6 @@ def artists(request):
     # Fetch all artists from the database, ordered by display_order and name
     artist_list = Artist.objects.all()
     return render(request, "artists.html", {'artists': artist_list})
+    
+def contact(request):
+    return render(request, "contact.html")

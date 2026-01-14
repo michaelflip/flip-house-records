@@ -2,13 +2,14 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from releases.views import homepage, artists  # ✅ import your homepage view
+from releases.views import homepage, artists, contact  # ✅ added contact
 
 urlpatterns = [
-    path('', homepage, name='home'),  # ✅ this line routes the root URL to index.html
+    path('', homepage, name='home'),
     path('admin/', admin.site.urls),
     path('releases/', include('releases.urls')),
     path('artists/', artists, name='artists'),
+    path('contact/', contact, name='contact'),  # ✅ new line
 ]
 
 if settings.DEBUG:
