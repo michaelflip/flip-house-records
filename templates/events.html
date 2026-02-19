@@ -153,14 +153,37 @@
       z-index: 1;
     }
 
-    .event-body {
-      font-family: Arial, sans-serif;
-      font-size: 1rem;
-      line-height: 1.7;
-      margin-bottom: 20px;
-      color: rgba(255, 255, 255, 0.9);
+    /* Two-column layout: left = info, right = flyer */
+    .event-layout {
+      display: flex;
+      gap: 30px;
+      align-items: flex-start;
       position: relative;
       z-index: 1;
+    }
+
+    .event-left {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .event-right {
+      flex: 0 0 280px;
+      max-width: 280px;
+    }
+
+    .event-flyer {
+      width: 100%;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+      display: block;
+    }
+
+    .event-flyer:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 50px rgba(255, 255, 255, 0.4);
     }
 
     .event-meta {
@@ -171,36 +194,21 @@
       margin-bottom: 20px;
       font-size: 0.95rem;
       color: rgba(255, 255, 255, 0.85);
-      position: relative;
-      z-index: 1;
       display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
+      flex-direction: column;
+      gap: 8px;
     }
 
     .event-meta span strong {
       color: white;
     }
 
-    .event-flyer-container {
-      text-align: center;
-      margin: 25px 0;
-      position: relative;
-      z-index: 1;
-    }
-
-    .event-flyer {
-      max-width: 100%;
-      max-height: 500px;
-      border: 3px solid rgba(255, 255, 255, 0.3);
-      border-radius: 10px;
-      box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
-      transition: all 0.3s ease;
-    }
-
-    .event-flyer:hover {
-      transform: scale(1.02);
-      box-shadow: 0 0 50px rgba(255, 255, 255, 0.4);
+    .event-body {
+      font-family: Arial, sans-serif;
+      font-size: 1rem;
+      line-height: 1.7;
+      margin-bottom: 20px;
+      color: rgba(255, 255, 255, 0.9);
     }
 
     .event-tags {
@@ -211,32 +219,68 @@
       margin-bottom: 20px;
       font-size: 0.85rem;
       color: rgba(255, 255, 255, 0.7);
-      position: relative;
-      z-index: 1;
     }
 
     .event-tags strong {
       color: white;
     }
 
-    .ticket-link {
-      display: inline-block;
+    /* Action buttons row: tickets + maps */
+    .event-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
       margin-top: 15px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 12px 28px;
+    }
+
+    .ticket-link,
+    .maps-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 20px;
       border-radius: 25px;
       text-decoration: none;
-      font-size: 1rem;
+      font-size: 0.9rem;
+      font-family: 'Orbitron', sans-serif;
       transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .ticket-link {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
       box-shadow: 0 0 15px rgba(102, 126, 234, 0.5);
-      position: relative;
-      z-index: 1;
     }
 
     .ticket-link:hover {
       transform: translateY(-3px);
       box-shadow: 0 0 25px rgba(102, 126, 234, 0.8);
+      color: white;
+    }
+
+    .maps-link-google {
+      background: linear-gradient(135deg, #4285f4 0%, #1a73e8 100%);
+      color: white;
+      box-shadow: 0 0 15px rgba(66, 133, 244, 0.4);
+    }
+
+    .maps-link-google:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 25px rgba(66, 133, 244, 0.7);
+      color: white;
+    }
+
+    .maps-link-apple {
+      background: linear-gradient(135deg, #555 0%, #333 100%);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+    }
+
+    .maps-link-apple:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 25px rgba(255, 255, 255, 0.25);
       color: white;
     }
 
@@ -254,7 +298,7 @@
       border-top: 2px solid rgba(255, 255, 255, 0.1);
     }
 
-    /* Responsive */
+    /* Responsive: stack on mobile */
     @media (max-width: 768px) {
       .page-title {
         font-size: 2rem;
@@ -266,6 +310,16 @@
 
       .event-title {
         font-size: 1.5rem;
+      }
+
+      .event-layout {
+        flex-direction: column;
+      }
+
+      .event-right {
+        flex: none;
+        max-width: 100%;
+        width: 100%;
       }
     }
   </style>
@@ -290,31 +344,50 @@
     <div class="event-card">
       <h3 class="event-title">{{ event.title }}</h3>
 
-      <div class="event-meta">
-        <span>📅 <strong>Date:</strong> {{ event.event_date|date:"F j, Y, g:i a" }}</span>
-        {% if event.venue %}<span>🎪 <strong>Venue:</strong> {{ event.venue }}</span>{% endif %}
-        {% if event.location %}<span>📍 <strong>Location:</strong> {{ event.location }}</span>{% endif %}
+      <div class="event-layout">
+
+        <!-- LEFT: all the info -->
+        <div class="event-left">
+
+          <div class="event-meta">
+            <span>📅 <strong>Date:</strong> {{ event.event_date|date:"F j, Y, g:i a" }}</span>
+            {% if event.venue %}<span>🎪 <strong>Venue:</strong> {{ event.venue }}</span>{% endif %}
+            {% if event.location %}<span>📍 <strong>Location:</strong> {{ event.location }}</span>{% endif %}
+          </div>
+
+          {% if event.description %}
+          <div class="event-body">{{ event.description|linebreaks }}</div>
+          {% endif %}
+
+          {% if event.tags %}
+          <div class="event-tags">
+            <strong>Tags:</strong> {{ event.tags }}
+          </div>
+          {% endif %}
+
+          <!-- Buttons: tickets + maps -->
+          <div class="event-actions">
+            {% if event.ticket_link %}
+            <a href="{{ event.ticket_link }}" target="_blank" class="ticket-link">🎟️ Get Tickets</a>
+            {% endif %}
+            {% if event.location %}
+            <a href="https://maps.google.com/?q={{ event.location|urlencode }}{% if event.venue %},{{ event.venue|urlencode }}{% endif %}"
+               target="_blank" class="maps-link maps-link-google">🗺️ Google Maps</a>
+            <a href="https://maps.apple.com/?q={{ event.location|urlencode }}{% if event.venue %},{{ event.venue|urlencode }}{% endif %}"
+               target="_blank" class="maps-link maps-link-apple"> Apple Maps</a>
+            {% endif %}
+          </div>
+
+        </div>
+
+        <!-- RIGHT: flyer image -->
+        {% if event.flyer %}
+        <div class="event-right">
+          <img src="{{ event.flyer.url }}" alt="{{ event.title }} flyer" class="event-flyer">
+        </div>
+        {% endif %}
+
       </div>
-
-      {% if event.description %}
-      <div class="event-body">{{ event.description|linebreaks }}</div>
-      {% endif %}
-
-      {% if event.flyer %}
-      <div class="event-flyer-container">
-        <img src="{{ event.flyer.url }}" alt="{{ event.title }} flyer" class="event-flyer">
-      </div>
-      {% endif %}
-
-      {% if event.tags %}
-      <div class="event-tags">
-        <strong>Tags:</strong> {{ event.tags }}
-      </div>
-      {% endif %}
-
-      {% if event.ticket_link %}
-      <a href="{{ event.ticket_link }}" target="_blank" class="ticket-link">🎟️ Get Tickets</a>
-      {% endif %}
     </div>
     {% empty %}
     <div class="no-events">
