@@ -3,51 +3,79 @@
 <html lang="en">
 <head>
   <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
-
+  <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
   <meta charset="UTF-8">
-  <title>Events - Flip House Records</title>
+  <title>Flip House Records - Events</title>
   <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap');
 
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       background-color: black;
       color: white;
-      margin: 0;
-      min-height: 100vh;
       font-family: 'Orbitron', sans-serif;
-      display: flex;
-      flex-direction: column;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
     }
 
+    /* Fixed Navigation Bar */
     nav {
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 15px 10px;
       display: flex;
       flex-wrap: wrap;
-      gap: 0.5rem;
-      z-index: 10;
-      padding: 0 10px;
       justify-content: center;
-      max-width: 100%;
+      gap: 0.5rem;
+      z-index: 1000;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
+    }
+
+    @media (min-width: 768px) {
+      nav {
+        padding: 20px 0;
+        gap: 1rem;
+      }
     }
 
     .nav-button {
       background: none;
       border: 2px solid white;
       color: white;
-      padding: 0.6rem 1rem;
+      padding: 0.4rem 0.9rem;
       border-radius: 50px;
       font-size: 0.85rem;
       cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+      white-space: nowrap;
       position: relative;
       overflow: hidden;
-      transition: all 0.3s ease;
-      box-shadow: 0 0 10px white;
-      white-space: nowrap;
-      min-width: fit-content;
+    }
+
+    @media (min-width: 768px) {
+      .nav-button {
+        padding: 0.5rem 1.2rem;
+        font-size: 1rem;
+      }
     }
 
     .nav-button:hover {
@@ -57,83 +85,194 @@
       box-shadow: 0 0 20px white;
     }
 
-    @media (min-width: 768px) {
-      nav {
-        gap: 1rem;
-        top: 20px;
-      }
-      
-      .nav-button {
-        padding: 0.5rem 1.2rem;
-        font-size: 1rem;
-      }
+    /* Main Container */
+    .events-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 120px 20px 60px 20px;
     }
 
-    .events-content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 120px 20px 80px;
+    .page-title {
       text-align: center;
-    }
-
-    .construction-icon {
-      font-size: 5rem;
-      margin: 40px 0;
-      animation: bounce 2s ease-in-out infinite;
-    }
-
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-20px); }
-    }
-
-    .events-title {
       font-size: 3rem;
-      margin-bottom: 30px;
+      margin-bottom: 50px;
       text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
       letter-spacing: 3px;
     }
 
-    .events-message {
-      font-size: 1.5rem;
-      margin: 30px auto;
-      max-width: 700px;
-      line-height: 1.8;
+    /* Event Cards */
+    .event-card {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(10px);
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 15px;
+      padding: 30px;
+      margin-bottom: 40px;
+      transition: all 0.4s ease;
+      box-shadow:
+        0 0 20px rgba(255, 255, 255, 0.1),
+        inset 0 0 30px rgba(255, 255, 255, 0.02);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .event-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.05),
+        transparent
+      );
+      transition: left 0.5s ease;
+    }
+
+    .event-card:hover::before {
+      left: 100%;
+    }
+
+    .event-card:hover {
+      border-color: rgba(255, 255, 255, 0.6);
+      box-shadow:
+        0 0 40px rgba(255, 255, 255, 0.2),
+        inset 0 0 50px rgba(255, 255, 255, 0.05);
+      transform: translateY(-5px);
+    }
+
+    .event-title {
+      font-size: 2rem;
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
       letter-spacing: 1px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .event-body {
+      font-family: Arial, sans-serif;
+      font-size: 1rem;
+      line-height: 1.7;
+      margin-bottom: 20px;
       color: rgba(255, 255, 255, 0.9);
+      position: relative;
+      z-index: 1;
     }
 
-    .events-message p {
-      margin: 20px 0;
+    .event-meta {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 12px 15px;
+      margin-bottom: 20px;
+      font-size: 0.95rem;
+      color: rgba(255, 255, 255, 0.85);
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
     }
 
-    footer {
-      padding: 20px;
+    .event-meta span strong {
+      color: white;
+    }
+
+    .event-flyer-container {
       text-align: center;
-      font-size: 0.9rem;
+      margin: 25px 0;
+      position: relative;
+      z-index: 1;
     }
 
+    .event-flyer {
+      max-width: 100%;
+      max-height: 500px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .event-flyer:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 50px rgba(255, 255, 255, 0.4);
+    }
+
+    .event-tags {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 12px 15px;
+      margin-bottom: 20px;
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.7);
+      position: relative;
+      z-index: 1;
+    }
+
+    .event-tags strong {
+      color: white;
+    }
+
+    .ticket-link {
+      display: inline-block;
+      margin-top: 15px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 12px 28px;
+      border-radius: 25px;
+      text-decoration: none;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 15px rgba(102, 126, 234, 0.5);
+      position: relative;
+      z-index: 1;
+    }
+
+    .ticket-link:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 25px rgba(102, 126, 234, 0.8);
+      color: white;
+    }
+
+    .no-events {
+      text-align: center;
+      font-size: 1.5rem;
+      margin-top: 100px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .footer {
+      text-align: center;
+      color: rgba(255, 255, 255, 0.6);
+      padding: 40px 20px;
+      border-top: 2px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Responsive */
     @media (max-width: 768px) {
-      .events-title {
+      .page-title {
         font-size: 2rem;
       }
 
-      .events-message {
-        font-size: 1.2rem;
+      .event-card {
+        padding: 20px;
       }
 
-      .construction-icon {
-        font-size: 4rem;
+      .event-title {
+        font-size: 1.5rem;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- Navigation Buttons -->
+  <!-- Fixed Navigation -->
   <nav>
     <button class="nav-button" onclick="window.location.href='/'">Home</button>
     <button class="nav-button" onclick="window.location.href='/artists/'">Artists</button>
@@ -143,39 +282,67 @@
     <button class="nav-button" onclick="window.location.href='/contact/'">Contact</button>
   </nav>
 
-  <div class="events-content">
-    <div class="construction-icon">
-      🚧
+  <!-- Main Content -->
+  <div class="events-container">
+    <h1 class="page-title">🎤 EVENTS</h1>
+
+    {% for event in events %}
+    <div class="event-card">
+      <h3 class="event-title">{{ event.title }}</h3>
+
+      <div class="event-meta">
+        <span>📅 <strong>Date:</strong> {{ event.event_date|date:"F j, Y, g:i a" }}</span>
+        {% if event.venue %}<span>🎪 <strong>Venue:</strong> {{ event.venue }}</span>{% endif %}
+        {% if event.location %}<span>📍 <strong>Location:</strong> {{ event.location }}</span>{% endif %}
+      </div>
+
+      {% if event.description %}
+      <div class="event-body">{{ event.description|linebreaks }}</div>
+      {% endif %}
+
+      {% if event.flyer %}
+      <div class="event-flyer-container">
+        <img src="{{ event.flyer.url }}" alt="{{ event.title }} flyer" class="event-flyer">
+      </div>
+      {% endif %}
+
+      {% if event.tags %}
+      <div class="event-tags">
+        <strong>Tags:</strong> {{ event.tags }}
+      </div>
+      {% endif %}
+
+      {% if event.ticket_link %}
+      <a href="{{ event.ticket_link }}" target="_blank" class="ticket-link">🎟️ Get Tickets</a>
+      {% endif %}
     </div>
-    <h1 class="events-title">EVENTS</h1>
-    <div class="events-message">
-      <p>Under construction.</p>
-      <p>Events coming soon. Stay tuned.</p>
+    {% empty %}
+    <div class="no-events">
+      No upcoming events. Stay tuned!
     </div>
+    {% endfor %}
   </div>
 
-  <!-- JavaScript for Ripple Effect -->
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2025 Flip House Records</p>
+  </footer>
+
+  <!-- Ripple Effect -->
   <script>
     const buttons = document.querySelectorAll('.nav-button');
-
     buttons.forEach(button => {
       button.addEventListener('click', function (e) {
         const ripple = document.createElement('span');
         ripple.classList.add('ripple');
-
         const rect = this.getBoundingClientRect();
         ripple.style.left = `${e.clientX - rect.left}px`;
         ripple.style.top = `${e.clientY - rect.top}px`;
-
         this.appendChild(ripple);
-
-        setTimeout(() => {
-          ripple.remove();
-        }, 600);
+        setTimeout(() => ripple.remove(), 600);
       });
     });
 
-    // Add ripple effect styles
     const style = document.createElement('style');
     style.innerHTML = `
       .ripple {
@@ -188,19 +355,12 @@
         animation: ripple-effect 0.6s linear;
         pointer-events: none;
       }
-
       @keyframes ripple-effect {
-        to {
-          transform: scale(4);
-          opacity: 0;
-        }
+        to { transform: scale(4); opacity: 0; }
       }
     `;
     document.head.appendChild(style);
   </script>
 
-  <footer class="footer">
-    <p>&copy; 2025 Flip House Records</p>
-  </footer>
 </body>
 </html>
