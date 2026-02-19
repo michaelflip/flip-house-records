@@ -66,3 +66,30 @@ class Artist(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Event(models.Model):
+    title = models.CharField(max_length=200, help_text="Event name (required)")
+    description = models.TextField(blank=True, null=True, help_text="Event description")
+    venue = models.CharField(max_length=200, blank=True, null=True, help_text="Venue name")
+    location = models.CharField(max_length=200, blank=True, null=True, help_text="City, State or full address")
+    event_date = models.DateTimeField(default=timezone.now, help_text="Date and time of the event")
+    ticket_link = models.URLField(max_length=500, blank=True, null=True, help_text="Link to buy tickets")
+    flyer = models.ImageField(
+        upload_to='event_flyers/',
+        storage=MediaStorage(),
+        blank=True,
+        null=True,
+        help_text="Event flyer image"
+    )
+    tags = models.CharField(max_length=300, blank=True, null=True, help_text="Comma-separated tags (e.g. hip hop, modesto, 209)")
+
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-event_date']
+
+    def __str__(self):
+        return f"{self.title} - {self.event_date.strftime('%B %d, %Y')}"

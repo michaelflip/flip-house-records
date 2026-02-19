@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import ReleasePost, Artist
+from .models import ReleasePost, Artist, Event
 from .forms import ReleaseUploadForm
 
 def release_list(request, tag=None):
@@ -38,5 +38,12 @@ def contact(request):
 def merch(request):
     return render(request, 'merch.html')
     
-def events(request):
-    return render(request, 'events.html')
+def events(request, tag=None):
+    if tag:
+        event_list = Event.objects.filter(tags__icontains=tag).order_by('-event_date')
+    else:
+        event_list = Event.objects.order_by('-event_date')
+    return render(request, 'events.html', {
+        'events': event_list,
+        'active_tag': tag,
+    })
