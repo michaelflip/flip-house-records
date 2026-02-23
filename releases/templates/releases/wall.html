@@ -611,6 +611,8 @@
       <p>By using The Wall, you represent that you are at least 13 years of age. If you are under 18, you represent that you have parental permission to be here.</p>
       <h3>6. PRIVACY NOTE</h3>
       <p>We may log IP addresses to prevent abuse and spam. We do not sell your data, but we will cooperate with law enforcement if illegal activity is detected on the platform.</p>
+      <h3>7. EMAIL & NEWSLETTER</h3>
+      <p>You may optionally provide your email address when reserving a username. Your email is used for password recovery and, if you choose, to receive occasional updates and newsletters from Flip House Records. We will <strong>never</strong> share, sell, or rent your email to any third party. You can opt out at any time by contacting us.</p>
     </div>
     <button class="tos-close-btn" onclick="closeTosPopup()">← CLOSE</button>
   </div>
@@ -655,6 +657,23 @@
         <button class="modal-btn primary" id="pwSubmitBtn">CONFIRM</button>
         <button class="modal-btn" id="reserveBtn" style="display:none;">RESERVE NAME</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Email Prompt Modal -->
+<div class="modal-overlay hidden" id="emailModal">
+  <div class="modal-box">
+    <div class="modal-title">ADD YOUR EMAIL?</div>
+    <div class="modal-sub" id="emailModalSub">
+      Optionally add your email for password recovery.<br><br>
+      <span style="color:rgba(255,255,255,0.4);font-size:0.75rem;">We may also send occasional newsletters — we will never share or sell your information. You can skip this.</span>
+    </div>
+    <input class="modal-input" type="email" id="emailInput" placeholder="your@email.com (optional)" maxlength="254" autocomplete="email">
+    <div class="modal-error" id="emailError"></div>
+    <div class="modal-btn-row">
+      <button class="modal-btn" id="emailSkipBtn">SKIP</button>
+      <button class="modal-btn primary" id="emailSaveBtn">SAVE EMAIL</button>
     </div>
   </div>
 </div>
@@ -997,6 +1016,7 @@ function connectChat() {
     else if (msg.type === 'username_status') { handleUsernameStatus(msg); }
     else if (msg.type === 'reserve_result') { handleReserveResult(msg); }
     else if (msg.type === 'auth_result') { handleAuthResult(msg); }
+    else if (msg.type === 'email_result') { handleEmailResult(msg); }
   };
 }
 
@@ -1111,13 +1131,41 @@ document.getElementById('reserveBtn').addEventListener('click', () => {
 });
 
 function handleReserveResult(msg) {
-  if (msg.success) { finalizeUsername(pendingUsername); }
-  else { document.getElementById('pwError').textContent = msg.error || 'Error.'; }
+  if (msg.success) {
+    finalizeUsername(pendingUsername);
+    // Just reserved — always offer email
+    setTimeout(() => openEmailModal(
+      'Add your email for password recovery.<br><br>' +
+      '<span style="color:rgba(255,255,255,0.4);font-size:0.75rem;">We may also send occasional newsletters — we will never share or sell your information. You can skip this.</span>'
+    ), 400);
+  } else {
+    document.getElementById('pwError').textContent = msg.error || 'Error.';
+  }
 }
 
 function handleAuthResult(msg) {
-  if (msg.success) { finalizeUsername(pendingUsername); }
-  else { document.getElementById('pwError').textContent = msg.error || 'Wrong password.'; }
+  if (msg.success) {
+    finalizeUsername(pendingUsername);
+    // If they logged in but have no email on file, prompt them
+    if (!msg.has_email) {
+      setTimeout(() => openEmailModal(
+        'Welcome back! You don't have an email on file.<br><br>' +
+        'Add one for password recovery — we may also send occasional newsletters. ' +
+        '<span style="color:rgba(255,255,255,0.4);font-size:0.75rem;">We will never share or sell your information.</span>'
+      ), 400);
+    }
+  } else {
+    document.getElementById('pwError').textContent = msg.error || 'Wrong password.';
+  }
+}
+
+function handleEmailResult(msg) {
+  if (msg.success) {
+    closeEmailModal();
+    appendMessage('', '// email saved successfully //', '', true);
+  } else {
+    document.getElementById('emailError').textContent = msg.error || 'Could not save email.';
+  }
 }
 
 function finalizeUsername(name) {
@@ -1134,6 +1182,37 @@ function openUsernameModal() {
   document.getElementById('usernameInput').value = myUsername || '';
   document.getElementById('modalError').textContent = '';
 }
+
+// ── Email modal ──────────────────────────────────────────────
+const emailModal = document.getElementById('emailModal');
+
+function openEmailModal(subText) {
+  if (subText) document.getElementById('emailModalSub').innerHTML = subText;
+  document.getElementById('emailInput').value = '';
+  document.getElementById('emailError').textContent = '';
+  emailModal.classList.remove('hidden');
+}
+
+function closeEmailModal() {
+  emailModal.classList.add('hidden');
+}
+
+document.getElementById('emailSkipBtn').addEventListener('click', closeEmailModal);
+
+document.getElementById('emailSaveBtn').addEventListener('click', () => {
+  const email = document.getElementById('emailInput').value.trim();
+  if (!email) { closeEmailModal(); return; }
+  if (!myUsername) { closeEmailModal(); return; }
+  if (!chatWS || chatWS.readyState !== WebSocket.OPEN) {
+    document.getElementById('emailError').textContent = 'Not connected. Try again.';
+    return;
+  }
+  chatWS.send(JSON.stringify({ type: 'save_email', username: myUsername, email }));
+});
+
+document.getElementById('emailInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('emailSaveBtn').click();
+});
 
 // ToS
 const tosModal = document.getElementById('tosModal');

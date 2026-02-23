@@ -186,6 +186,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 **result,
             }))
 
+        elif action == "save_email":
+            username = msg.get("username", "").strip()[:50]
+            email = msg.get("email", "").strip()[:254]
+            result = await self.save_email(username, email)
+            await self.send(text_data=json.dumps({
+                "type": "email_result",
+                **result,
+            }))
+
     async def chat_broadcast(self, event):
         await self.send(text_data=json.dumps({
             "type": "message",
@@ -204,9 +213,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
         from releases.models import ChatUsername
         try:
             entry = ChatUsername.objects.get(username__iexact=username)
-            return {"taken": True, "password_protected": True}
+            return {"taken": True, "password_protected": True, "has_email": bool(entry.email)}
         except ChatUsername.DoesNotExist:
-            return {"taken": False, "password_protected": False}
+            return {"taken": False, "password_protected": False, "has_email": False}
 
     @database_sync_to_async
     def reserve_username(self, username, password):
@@ -227,7 +236,22 @@ class ChatConsumer(AsyncWebsocketConsumer):
         try:
             entry = ChatUsername.objects.get(username__iexact=username)
             if verify_password(password, entry.password_hash):
-                return {"success": True}
+                return {"success": True, "has_email": bool(entry.email)}
             return {"success": False, "error": "Wrong password."}
+        except ChatUsername.DoesNotExist:
+            return {"success": False, "error": "Username not found."}
+
+    @database_sync_to_async
+    def save_email(self, username, email):
+        from releases.models import ChatUsername
+        import re
+        # Basic email validation
+        if email and not re.match(r'^[^@]+@[^@]+\.[^@]+$', email):
+            return {"success": False, "error": "Invalid email address."}
+        try:
+            entry = ChatUsername.objects.get(username__iexact=username)
+            entry.email = email if email else None
+            entry.save(update_fields=['email'])
+            return {"success": True}
         except ChatUsername.DoesNotExist:
             return {"success": False, "error": "Username not found."}
