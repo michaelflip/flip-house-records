@@ -31,13 +31,10 @@
       min-height: 100vh;
     }
 
-    /* Fixed Navigation Bar */
     nav {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      background: rgba(0, 0, 0, 0.95);
+      top: 0; left: 0; right: 0;
+      background: rgba(0,0,0,0.95);
       backdrop-filter: blur(10px);
       padding: 15px 10px;
       display: flex;
@@ -45,44 +42,31 @@
       justify-content: center;
       gap: 0.5rem;
       z-index: 1000;
-      border-bottom: 2px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
+      border-bottom: 2px solid rgba(255,255,255,0.2);
+      box-shadow: 0 4px 20px rgba(255,255,255,0.1);
     }
 
     @media (min-width: 768px) {
-      nav {
-        padding: 20px 0;
-        gap: 1rem;
-      }
+      nav { padding: 18px 10px; gap: 0.75rem; }
     }
 
     .nav-button {
       background: none;
       border: 2px solid white;
       color: white;
-      padding: 0.4rem 0.9rem;
+      padding: 0.45rem 1rem;
       border-radius: 50px;
+      font-family: 'Orbitron', sans-serif;
       font-size: 0.85rem;
       cursor: pointer;
       transition: all 0.3s ease;
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
       white-space: nowrap;
-      position: relative;
-      overflow: hidden;
-    }
-
-    @media (min-width: 768px) {
-      .nav-button {
-        padding: 0.5rem 1.2rem;
-        font-size: 1rem;
-      }
     }
 
     .nav-button:hover {
       background: white;
       color: black;
       transform: scale(1.05);
-      box-shadow: 0 0 20px white;
     }
 
     /* Main Container */
@@ -333,6 +317,8 @@
     <button class="nav-button" onclick="window.location.href='/releases/'">Releases</button>
     <button class="nav-button" onclick="window.location.href='/events/'">Events</button>
     <button class="nav-button" onclick="window.location.href='/merch/'">Merch</button>
+    <button class="nav-button" onclick="window.location.href='/links/'">Links</button>
+    <button class="nav-button" onclick="window.location.href='/wall/'">The Wall</button>
     <button class="nav-button" onclick="window.location.href='/contact/'">Contact</button>
   </nav>
 

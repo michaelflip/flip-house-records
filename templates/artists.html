@@ -23,53 +23,44 @@
 
         nav {
             position: fixed;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
+            top: 0; left: 0; right: 0;
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 10px;
             display: flex;
             flex-wrap: wrap;
-            gap: 0.5rem;
-            z-index: 10;
-            padding: 0 10px;
             justify-content: center;
-            max-width: 100%;
+            gap: 0.5rem;
+            z-index: 1000;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+            box-shadow: 0 4px 20px rgba(255,255,255,0.1);
+        }
+
+        @media (min-width: 768px) {
+            nav { padding: 18px 10px; gap: 0.75rem; }
         }
 
         .nav-button {
             background: none;
             border: 2px solid white;
             color: white;
-            padding: 0.6rem 1rem;
+            padding: 0.45rem 1rem;
             border-radius: 50px;
+            font-family: 'Orbitron', sans-serif;
             font-size: 0.85rem;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 0 10px white;
             white-space: nowrap;
-            min-width: fit-content;
         }
 
         .nav-button:hover {
             background: white;
             color: black;
             transform: scale(1.05);
-            box-shadow: 0 0 20px white;
-        }
-
-        @media (min-width: 768px) {
-            nav {
-                gap: 1rem;
-                top: 20px;
-            }
-            
-            .nav-button {
-                padding: 0.5rem 1.2rem;
-                font-size: 1rem;
-            }
         }
 
         .artists-container {
-            padding-top: 120px;
+            padding-top: 100px;
             max-width: 1200px;
             margin: 0 auto;
             padding-left: 20px;
@@ -208,6 +199,8 @@
     <button class="nav-button" onclick="window.location.href='/releases/'">Releases</button>
     <button class="nav-button" onclick="window.location.href='/events/'">Events</button>
     <button class="nav-button" onclick="window.location.href='/merch/'">Merch</button>
+    <button class="nav-button" onclick="window.location.href='/links/'">Links</button>
+    <button class="nav-button" onclick="window.location.href='/wall/'">The Wall</button>
     <button class="nav-button" onclick="window.location.href='/contact/'">Contact</button>
 </nav>
 
