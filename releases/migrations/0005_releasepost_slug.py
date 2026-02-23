@@ -22,15 +22,15 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        # Step 1: add column without unique constraint, allowing blanks
         migrations.AddField(
             model_name='releasepost',
             name='slug',
             field=models.SlugField(max_length=120, blank=True, default=''),
         ),
-        # Step 2: populate slugs for all existing rows
         migrations.RunPython(populate_slugs, migrations.RunPython.noop),
-        # Step 3: now add the unique constraint safely
         migrations.AlterField(
             model_name='releasepost',
             name='slug',
+            field=models.SlugField(max_length=120, unique=True, blank=True),
+        ),
+    ]
