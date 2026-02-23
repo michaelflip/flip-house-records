@@ -16,8 +16,8 @@ def release_list(request, tag=None):
     })
 
 
-def release_detail(request, pk):
-    post = get_object_or_404(ReleasePost, pk=pk)
+def release_detail(request, slug):
+    post = get_object_or_404(ReleasePost, slug=slug)
     return render(request, 'releases/release_detail.html', {'post': post})
 
 

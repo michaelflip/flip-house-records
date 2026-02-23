@@ -1,10 +1,12 @@
 from django.db import models
 from django.utils import timezone
+from django.utils.text import slugify
 from fliphouserecords.storage_backends import MediaStorage
 
 
 class ReleasePost(models.Model):
     title = models.CharField(max_length=100)
+    slug = models.SlugField(max_length=120, unique=True, blank=True)
     body = models.TextField(blank=True, null=True)
 
     album_art = models.ImageField(
@@ -23,6 +25,17 @@ class ReleasePost(models.Model):
     youtube_url = models.URLField(max_length=500, blank=True, null=True, help_text="YouTube video URL (optional — used instead of or alongside audio file)")
     tags = models.CharField(max_length=200, blank=True, null=True, help_text="Comma-separated tags (e.g. boom bap, chill, 209)")
     release_datetime = models.DateTimeField(default=timezone.now, blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base = slugify(self.title)
+            slug = base
+            n = 1
+            while ReleasePost.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base}-{n}"
+                n += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title
