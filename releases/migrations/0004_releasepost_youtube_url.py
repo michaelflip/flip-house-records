@@ -14,8 +14,3 @@ class Migration(migrations.Migration):
             field=models.URLField(blank=True, help_text='YouTube video URL (optional — used instead of or alongside audio file)', max_length=500, null=True),
         ),
     ]
-```
-
-Create that file, commit and push, then in the Render Shell just run:
-```
-python manage.py migrate
