@@ -1,540 +1,447 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Flip House Records - The Wall</title>
-  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Share+Tech+Mono&display=swap');
 
-    :root {
-      --white: #ffffff;
-      --dim: rgba(255,255,255,0.5);
-      --faint: rgba(255,255,255,0.08);
-      --border: rgba(255,255,255,0.15);
-    }
+{% block title %}Flip House Records - The Wall{% endblock %}
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+{% block extra_css %}
+<style>
+  :root {
+    --white: #ffffff;
+    --dim: rgba(255,255,255,0.5);
+    --faint: rgba(255,255,255,0.08);
+    --border: rgba(255,255,255,0.15);
+  }
 
-    body {
-      background: #000;
-      color: #fff;
-      font-family: 'Orbitron', sans-serif;
-      min-height: 100vh;
-    }
+  .page-wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 110px 16px 80px;
+  }
 
-    /* ── NAV ── */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      background: rgba(0,0,0,0.95);
-      backdrop-filter: blur(10px);
-      padding: 18px 0;
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 0.6rem;
-      z-index: 1000;
-      border-bottom: 2px solid rgba(255,255,255,0.2);
-    }
-    .nav-button {
-      background: none;
-      border: 2px solid white;
-      color: white;
-      padding: 0.45rem 1rem;
-      border-radius: 50px;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    .nav-button:hover, .nav-button.active {
-      background: white; color: black; transform: scale(1.05);
-    }
+  .page-title {
+    text-align: center;
+    font-size: 2.6rem;
+    letter-spacing: 5px;
+    margin-bottom: 6px;
+    text-shadow: 0 0 30px rgba(255,255,255,0.4);
+  }
 
-    /* ── LAYOUT ── */
-    .page-wrap {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 110px 16px 80px;
-    }
+  .page-sub {
+    text-align: center;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--dim);
+    letter-spacing: 3px;
+    margin-bottom: 50px;
+  }
 
-    .page-title {
-      text-align: center;
-      font-size: 2.6rem;
-      letter-spacing: 5px;
-      margin-bottom: 6px;
-      text-shadow: 0 0 30px rgba(255,255,255,0.4);
-    }
-    .page-sub {
-      text-align: center;
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.8rem;
-      color: var(--dim);
-      letter-spacing: 3px;
-      margin-bottom: 50px;
-    }
+  .section-header {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 4px;
+    color: rgba(255,255,255,0.35);
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px;
+    margin-bottom: 22px;
+  }
 
-    /* ── SECTION HEADERS ── */
-    .section-header {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.7rem;
-      letter-spacing: 4px;
-      color: rgba(255,255,255,0.35);
-      text-transform: uppercase;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 10px;
-      margin-bottom: 22px;
-    }
+  .canvas-section { margin-bottom: 60px; }
 
-    /* ═══════════════════════════════════
-       CANVAS SECTION
-    ═══════════════════════════════════ */
-    .canvas-section {
-      margin-bottom: 60px;
-    }
+  .canvas-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
 
-    .canvas-toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 16px;
-    }
+  .tool-btn {
+    background: var(--faint);
+    border: 1px solid var(--border);
+    color: #fff;
+    padding: 7px 16px;
+    border-radius: 6px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 1px;
+  }
+  .tool-btn:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.4); }
+  .tool-btn.active { background: #fff; color: #000; border-color: #fff; }
 
-    .tool-btn {
-      background: var(--faint);
-      border: 1px solid var(--border);
-      color: #fff;
-      padding: 7px 16px;
-      border-radius: 6px;
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.82rem;
-      cursor: pointer;
-      transition: all 0.2s;
-      letter-spacing: 1px;
-    }
-    .tool-btn:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.4); }
-    .tool-btn.active { background: #fff; color: #000; border-color: #fff; }
+  .size-slider-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--dim);
+  }
+  #brushSize { width: 80px; accent-color: #fff; }
 
-    .size-slider-wrap {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.78rem;
-      color: var(--dim);
-    }
-    #brushSize { width: 80px; accent-color: #fff; }
+  .color-swatch {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform 0.15s, border-color 0.15s;
+    flex-shrink: 0;
+  }
+  .color-swatch:hover { transform: scale(1.15); }
+  .color-swatch.selected { border-color: #fff; transform: scale(1.2); }
 
-    .color-swatch {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      border: 2px solid transparent;
-      cursor: pointer;
-      transition: transform 0.15s, border-color 0.15s;
-      flex-shrink: 0;
-    }
-    .color-swatch:hover { transform: scale(1.15); }
-    .color-swatch.selected { border-color: #fff; transform: scale(1.2); }
+  #colorPicker {
+    width: 32px;
+    height: 32px;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    cursor: pointer;
+    background: none;
+    padding: 0;
+  }
 
-    #colorPicker {
-      width: 32px;
-      height: 32px;
-      border: 2px solid var(--border);
-      border-radius: 50%;
-      cursor: pointer;
-      background: none;
-      padding: 0;
-    }
+  .canvas-outer {
+    position: relative;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    background: #111;
+    box-shadow: 0 0 40px rgba(255,255,255,0.06);
+    touch-action: none;
+  }
 
-    .canvas-outer {
-      position: relative;
-      border: 2px solid var(--border);
-      border-radius: 10px;
-      overflow: hidden;
-      background: #111;
-      box-shadow: 0 0 40px rgba(255,255,255,0.06);
-      touch-action: none;
-    }
+  #wallCanvas {
+    display: block;
+    width: 100%;
+    cursor: crosshair;
+    image-rendering: pixelated;
+  }
 
-    #wallCanvas {
-      display: block;
-      width: 100%;
-      cursor: crosshair;
-      image-rendering: pixelated;
-    }
+  .canvas-status {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.3);
+    margin-top: 10px;
+    letter-spacing: 1px;
+  }
 
-    .canvas-status {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.72rem;
-      color: rgba(255,255,255,0.3);
-      margin-top: 10px;
-      letter-spacing: 1px;
-    }
+  .username-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
 
-    /* ═══════════════════════════════════
-       CHAT SECTION
-    ═══════════════════════════════════ */
-    .chat-section {}
+  .username-display {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.9rem;
+    color: var(--white);
+    background: var(--faint);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 7px 14px;
+    letter-spacing: 1px;
+  }
 
-    /* Username bar */
-    .username-bar {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-    }
+  .username-tag {
+    font-size: 0.68rem;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 1px;
+    font-family: 'Share Tech Mono', monospace;
+  }
 
-    .username-display {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.9rem;
-      color: var(--white);
-      background: var(--faint);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 7px 14px;
-      letter-spacing: 1px;
-    }
+  .chat-window {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    height: 320px;
+    overflow-y: auto;
+    padding: 16px;
+    margin-bottom: 14px;
+    scroll-behavior: smooth;
+  }
+  .chat-window::-webkit-scrollbar { width: 4px; }
+  .chat-window::-webkit-scrollbar-track { background: transparent; }
+  .chat-window::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
 
-    .username-tag {
-      font-size: 0.68rem;
-      color: rgba(255,255,255,0.3);
-      letter-spacing: 1px;
-      font-family: 'Share Tech Mono', monospace;
-    }
+  .chat-msg {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.83rem;
+    line-height: 1.6;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .chat-msg:last-child { border-bottom: none; }
+  .chat-msg .ts { color: rgba(255,255,255,0.2); font-size: 0.72rem; margin-right: 6px; }
+  .chat-msg .user { color: #fff; font-weight: bold; margin-right: 6px; }
+  .chat-msg .text { color: rgba(255,255,255,0.8); }
+  .chat-msg.system .text { color: rgba(255,255,255,0.3); font-style: italic; }
 
-    /* Chat window */
-    .chat-window {
-      background: rgba(255,255,255,0.02);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      height: 320px;
-      overflow-y: auto;
-      padding: 16px;
-      margin-bottom: 14px;
-      scroll-behavior: smooth;
-    }
+  .chat-input-row { display: flex; gap: 10px; }
 
-    .chat-window::-webkit-scrollbar { width: 4px; }
-    .chat-window::-webkit-scrollbar-track { background: transparent; }
-    .chat-window::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+  .chat-input {
+    flex: 1;
+    background: var(--faint);
+    border: 1px solid var(--border);
+    color: #fff;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.88rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .chat-input:focus { border-color: rgba(255,255,255,0.45); }
+  .chat-input::placeholder { color: rgba(255,255,255,0.2); }
 
-    .chat-msg {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.83rem;
-      line-height: 1.6;
-      padding: 4px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-    }
-    .chat-msg:last-child { border-bottom: none; }
-    .chat-msg .ts { color: rgba(255,255,255,0.2); font-size: 0.72rem; margin-right: 6px; }
-    .chat-msg .user { color: #fff; font-weight: bold; margin-right: 6px; }
-    .chat-msg .text { color: rgba(255,255,255,0.8); }
-    .chat-msg.system .text { color: rgba(255,255,255,0.3); font-style: italic; }
+  .chat-send-btn {
+    background: #fff;
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 22px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.8rem;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+  }
+  .chat-send-btn:hover { background: rgba(255,255,255,0.85); transform: scale(1.03); }
 
-    /* Input row */
-    .chat-input-row {
-      display: flex;
-      gap: 10px;
-    }
+  /* Modals */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(6px);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.hidden { display: none; }
 
-    .chat-input {
-      flex: 1;
-      background: var(--faint);
-      border: 1px solid var(--border);
-      color: #fff;
-      border-radius: 8px;
-      padding: 10px 14px;
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.88rem;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-    .chat-input:focus { border-color: rgba(255,255,255,0.45); }
-    .chat-input::placeholder { color: rgba(255,255,255,0.2); }
+  .modal-box {
+    background: #0a0a0a;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 14px;
+    padding: 36px 32px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 0 60px rgba(255,255,255,0.08);
+  }
 
-    .chat-send-btn {
-      background: #fff;
-      color: #000;
-      border: none;
-      border-radius: 8px;
-      padding: 10px 22px;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.8rem;
-      cursor: pointer;
-      letter-spacing: 1px;
-      transition: all 0.2s;
-    }
-    .chat-send-btn:hover { background: rgba(255,255,255,0.85); transform: scale(1.03); }
+  .modal-title { font-size: 1.1rem; letter-spacing: 3px; margin-bottom: 8px; }
+  .modal-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--dim);
+    margin-bottom: 24px;
+    letter-spacing: 1px;
+    line-height: 1.6;
+  }
 
-    /* Username modal */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.85);
-      backdrop-filter: blur(6px);
-      z-index: 2000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    .modal-overlay.hidden { display: none; }
+  .modal-input {
+    width: 100%;
+    background: var(--faint);
+    border: 1px solid var(--border);
+    color: #fff;
+    border-radius: 8px;
+    padding: 11px 14px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.9rem;
+    outline: none;
+    margin-bottom: 12px;
+    transition: border-color 0.2s;
+  }
+  .modal-input:focus { border-color: rgba(255,255,255,0.45); }
+  .modal-input::placeholder { color: rgba(255,255,255,0.2); }
 
-    .modal-box {
-      background: #0a0a0a;
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 14px;
-      padding: 36px 32px;
-      width: 100%;
-      max-width: 420px;
-      box-shadow: 0 0 60px rgba(255,255,255,0.08);
-    }
+  .modal-error {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.78rem;
+    color: #ff6b6b;
+    margin-bottom: 12px;
+    min-height: 18px;
+    letter-spacing: 1px;
+  }
 
-    .modal-title {
-      font-size: 1.1rem;
-      letter-spacing: 3px;
-      margin-bottom: 8px;
-    }
-    .modal-sub {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.78rem;
-      color: var(--dim);
-      margin-bottom: 24px;
-      letter-spacing: 1px;
-      line-height: 1.6;
-    }
+  .modal-btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
 
-    .modal-input {
-      width: 100%;
-      background: var(--faint);
-      border: 1px solid var(--border);
-      color: #fff;
-      border-radius: 8px;
-      padding: 11px 14px;
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.9rem;
-      outline: none;
-      margin-bottom: 12px;
-      transition: border-color 0.2s;
-    }
-    .modal-input:focus { border-color: rgba(255,255,255,0.45); }
-    .modal-input::placeholder { color: rgba(255,255,255,0.2); }
+  .modal-btn {
+    flex: 1;
+    background: none;
+    border: 1px solid var(--border);
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.78rem;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+  }
+  .modal-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.4); }
+  .modal-btn.primary { background: #fff; color: #000; border-color: #fff; }
+  .modal-btn.primary:hover { background: rgba(255,255,255,0.88); }
 
-    .modal-error {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.78rem;
-      color: #ff6b6b;
-      margin-bottom: 12px;
-      min-height: 18px;
-      letter-spacing: 1px;
-    }
+  #pwStep { display: none; }
 
-    .modal-btn-row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
+  /* ToS Modal */
+  #tosModal .modal-box { max-width: 520px; }
 
-    .modal-btn {
-      flex: 1;
-      background: none;
-      border: 1px solid var(--border);
-      color: #fff;
-      padding: 10px 16px;
-      border-radius: 8px;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.78rem;
-      cursor: pointer;
-      letter-spacing: 1px;
-      transition: all 0.2s;
-    }
-    .modal-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.4); }
-    .modal-btn.primary { background: #fff; color: #000; border-color: #fff; }
-    .modal-btn.primary:hover { background: rgba(255,255,255,0.88); }
+  .tos-link {
+    color: #fff;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    cursor: pointer;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+    transition: opacity 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .tos-link:hover { opacity: 0.7; }
+  .tos-link::after { content: ' ↗'; font-size: 0.8rem; opacity: 0.6; }
 
-    /* password prompt step */
-    #pwStep { display: none; }
+  .tos-agree-btn {
+    width: 100%;
+    margin-top: 20px;
+    background: #fff;
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    padding: 13px 20px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.78rem;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+  }
+  .tos-agree-btn:hover { background: rgba(255,255,255,0.88); transform: scale(1.02); }
 
-    /* ── ToS MODAL ── */
-    #tosModal .modal-box { max-width: 520px; }
+  .tos-decline-btn {
+    width: 100%;
+    margin-top: 10px;
+    background: none;
+    color: rgba(255,255,255,0.35);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.78rem;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+  }
+  .tos-decline-btn:hover { color: rgba(255,255,255,0.6); border-color: rgba(255,255,255,0.25); }
 
-    .tos-link {
-      color: #fff;
-      text-decoration: underline;
-      text-decoration-style: dotted;
-      cursor: pointer;
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.95rem;
-      letter-spacing: 1px;
-      transition: opacity 0.2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .tos-link:hover { opacity: 0.7; }
-    .tos-link::after { content: ' ↗'; font-size: 0.8rem; opacity: 0.6; }
+  #tosPopup {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.92);
+    backdrop-filter: blur(8px);
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  #tosPopup.hidden { display: none; }
 
-    .tos-agree-btn {
-      width: 100%;
-      margin-top: 20px;
-      background: #fff;
-      color: #000;
-      border: none;
-      border-radius: 8px;
-      padding: 13px 20px;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.78rem;
-      cursor: pointer;
-      letter-spacing: 1px;
-      transition: all 0.2s;
-    }
-    .tos-agree-btn:hover { background: rgba(255,255,255,0.88); transform: scale(1.02); }
+  .tos-popup-box {
+    background: #0a0a0a;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 14px;
+    padding: 36px 32px;
+    width: 100%;
+    max-width: 640px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 0 60px rgba(255,255,255,0.08);
+  }
+  .tos-popup-box::-webkit-scrollbar { width: 4px; }
+  .tos-popup-box::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
 
-    .tos-decline-btn {
-      width: 100%;
-      margin-top: 10px;
-      background: none;
-      color: rgba(255,255,255,0.35);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 8px;
-      padding: 10px 20px;
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.78rem;
-      cursor: pointer;
-      letter-spacing: 1px;
-      transition: all 0.2s;
-    }
-    .tos-decline-btn:hover { color: rgba(255,255,255,0.6); border-color: rgba(255,255,255,0.25); }
+  .tos-popup-title { font-size: 1rem; letter-spacing: 3px; margin-bottom: 4px; }
+  .tos-popup-date {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 2px;
+    margin-bottom: 24px;
+  }
+  .tos-popup-body {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.75);
+  }
+  .tos-popup-body h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.78rem;
+    color: #fff;
+    letter-spacing: 2px;
+    margin: 20px 0 8px;
+  }
+  .tos-popup-body ul { padding-left: 18px; margin: 6px 0; }
+  .tos-popup-body li { margin-bottom: 6px; }
 
-    /* Full ToS popup window */
-    #tosPopup {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.92);
-      backdrop-filter: blur(8px);
-      z-index: 3000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    #tosPopup.hidden { display: none; }
+  .tos-close-btn {
+    margin-top: 28px;
+    background: none;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.6);
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.78rem;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+  }
+  .tos-close-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
 
-    .tos-popup-box {
-      background: #0a0a0a;
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 14px;
-      padding: 36px 32px;
-      width: 100%;
-      max-width: 640px;
-      max-height: 80vh;
-      overflow-y: auto;
-      box-shadow: 0 0 60px rgba(255,255,255,0.08);
-    }
-    .tos-popup-box::-webkit-scrollbar { width: 4px; }
-    .tos-popup-box::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+  #canvasLock {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 2px;
+    border-radius: 10px;
+  }
+  #canvasLock.hidden { display: none; }
 
-    .tos-popup-title { font-size: 1rem; letter-spacing: 3px; margin-bottom: 4px; }
-    .tos-popup-date {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.72rem;
-      color: rgba(255,255,255,0.3);
-      letter-spacing: 2px;
-      margin-bottom: 24px;
-    }
-    .tos-popup-body {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.8rem;
-      line-height: 1.8;
-      color: rgba(255,255,255,0.75);
-    }
-    .tos-popup-body h3 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.78rem;
-      color: #fff;
-      letter-spacing: 2px;
-      margin: 20px 0 8px;
-    }
-    .tos-popup-body ul { padding-left: 18px; margin: 6px 0; }
-    .tos-popup-body li { margin-bottom: 6px; }
+  @media (max-width: 600px) {
+    .page-title { font-size: 1.8rem; }
+    .canvas-toolbar { gap: 6px; }
+  }
+</style>
+{% endblock %}
 
-    .tos-close-btn {
-      margin-top: 28px;
-      background: none;
-      border: 1px solid rgba(255,255,255,0.2);
-      color: rgba(255,255,255,0.6);
-      border-radius: 8px;
-      padding: 10px 24px;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.78rem;
-      cursor: pointer;
-      letter-spacing: 1px;
-      transition: all 0.2s;
-    }
-    .tos-close-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
+{% block body %}
 
-    /* Lock overlay on canvas until ToS agreed */
-    #canvasLock {
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      backdrop-filter: blur(4px);
-      z-index: 10;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.85rem;
-      color: rgba(255,255,255,0.4);
-      letter-spacing: 2px;
-      border-radius: 10px;
-    }
-    #canvasLock.hidden { display: none; }
-
-    .footer {
-      text-align: center;
-      color: rgba(255,255,255,0.3);
-      padding: 40px 20px;
-      font-size: 0.8rem;
-      border-top: 1px solid rgba(255,255,255,0.08);
-      margin-top: 60px;
-    }
-
-    @media (max-width: 600px) {
-      .page-title { font-size: 1.8rem; }
-      .canvas-toolbar { gap: 6px; }
-    }
-  </style>
-</head>
-<body>
-
-<!-- ── NAV ── -->
-<nav>
-  <button class="nav-button" onclick="location.href='/'">Home</button>
-  <button class="nav-button" onclick="location.href='/artists/'">Artists</button>
-  <button class="nav-button" onclick="location.href='/releases/'">Releases</button>
-  <button class="nav-button" onclick="location.href='/events/'">Events</button>
-  <button class="nav-button" onclick="location.href='/merch/'">Merch</button>
-  <button class="nav-button" onclick="location.href='/links/'">Links</button>
-  <button class="nav-button active" onclick="location.href='/wall/'">The Wall</button>
-  <button class="nav-button" onclick="location.href='/contact/'">Contact</button>
-</nav>
-
-<!-- ── ToS FULL POPUP ── -->
+<!-- ToS Full Popup -->
 <div id="tosPopup" class="hidden">
   <div class="tos-popup-box">
     <div class="tos-popup-title">TERMS OF SERVICE: "THE WALL"</div>
     <div class="tos-popup-date">Last Updated: February 22, 2026</div>
     <div class="tos-popup-body">
       <p>Welcome to The Wall at fliphouserecords.com. By clicking "I Agree" or by accessing and using this page, you are entering into a legally binding agreement. If you don't agree to these terms, please head back to the main site.</p>
-
       <h3>1. COMMUNITY CONDUCT (THE "DON'T BE A JERK" POLICY)</h3>
       <p>"The Wall" is a shared creative space. To keep it functional and fun, you agree not to:</p>
       <ul>
@@ -543,10 +450,8 @@
         <li>Post "Doxxing" information (phone numbers, home addresses, or private data).</li>
         <li>Use bots or scripts to automate drawing or spam the chat room.</li>
       </ul>
-
       <h3>2. USER-GENERATED CONTENT & LICENSING</h3>
       <p>You own what you create, but because this is a public, shared experience, you grant Flip House Records a non-exclusive, royalty-free, worldwide license to display, record, and share snapshots of "The Wall" (including your contributions) for promotional or archival purposes.</p>
-
       <h3>3. MODERATION & "THE RIGHT TO ERASE"</h3>
       <p>We don't pre-screen content, but we reserve the right to:</p>
       <ul>
@@ -554,13 +459,10 @@
         <li>Delete specific drawings or chat messages that violate these terms.</li>
         <li>Ban IP addresses or users who repeatedly disrupt the experience.</li>
       </ul>
-
       <h3>4. DISCLAIMER OF LIABILITY</h3>
       <p>The Wall is provided "As-Is." Flip House Records is not responsible for the content created by users. You understand that you may be exposed to content that is offensive, indecent, or objectionable. We are not liable for any emotional distress, data loss, or technical "glitches" that occur while using this experimental tool.</p>
-
       <h3>5. AGE REQUIREMENT</h3>
       <p>By using The Wall, you represent that you are at least 13 years of age. If you are under 18, you represent that you have parental permission to be here.</p>
-
       <h3>6. PRIVACY NOTE</h3>
       <p>We may log IP addresses to prevent abuse and spam. We do not sell your data, but we will cooperate with law enforcement if illegal activity is detected on the platform.</p>
     </div>
@@ -568,7 +470,7 @@
   </div>
 </div>
 
-<!-- ── ToS AGREEMENT MODAL ── -->
+<!-- ToS Agreement Modal -->
 <div class="modal-overlay" id="tosModal">
   <div class="modal-box">
     <div class="modal-title">BEFORE YOU ENTER</div>
@@ -582,7 +484,7 @@
   </div>
 </div>
 
-<!-- ── USERNAME MODAL ── -->
+<!-- Username Modal -->
 <div class="modal-overlay hidden" id="usernameModal">
   <div class="modal-box">
     <div class="modal-title">ENTER THE WALL</div>
@@ -590,8 +492,6 @@
       Type a username or leave blank for a random one.<br>
       Reserved names require a password.
     </div>
-
-    <!-- Step 1: pick a name -->
     <div id="nameStep">
       <input class="modal-input" type="text" id="usernameInput" placeholder="username (optional)" maxlength="50" autocomplete="off">
       <div class="modal-error" id="modalError"></div>
@@ -600,8 +500,6 @@
         <button class="modal-btn primary" id="enterBtn">ENTER</button>
       </div>
     </div>
-
-    <!-- Step 2: password (if name is taken) -->
     <div id="pwStep">
       <div style="font-family:'Share Tech Mono',monospace;font-size:0.82rem;color:var(--dim);margin-bottom:14px;" id="pwLabel"></div>
       <input class="modal-input" type="password" id="passwordInput" placeholder="password" maxlength="100" autocomplete="off">
@@ -612,45 +510,29 @@
         <button class="modal-btn" id="reserveBtn" style="display:none;">RESERVE NAME</button>
       </div>
     </div>
-
   </div>
 </div>
 
-<!-- ── MAIN ── -->
+<!-- Main Content -->
 <div class="page-wrap">
   <h1 class="page-title">THE WALL</h1>
   <p class="page-sub">// LEAVE YOUR MARK //</p>
 
-  <!-- ══ CANVAS ══ -->
   <div class="canvas-section">
     <div class="section-header">PAINT — shared canvas, open to all</div>
-
     <div class="canvas-toolbar">
-      <!-- Tools -->
       <button class="tool-btn active" id="btnDraw" onclick="setTool('draw')">✏ DRAW</button>
       <button class="tool-btn" id="btnErase" onclick="setTool('erase')">◻ ERASE</button>
       <button class="tool-btn" id="btnFill" onclick="setTool('fill')">⬛ FILL</button>
-
-      <!-- Brush size -->
       <div class="size-slider-wrap">
         <span>SIZE</span>
         <input type="range" id="brushSize" min="1" max="20" value="3">
         <span id="sizeLabel">3</span>
       </div>
-
-      <!-- Palette swatches -->
-      {% for hex in "#ffffff #ff4444 #ff8c00 #ffd700 #44ff88 #00cfff #7b61ff #ff61d8 #000000 #555555 #c0a060 #1a1a2e" %}{% endfor %}
-      <div id="palette" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
-        <!-- injected by JS -->
-      </div>
-
-      <!-- Custom color picker -->
+      <div id="palette" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;"></div>
       <input type="color" id="colorPicker" value="#ffffff" title="Custom color">
-
-      <!-- Clear -->
       <button class="tool-btn" id="btnClear" onclick="confirmClear()" style="margin-left:auto;border-color:rgba(255,80,80,0.5);color:rgba(255,100,100,0.9)">✕ CLEAR ALL</button>
     </div>
-
     <div class="canvas-outer" id="canvasOuter">
       <canvas id="wallCanvas"></canvas>
       <div id="canvasLock">// AGREE TO TERMS TO UNLOCK //</div>
@@ -658,20 +540,16 @@
     <div class="canvas-status" id="canvasStatus">connecting…</div>
   </div>
 
-  <!-- ══ CHAT ══ -->
   <div class="chat-section">
     <div class="section-header">CHAT — anonymous, real-time</div>
-
     <div class="username-bar">
       <span class="username-tag">CHATTING AS</span>
       <span class="username-display" id="usernameTag">—</span>
       <button class="tool-btn" onclick="openUsernameModal()" style="font-size:0.75rem;padding:6px 12px;">CHANGE</button>
     </div>
-
     <div class="chat-window" id="chatWindow">
       <div class="chat-msg system"><span class="text">// loading messages…</span></div>
     </div>
-
     <div class="chat-input-row">
       <input class="chat-input" type="text" id="chatInput" placeholder="say something…" maxlength="500" autocomplete="off">
       <button class="chat-send-btn" onclick="sendChat()">SEND</button>
@@ -681,17 +559,16 @@
 
 <footer class="footer">&copy; 2025 Flip House Records</footer>
 
+{% endblock %}
+
+{% block extra_js %}
 <script>
-// ═══════════════════════════════════════════════════════════════
-// CANVAS SETUP
-// ═══════════════════════════════════════════════════════════════
-const COLS = 160, ROWS = 90;  // grid resolution
+const COLS = 160, ROWS = 90;
 const canvas = document.getElementById('wallCanvas');
 const ctx = canvas.getContext('2d');
 canvas.width = COLS;
 canvas.height = ROWS;
 
-// CSS size via aspect ratio trick
 const outer = document.getElementById('canvasOuter');
 function resizeCanvas() {
   const w = outer.offsetWidth;
@@ -701,7 +578,6 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
 
-// Pixel state
 let pixelData = {};
 
 function renderAll() {
@@ -722,16 +598,11 @@ function applyPixels(pixels) {
     else pixelData[key] = p.color;
   }
   for (const p of pixels) {
-    if (p.color === 'erase') {
-      ctx.fillStyle = '#111';
-    } else {
-      ctx.fillStyle = p.color;
-    }
+    ctx.fillStyle = p.color === 'erase' ? '#111' : p.color;
     ctx.fillRect(p.x, p.y, 1, 1);
   }
 }
 
-// ── Tools ──
 let currentTool = 'draw';
 let currentColor = '#ffffff';
 let brushSz = 3;
@@ -747,7 +618,6 @@ function setTool(t) {
   canvas.style.cursor = t === 'erase' ? 'cell' : 'crosshair';
 }
 
-// Palette
 const PALETTE = ['#ffffff','#ff4444','#ff8c00','#ffd700','#44ff88','#00cfff','#7b61ff','#ff61d8','#000000','#555555','#c0a060','#1a1a2e'];
 const paletteEl = document.getElementById('palette');
 PALETTE.forEach(hex => {
@@ -776,7 +646,6 @@ document.getElementById('brushSize').addEventListener('input', e => {
   document.getElementById('sizeLabel').textContent = brushSz;
 });
 
-// ── Coordinate mapping ──
 function getCellFromEvent(e) {
   const rect = canvas.getBoundingClientRect();
   const scaleX = COLS / rect.width;
@@ -799,7 +668,6 @@ function paintAt(x, y) {
   const half = Math.floor(brushSz / 2);
   const batch = [];
   if (currentTool === 'fill') {
-    // Flood fill
     const target = pixelData[`${x},${y}`] || null;
     if (target === currentColor) return;
     const stack = [[x, y]];
@@ -858,74 +726,49 @@ function confirmClear() {
   }
 }
 
-// ── Canvas WebSocket ──
 let canvasWS;
 const canvasStatus = document.getElementById('canvasStatus');
 
 function connectCanvas() {
   const proto = location.protocol === 'https:' ? 'wss' : 'ws';
   canvasWS = new WebSocket(`${proto}://${location.host}/ws/canvas/`);
-
   canvasWS.onopen = () => {
     canvasStatus.textContent = '● connected';
     canvasStatus.style.color = 'rgba(100,255,150,0.6)';
   };
-
   canvasWS.onclose = () => {
     canvasStatus.textContent = '○ disconnected — retrying…';
     canvasStatus.style.color = 'rgba(255,100,100,0.5)';
     setTimeout(connectCanvas, 3000);
   };
-
-  canvasWS.onerror = () => {
-    canvasStatus.textContent = '○ connection error';
-  };
-
+  canvasWS.onerror = () => { canvasStatus.textContent = '○ connection error'; };
   canvasWS.onmessage = e => {
     const msg = JSON.parse(e.data);
-    if (msg.type === 'canvas_init') {
-      pixelData = msg.data || {};
-      renderAll();
-    } else if (msg.type === 'draw') {
-      applyPixels(msg.pixels);
-    } else if (msg.type === 'clear') {
-      pixelData = {};
-      renderAll();
-    }
+    if (msg.type === 'canvas_init') { pixelData = msg.data || {}; renderAll(); }
+    else if (msg.type === 'draw') { applyPixels(msg.pixels); }
+    else if (msg.type === 'clear') { pixelData = {}; renderAll(); }
   };
 }
 
 connectCanvas();
 renderAll();
 
-
-// ═══════════════════════════════════════════════════════════════
-// CHAT
-// ═══════════════════════════════════════════════════════════════
 let chatWS;
 let myUsername = null;
 const chatWindow = document.getElementById('chatWindow');
-
-// Seed with server-rendered history
 const HISTORY = {{ messages_json|safe }};
 
 function connectChat() {
   const proto = location.protocol === 'https:' ? 'wss' : 'ws';
   chatWS = new WebSocket(`${proto}://${location.host}/ws/chat/`);
-
   chatWS.onopen = () => {};
   chatWS.onclose = () => { setTimeout(connectChat, 3000); };
   chatWS.onmessage = e => {
     const msg = JSON.parse(e.data);
-    if (msg.type === 'message') {
-      appendMessage(msg.username, msg.message, msg.timestamp, false);
-    } else if (msg.type === 'username_status') {
-      handleUsernameStatus(msg);
-    } else if (msg.type === 'reserve_result') {
-      handleReserveResult(msg);
-    } else if (msg.type === 'auth_result') {
-      handleAuthResult(msg);
-    }
+    if (msg.type === 'message') { appendMessage(msg.username, msg.message, msg.timestamp, false); }
+    else if (msg.type === 'username_status') { handleUsernameStatus(msg); }
+    else if (msg.type === 'reserve_result') { handleReserveResult(msg); }
+    else if (msg.type === 'auth_result') { handleAuthResult(msg); }
   };
 }
 
@@ -947,7 +790,6 @@ function escapeHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// Load history
 chatWindow.innerHTML = '';
 if (HISTORY.length === 0) {
   appendMessage('', '// no messages yet — be the first //', '', true);
@@ -968,35 +810,24 @@ document.getElementById('chatInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') sendChat();
 });
 
-
-// ═══════════════════════════════════════════════════════════════
-// USERNAME MODAL
-// ═══════════════════════════════════════════════════════════════
 const modal = document.getElementById('usernameModal');
 let pendingUsername = null;
 
 function generateRandomName() {
-  // Small client-side random name for instant feel; server generates the real one
   const adj = ['cosmic','dusty','frozen','neon','glitch','vapor','turbo','indie','lunar','wired'];
   const noun = ['bass','beat','flip','groove','sample','scratch','synth','vinyl','wave','zone'];
   return `${adj[Math.floor(Math.random()*adj.length)]}-${noun[Math.floor(Math.random()*noun.length)]}-${Math.floor(Math.random()*90)+10}`;
 }
 
 document.getElementById('randomBtn').addEventListener('click', () => {
-  const name = generateRandomName();
-  document.getElementById('usernameInput').value = name;
+  document.getElementById('usernameInput').value = generateRandomName();
 });
 
 document.getElementById('enterBtn').addEventListener('click', () => {
   let name = document.getElementById('usernameInput').value.trim();
   if (!name) name = generateRandomName();
   pendingUsername = name;
-
-  if (!chatWS || chatWS.readyState !== WebSocket.OPEN) {
-    // WS not ready yet, just set it
-    finalizeUsername(name);
-    return;
-  }
+  if (!chatWS || chatWS.readyState !== WebSocket.OPEN) { finalizeUsername(name); return; }
   chatWS.send(JSON.stringify({ type: 'check_username', username: name }));
 });
 
@@ -1006,10 +837,8 @@ document.getElementById('usernameInput').addEventListener('keydown', e => {
 
 function handleUsernameStatus(msg) {
   if (!msg.taken) {
-    // Free name — offer to reserve it
     showPwStep(`"${msg.username}" is available. Set a password to reserve it, or skip.`, false);
   } else {
-    // Taken — need password to use it
     showPwStep(`"${msg.username}" is reserved. Enter the password to use it.`, true);
   }
 }
@@ -1022,7 +851,6 @@ function showPwStep(label, isLogin) {
   document.getElementById('pwError').textContent = '';
   const reserveBtn = document.getElementById('reserveBtn');
   const submitBtn = document.getElementById('pwSubmitBtn');
-
   if (isLogin) {
     submitBtn.textContent = 'LOGIN';
     reserveBtn.style.display = 'none';
@@ -1042,10 +870,8 @@ document.getElementById('pwBackBtn').addEventListener('click', () => {
 document.getElementById('pwSubmitBtn').addEventListener('click', () => {
   const pw = document.getElementById('passwordInput').value;
   if (document.getElementById('pwSubmitBtn').textContent === 'LOGIN') {
-    // Auth attempt
     chatWS.send(JSON.stringify({ type: 'auth_username', username: pendingUsername, password: pw }));
   } else {
-    // Skip — just use the name without reserving
     finalizeUsername(pendingUsername);
   }
 });
@@ -1057,19 +883,13 @@ document.getElementById('reserveBtn').addEventListener('click', () => {
 });
 
 function handleReserveResult(msg) {
-  if (msg.success) {
-    finalizeUsername(pendingUsername);
-  } else {
-    document.getElementById('pwError').textContent = msg.error || 'Error.';
-  }
+  if (msg.success) { finalizeUsername(pendingUsername); }
+  else { document.getElementById('pwError').textContent = msg.error || 'Error.'; }
 }
 
 function handleAuthResult(msg) {
-  if (msg.success) {
-    finalizeUsername(pendingUsername);
-  } else {
-    document.getElementById('pwError').textContent = msg.error || 'Wrong password.';
-  }
+  if (msg.success) { finalizeUsername(pendingUsername); }
+  else { document.getElementById('pwError').textContent = msg.error || 'Wrong password.'; }
 }
 
 function finalizeUsername(name) {
@@ -1087,45 +907,31 @@ function openUsernameModal() {
   document.getElementById('modalError').textContent = '';
 }
 
-// ═══════════════════════════════════════════════════════════════
-// TERMS OF SERVICE
-// ═══════════════════════════════════════════════════════════════
+// ToS
 const tosModal = document.getElementById('tosModal');
 const tosPopup = document.getElementById('tosPopup');
 let tosAgreed = false;
 
-function openTosPopup() {
-  tosPopup.classList.remove('hidden');
-}
-
-function closeTosPopup() {
-  tosPopup.classList.add('hidden');
-}
+function openTosPopup() { tosPopup.classList.remove('hidden'); }
+function closeTosPopup() { tosPopup.classList.add('hidden'); }
 
 function agreeTos() {
   tosAgreed = true;
-  // Store in sessionStorage so it persists for the tab session
   sessionStorage.setItem('wall_tos_agreed', '1');
   tosModal.classList.add('hidden');
-  // Unlock canvas
   document.getElementById('canvasLock').classList.add('hidden');
-  // Now show the username modal
   openUsernameModal();
 }
 
-// Show modal on load
 window.addEventListener('load', () => {
-  // Check if already agreed this session
   if (sessionStorage.getItem('wall_tos_agreed') === '1') {
     tosAgreed = true;
     tosModal.classList.add('hidden');
     document.getElementById('canvasLock').classList.add('hidden');
     openUsernameModal();
   } else {
-    // Show ToS first, keep username modal hidden
     tosModal.classList.remove('hidden');
   }
 });
 </script>
-</body>
-</html>
+{% endblock %}

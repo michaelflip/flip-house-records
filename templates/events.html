@@ -1,425 +1,207 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
-  <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
-  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
-  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
-  <meta charset="UTF-8">
-  <title>Flip House Records - Events</title>
-  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap');
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+{% block title %}Flip House Records - Events{% endblock %}
 
-    html {
-      scroll-behavior: smooth;
-    }
+{% block extra_css %}
+<style>
+  .events-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 100px 20px 60px;
+  }
 
-    body {
-      background-color: black;
-      color: white;
-      font-family: 'Orbitron', sans-serif;
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
-    }
+  .page-title {
+    text-align: center;
+    font-size: 3rem;
+    margin-bottom: 50px;
+    text-shadow: 0 0 20px rgba(255,255,255,0.5);
+    letter-spacing: 3px;
+  }
 
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      background: rgba(0,0,0,0.95);
-      backdrop-filter: blur(10px);
-      padding: 15px 10px;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 0.5rem;
-      z-index: 1000;
-      border-bottom: 2px solid rgba(255,255,255,0.2);
-      box-shadow: 0 4px 20px rgba(255,255,255,0.1);
-    }
+  .event-card {
+    background: rgba(255,255,255,0.03);
+    backdrop-filter: blur(10px);
+    border: 3px solid rgba(255,255,255,0.3);
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 40px;
+    transition: all 0.4s ease;
+    box-shadow: 0 0 20px rgba(255,255,255,0.1), inset 0 0 30px rgba(255,255,255,0.02);
+    position: relative;
+    overflow: hidden;
+  }
 
-    @media (min-width: 768px) {
-      nav { padding: 18px 10px; gap: 0.75rem; }
-    }
+  .event-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+    transition: left 0.5s ease;
+  }
 
-    .nav-button {
-      background: none;
-      border: 2px solid white;
-      color: white;
-      padding: 0.45rem 1rem;
-      border-radius: 50px;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      white-space: nowrap;
-    }
+  .event-card:hover::before { left: 100%; }
+  .event-card:hover {
+    border-color: rgba(255,255,255,0.6);
+    box-shadow: 0 0 40px rgba(255,255,255,0.2), inset 0 0 50px rgba(255,255,255,0.05);
+    transform: translateY(-5px);
+  }
 
-    .nav-button:hover {
-      background: white;
-      color: black;
-      transform: scale(1.05);
-    }
+  .event-title {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px rgba(255,255,255,0.3);
+    letter-spacing: 1px;
+    position: relative;
+    z-index: 1;
+  }
 
-    /* Main Container */
-    .events-container {
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 120px 20px 60px 20px;
-    }
+  .event-layout {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+    position: relative;
+    z-index: 1;
+  }
 
-    .page-title {
-      text-align: center;
-      font-size: 3rem;
-      margin-bottom: 50px;
-      text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-      letter-spacing: 3px;
-    }
+  .event-left { flex: 1; min-width: 0; }
+  .event-right { flex: 0 0 280px; max-width: 280px; }
 
-    /* Event Cards */
-    .event-card {
-      background: rgba(255, 255, 255, 0.03);
-      backdrop-filter: blur(10px);
-      border: 3px solid rgba(255, 255, 255, 0.3);
-      border-radius: 15px;
-      padding: 30px;
-      margin-bottom: 40px;
-      transition: all 0.4s ease;
-      box-shadow:
-        0 0 20px rgba(255, 255, 255, 0.1),
-        inset 0 0 30px rgba(255, 255, 255, 0.02);
-      position: relative;
-      overflow: hidden;
-    }
+  .event-flyer {
+    width: 100%;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-radius: 10px;
+    box-shadow: 0 0 30px rgba(255,255,255,0.2);
+    transition: all 0.3s ease;
+    display: block;
+  }
 
-    .event-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.05),
-        transparent
-      );
-      transition: left 0.5s ease;
-    }
+  .event-flyer:hover { transform: scale(1.02); box-shadow: 0 0 50px rgba(255,255,255,0.4); }
 
-    .event-card:hover::before {
-      left: 100%;
-    }
+  .event-meta {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+    color: rgba(255,255,255,0.85);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
 
-    .event-card:hover {
-      border-color: rgba(255, 255, 255, 0.6);
-      box-shadow:
-        0 0 40px rgba(255, 255, 255, 0.2),
-        inset 0 0 50px rgba(255, 255, 255, 0.05);
-      transform: translateY(-5px);
-    }
+  .event-meta span strong { color: white; }
 
-    .event-title {
-      font-size: 2rem;
-      margin-bottom: 20px;
-      text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-      letter-spacing: 1px;
-      position: relative;
-      z-index: 1;
-    }
+  .event-body {
+    font-family: Arial, sans-serif;
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: 20px;
+    color: rgba(255,255,255,0.9);
+  }
 
-    /* Two-column layout: left = info, right = flyer */
-    .event-layout {
-      display: flex;
-      gap: 30px;
-      align-items: flex-start;
-      position: relative;
-      z-index: 1;
-    }
+  .event-tags {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.7);
+  }
 
-    .event-left {
-      flex: 1;
-      min-width: 0;
-    }
+  .event-tags strong { color: white; }
 
-    .event-right {
-      flex: 0 0 280px;
-      max-width: 280px;
-    }
+  .event-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
 
-    .event-flyer {
-      width: 100%;
-      border: 3px solid rgba(255, 255, 255, 0.3);
-      border-radius: 10px;
-      box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
-      transition: all 0.3s ease;
-      display: block;
-    }
+  .ticket-link, .maps-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-family: 'Orbitron', sans-serif;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+  }
 
-    .event-flyer:hover {
-      transform: scale(1.02);
-      box-shadow: 0 0 50px rgba(255, 255, 255, 0.4);
-    }
+  .ticket-link {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 0 15px rgba(102,126,234,0.5);
+  }
+  .ticket-link:hover { transform: translateY(-3px); box-shadow: 0 0 25px rgba(102,126,234,0.8); color: white; }
 
-    .event-meta {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 8px;
-      padding: 12px 15px;
-      margin-bottom: 20px;
-      font-size: 0.95rem;
-      color: rgba(255, 255, 255, 0.85);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
+  .maps-link-google {
+    background: linear-gradient(135deg, #4285f4 0%, #1a73e8 100%);
+    color: white;
+    box-shadow: 0 0 15px rgba(66,133,244,0.4);
+  }
+  .maps-link-google:hover { transform: translateY(-3px); box-shadow: 0 0 25px rgba(66,133,244,0.7); color: white; }
 
-    .event-meta span strong {
-      color: white;
-    }
+  .maps-link-apple {
+    background: linear-gradient(135deg, #555 0%, #333 100%);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.2);
+    box-shadow: 0 0 15px rgba(255,255,255,0.1);
+  }
+  .maps-link-apple:hover { transform: translateY(-3px); box-shadow: 0 0 25px rgba(255,255,255,0.25); color: white; }
 
-    .event-body {
-      font-family: Arial, sans-serif;
-      font-size: 1rem;
-      line-height: 1.7;
-      margin-bottom: 20px;
-      color: rgba(255, 255, 255, 0.9);
-    }
+  .no-events { text-align: center; font-size: 1.5rem; margin-top: 100px; color: rgba(255,255,255,0.5); }
 
-    .event-tags {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 8px;
-      padding: 12px 15px;
-      margin-bottom: 20px;
-      font-size: 0.85rem;
-      color: rgba(255, 255, 255, 0.7);
-    }
+  @media (max-width: 768px) {
+    .page-title { font-size: 2rem; }
+    .event-card { padding: 20px; }
+    .event-title { font-size: 1.5rem; }
+    .event-layout { flex-direction: column; }
+    .event-right { flex: none; max-width: 100%; width: 100%; }
+  }
+</style>
+{% endblock %}
 
-    .event-tags strong {
-      color: white;
-    }
+{% block content %}
+<div class="events-container">
+  <h1 class="page-title">🎤 EVENTS</h1>
 
-    /* Action buttons row: tickets + maps */
-    .event-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 15px;
-    }
-
-    .ticket-link,
-    .maps-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 10px 20px;
-      border-radius: 25px;
-      text-decoration: none;
-      font-size: 0.9rem;
-      font-family: 'Orbitron', sans-serif;
-      transition: all 0.3s ease;
-      white-space: nowrap;
-    }
-
-    .ticket-link {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      box-shadow: 0 0 15px rgba(102, 126, 234, 0.5);
-    }
-
-    .ticket-link:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 0 25px rgba(102, 126, 234, 0.8);
-      color: white;
-    }
-
-    .maps-link-google {
-      background: linear-gradient(135deg, #4285f4 0%, #1a73e8 100%);
-      color: white;
-      box-shadow: 0 0 15px rgba(66, 133, 244, 0.4);
-    }
-
-    .maps-link-google:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 0 25px rgba(66, 133, 244, 0.7);
-      color: white;
-    }
-
-    .maps-link-apple {
-      background: linear-gradient(135deg, #555 0%, #333 100%);
-      color: white;
-      border: 1px solid rgba(255,255,255,0.2);
-      box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
-    }
-
-    .maps-link-apple:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 0 25px rgba(255, 255, 255, 0.25);
-      color: white;
-    }
-
-    .no-events {
-      text-align: center;
-      font-size: 1.5rem;
-      margin-top: 100px;
-      color: rgba(255, 255, 255, 0.5);
-    }
-
-    .footer {
-      text-align: center;
-      color: rgba(255, 255, 255, 0.6);
-      padding: 40px 20px;
-      border-top: 2px solid rgba(255, 255, 255, 0.1);
-    }
-
-    /* Responsive: stack on mobile */
-    @media (max-width: 768px) {
-      .page-title {
-        font-size: 2rem;
-      }
-
-      .event-card {
-        padding: 20px;
-      }
-
-      .event-title {
-        font-size: 1.5rem;
-      }
-
-      .event-layout {
-        flex-direction: column;
-      }
-
-      .event-right {
-        flex: none;
-        max-width: 100%;
-        width: 100%;
-      }
-    }
-  </style>
-</head>
-<body>
-
-  <!-- Fixed Navigation -->
-  <nav>
-    <button class="nav-button" onclick="window.location.href='/'">Home</button>
-    <button class="nav-button" onclick="window.location.href='/artists/'">Artists</button>
-    <button class="nav-button" onclick="window.location.href='/releases/'">Releases</button>
-    <button class="nav-button" onclick="window.location.href='/events/'">Events</button>
-    <button class="nav-button" onclick="window.location.href='/merch/'">Merch</button>
-    <button class="nav-button" onclick="window.location.href='/links/'">Links</button>
-    <button class="nav-button" onclick="window.location.href='/wall/'">The Wall</button>
-    <button class="nav-button" onclick="window.location.href='/contact/'">Contact</button>
-  </nav>
-
-  <!-- Main Content -->
-  <div class="events-container">
-    <h1 class="page-title">🎤 EVENTS</h1>
-
-    {% for event in events %}
-    <div class="event-card">
-      <h3 class="event-title">{{ event.title }}</h3>
-
-      <div class="event-layout">
-
-        <!-- LEFT: all the info -->
-        <div class="event-left">
-
-          <div class="event-meta">
-            <span>📅 <strong>Date:</strong> {{ event.event_date|date:"F j, Y, g:i a" }}</span>
-            {% if event.venue %}<span>🎪 <strong>Venue:</strong> {{ event.venue }}</span>{% endif %}
-            {% if event.location %}<span>📍 <strong>Location:</strong> {{ event.location }}</span>{% endif %}
-          </div>
-
-          {% if event.description %}
-          <div class="event-body">{{ event.description|linebreaks }}</div>
-          {% endif %}
-
-          {% if event.tags %}
-          <div class="event-tags">
-            <strong>Tags:</strong> {{ event.tags }}
-          </div>
-          {% endif %}
-
-          <!-- Buttons: tickets + maps -->
-          <div class="event-actions">
-            {% if event.ticket_link %}
-            <a href="{{ event.ticket_link }}" target="_blank" class="ticket-link">🎟️ Get Tickets</a>
-            {% endif %}
-            {% if event.location %}
-            <a href="https://maps.google.com/?q={{ event.location|urlencode }}{% if event.venue %},{{ event.venue|urlencode }}{% endif %}"
-               target="_blank" class="maps-link maps-link-google">🗺️ Google Maps</a>
-            <a href="https://maps.apple.com/?q={{ event.location|urlencode }}{% if event.venue %},{{ event.venue|urlencode }}{% endif %}"
-               target="_blank" class="maps-link maps-link-apple"> Apple Maps</a>
-            {% endif %}
-          </div>
-
+  {% for event in events %}
+  <div class="event-card">
+    <h3 class="event-title">{{ event.title }}</h3>
+    <div class="event-layout">
+      <div class="event-left">
+        <div class="event-meta">
+          <span>📅 <strong>Date:</strong> {{ event.event_date|date:"F j, Y, g:i a" }}</span>
+          {% if event.venue %}<span>🎪 <strong>Venue:</strong> {{ event.venue }}</span>{% endif %}
+          {% if event.location %}<span>📍 <strong>Location:</strong> {{ event.location }}</span>{% endif %}
         </div>
-
-        <!-- RIGHT: flyer image -->
-        {% if event.flyer %}
-        <div class="event-right">
-          <img src="{{ event.flyer.url }}" alt="{{ event.title }} flyer" class="event-flyer">
-        </div>
+        {% if event.description %}
+        <div class="event-body">{{ event.description|linebreaks }}</div>
         {% endif %}
-
+        {% if event.tags %}
+        <div class="event-tags"><strong>Tags:</strong> {{ event.tags }}</div>
+        {% endif %}
+        <div class="event-actions">
+          {% if event.ticket_link %}
+          <a href="{{ event.ticket_link }}" target="_blank" class="ticket-link">🎟️ Get Tickets</a>
+          {% endif %}
+          {% if event.location %}
+          <a href="https://maps.google.com/?q={{ event.location|urlencode }}{% if event.venue %},{{ event.venue|urlencode }}{% endif %}" target="_blank" class="maps-link maps-link-google">🗺️ Google Maps</a>
+          <a href="https://maps.apple.com/?q={{ event.location|urlencode }}{% if event.venue %},{{ event.venue|urlencode }}{% endif %}" target="_blank" class="maps-link maps-link-apple"> Apple Maps</a>
+          {% endif %}
+        </div>
       </div>
+      {% if event.flyer %}
+      <div class="event-right">
+        <img src="{{ event.flyer.url }}" alt="{{ event.title }} flyer" class="event-flyer">
+      </div>
+      {% endif %}
     </div>
-    {% empty %}
-    <div class="no-events">
-      No upcoming events. Stay tuned!
-    </div>
-    {% endfor %}
   </div>
-
-  <!-- Footer -->
-  <footer class="footer">
-    <p>&copy; 2025 Flip House Records</p>
-  </footer>
-
-  <!-- Ripple Effect -->
-  <script>
-    const buttons = document.querySelectorAll('.nav-button');
-    buttons.forEach(button => {
-      button.addEventListener('click', function (e) {
-        const ripple = document.createElement('span');
-        ripple.classList.add('ripple');
-        const rect = this.getBoundingClientRect();
-        ripple.style.left = `${e.clientX - rect.left}px`;
-        ripple.style.top = `${e.clientY - rect.top}px`;
-        this.appendChild(ripple);
-        setTimeout(() => ripple.remove(), 600);
-      });
-    });
-
-    const style = document.createElement('style');
-    style.innerHTML = `
-      .ripple {
-        position: absolute;
-        width: 100px;
-        height: 100px;
-        background: rgba(255, 255, 255, 0.3);
-        border-radius: 50%;
-        transform: scale(0);
-        animation: ripple-effect 0.6s linear;
-        pointer-events: none;
-      }
-      @keyframes ripple-effect {
-        to { transform: scale(4); opacity: 0; }
-      }
-    `;
-    document.head.appendChild(style);
-  </script>
-
-</body>
-</html>
+  {% empty %}
+  <div class="no-events">No upcoming events. Stay tuned!</div>
+  {% endfor %}
+</div>
+{% endblock %}

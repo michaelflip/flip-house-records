@@ -1,192 +1,73 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
 
-  <meta charset="UTF-8">
-  <title>Merch - Flip House Records</title>
-  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap');
+{% block title %}Merch - Flip House Records{% endblock %}
 
-    body {
-      background-color: black;
-      color: white;
-      margin: 0;
-      min-height: 100vh;
-      font-family: 'Orbitron', sans-serif;
-      display: flex;
-      flex-direction: column;
-    }
+{% block extra_css %}
+<style>
+  body { display: flex; flex-direction: column; }
 
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      background: rgba(0,0,0,0.95);
-      backdrop-filter: blur(10px);
-      padding: 15px 10px;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 0.5rem;
-      z-index: 1000;
-      border-bottom: 2px solid rgba(255,255,255,0.2);
-      box-shadow: 0 4px 20px rgba(255,255,255,0.1);
-    }
+  .merch-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 120px 20px 80px;
+    text-align: center;
+    min-height: 100vh;
+  }
 
-    @media (min-width: 768px) {
-      nav { padding: 18px 10px; gap: 0.75rem; }
-    }
+  .merch-emojis {
+    font-size: 4rem;
+    margin: 40px 0;
+    line-height: 1.5;
+    animation: float 3s ease-in-out infinite;
+  }
 
-    .nav-button {
-      background: none;
-      border: 2px solid white;
-      color: white;
-      padding: 0.45rem 1rem;
-      border-radius: 50px;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      white-space: nowrap;
-    }
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
 
-    .nav-button:hover {
-      background: white;
-      color: black;
-      transform: scale(1.05);
-    }
+  .merch-message {
+    font-size: 1.5rem;
+    margin: 30px auto;
+    max-width: 700px;
+    line-height: 1.8;
+    letter-spacing: 1px;
+  }
 
-    .merch-content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 120px 20px 80px;
-      text-align: center;
-    }
+  .merch-message p { margin: 20px 0; }
 
-    .merch-emojis {
-      font-size: 4rem;
-      margin: 40px 0;
-      line-height: 1.5;
-      animation: float 3s ease-in-out infinite;
-    }
+  .merch-link {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    text-shadow: 0 0 10px white;
+    border-bottom: 2px solid white;
+    padding-bottom: 2px;
+  }
 
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-10px); }
-    }
+  .merch-link:hover {
+    color: #00ff00;
+    text-shadow: 0 0 20px #00ff00;
+    border-bottom-color: #00ff00;
+  }
+</style>
+{% endblock %}
 
-    .merch-message {
-      font-size: 1.5rem;
-      margin: 30px auto;
-      max-width: 700px;
-      line-height: 1.8;
-      letter-spacing: 1px;
-    }
-
-    .merch-message p {
-      margin: 20px 0;
-    }
-
-    .merch-link {
-      color: white;
-      text-decoration: none;
-      font-weight: bold;
-      transition: all 0.3s ease;
-      text-shadow: 0 0 10px white;
-      border-bottom: 2px solid white;
-      padding-bottom: 2px;
-    }
-
-    .merch-link:hover {
-      color: #00ff00;
-      text-shadow: 0 0 20px #00ff00;
-      border-bottom-color: #00ff00;
-      transform: scale(1.05);
-    }
-
-    footer {
-      padding: 20px;
-      text-align: center;
-      font-size: 0.9rem;
-    }
-  </style>
-</head>
-<body>
-
-  <!-- Navigation Buttons -->
-  <nav>
-    <button class="nav-button" onclick="window.location.href='/'">Home</button>
-    <button class="nav-button" onclick="window.location.href='/artists/'">Artists</button>
-    <button class="nav-button" onclick="window.location.href='/releases/'">Releases</button>
-    <button class="nav-button" onclick="window.location.href='/events/'">Events</button>
-    <button class="nav-button" onclick="window.location.href='/merch/'">Merch</button>
-    <button class="nav-button" onclick="window.location.href='/links/'">Links</button>
-    <button class="nav-button" onclick="window.location.href='/wall/'">The Wall</button>
-    <button class="nav-button" onclick="window.location.href='/contact/'">Contact</button>
-  </nav>
-
-  <div class="merch-content">
-    <div class="merch-emojis">
-      👕 🧢 🎧 💿 🛍️ 🎨
-    </div>
-    <div class="merch-message">
-      <p>Merch coming soon.</p>
-      <p>Head over to <a href="https://danked.com" class="merch-link" target="_blank" rel="noopener noreferrer">danked.com</a> for now and buy something cool!</p>
-    </div>
+{% block body %}
+<div class="merch-content">
+  <div class="merch-emojis">👕 🧢 🎧 💿 🛍️ 🎨</div>
+  <div class="merch-message">
+    <p>Merch coming soon.</p>
+    <p>Head over to <a href="https://danked.com" class="merch-link" target="_blank" rel="noopener noreferrer">danked.com</a> for now and buy something cool!</p>
   </div>
+</div>
 
-  <!-- JavaScript for Ripple Effect -->
-  <script>
-    const buttons = document.querySelectorAll('.nav-button');
-
-    buttons.forEach(button => {
-      button.addEventListener('click', function (e) {
-        const ripple = document.createElement('span');
-        ripple.classList.add('ripple');
-
-        const rect = this.getBoundingClientRect();
-        ripple.style.left = `${e.clientX - rect.left}px`;
-        ripple.style.top = `${e.clientY - rect.top}px`;
-
-        this.appendChild(ripple);
-
-        setTimeout(() => {
-          ripple.remove();
-        }, 600);
-      });
-    });
-
-    // Add ripple effect styles
-    const style = document.createElement('style');
-    style.innerHTML = `
-      .ripple {
-        position: absolute;
-        width: 100px;
-        height: 100px;
-        background: rgba(255, 255, 255, 0.3);
-        border-radius: 50%;
-        transform: scale(0);
-        animation: ripple-effect 0.6s linear;
-        pointer-events: none;
-      }
-
-      @keyframes ripple-effect {
-        to {
-          transform: scale(4);
-          opacity: 0;
-        }
-      }
-    `;
-    document.head.appendChild(style);
-  </script>
-
-  <footer class="footer">
-    <p>&copy; 2025 Flip House Records</p>
-  </footer>
-</body>
-</html>
+<footer class="footer">
+  <p>&copy; 2025 Flip House Records</p>
+</footer>
+{% endblock %}

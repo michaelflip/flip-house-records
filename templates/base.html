@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{% load static %}
+<link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+<link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+<link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
+<link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Flip House Records{% endblock %}</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+<link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" />
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Share+Tech+Mono&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background-color: #000;
+    color: #fff;
+    font-family: 'Orbitron', sans-serif;
+    margin: 0;
+    min-height: 100vh;
+  }
+
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: rgba(0,0,0,0.95);
+    backdrop-filter: blur(10px);
+    padding: 15px 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    z-index: 1000;
+    border-bottom: 2px solid rgba(255,255,255,0.2);
+    box-shadow: 0 4px 20px rgba(255,255,255,0.1);
+  }
+
+  @media (min-width: 768px) {
+    nav { gap: 0.75rem; padding: 18px 10px; }
+  }
+
+  .nav-button {
+    background: none;
+    border: 2px solid white;
+    color: white;
+    padding: 0.45rem 1rem;
+    border-radius: 50px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+  }
+
+  .nav-button:hover, .nav-button.active {
+    background: white;
+    color: black;
+    transform: scale(1.05);
+  }
+
+  .footer {
+    text-align: center;
+    color: rgba(255,255,255,0.4);
+    padding: 40px 20px;
+    font-size: 0.8rem;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    margin-top: 60px;
+  }
+
+  /* upload_release uses these */
+  .release-box {
+    background-color: #fff;
+    color: #000;
+    border: 3px solid #333;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 0 8px rgba(255,255,255,0.1);
+  }
+  .release-box img {
+    border: 2px solid #eee;
+    object-fit: cover;
+    width: 160px;
+    height: 160px;
+    border-radius: 4px;
+  }
+</style>
+
+{% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+<nav>
+  <button class="nav-button" onclick="window.location.href='/'">Home</button>
+  <button class="nav-button" onclick="window.location.href='/artists/'">Artists</button>
+  <button class="nav-button" onclick="window.location.href='/releases/'">Releases</button>
+  <button class="nav-button" onclick="window.location.href='/events/'">Events</button>
+  <button class="nav-button" onclick="window.location.href='/merch/'">Merch</button>
+  <button class="nav-button" onclick="window.location.href='/links/'">Links</button>
+  <button class="nav-button" onclick="window.location.href='/wall/'">The Wall</button>
+  <button class="nav-button" onclick="window.location.href='/contact/'">Contact</button>
+</nav>
+
+{% block body %}
+{% block content %}{% endblock %}
+
+<footer class="footer">
+  <p>&copy; 2025 Flip House Records</p>
+</footer>
+{% endblock %}
+
+{% block extra_js %}{% endblock %}
+
+</body>
+</html>

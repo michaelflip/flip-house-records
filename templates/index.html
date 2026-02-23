@@ -1,151 +1,53 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
 
-  <meta charset="UTF-8">
-  <title>Flip House Records</title>
-  <!-- Updated path to local Bootstrap CSS -->
-  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap');
+{% block title %}Flip House Records{% endblock %}
 
-    body {
-      background-color: black;
-      color: white;
-      margin: 0;
-      min-height: 100vh;
-      font-family: 'Orbitron', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding-top: 80px;
-    }
+{% block extra_css %}
+<style>
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
 
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      background: rgba(0,0,0,0.95);
-      backdrop-filter: blur(10px);
-      padding: 15px 10px;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 0.5rem;
-      z-index: 1000;
-      border-bottom: 2px solid rgba(255,255,255,0.2);
-      box-shadow: 0 4px 20px rgba(255,255,255,0.1);
-    }
+  .home-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 100px 20px 60px;
+    text-align: center;
+  }
 
-    @media (min-width: 768px) {
-      nav { padding: 18px 10px; gap: 0.75rem; }
-    }
+  .logo {
+    width: 50%;
+    max-width: 600px;
+    height: auto;
+    margin-bottom: 1.5rem;
+  }
 
-    .nav-button {
-      background: none;
-      border: 2px solid white;
-      color: white;
-      padding: 0.45rem 1rem;
-      border-radius: 50px;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      white-space: nowrap;
-    }
+  .tagline {
+    font-size: 1.2rem;
+    color: white;
+    text-align: center;
+    text-shadow: 2px 2px 10px rgba(255,255,255,0.3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    max-width: 700px;
+  }
+</style>
+{% endblock %}
 
-    .nav-button:hover {
-      background: white;
-      color: black;
-      transform: scale(1.05);
-    }
-
-    .logo {
-      width: 50%;
-      max-width: 600px;
-      height: auto;
-      margin-bottom: 1rem;
-    }
-
-    .tagline {
-      font-size: 1.5rem;
-      color: white;
-      text-align: center;
-      text-shadow: 2px 2px 10px rgba(255, 255, 255, 0.3);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-    }
-  </style>
-</head>
-<body>
-
-  <!-- Navigation Buttons -->
-  <nav>
-    <button class="nav-button" onclick="window.location.href='/'">Home</button>
-    <button class="nav-button" onclick="window.location.href='/artists/'">Artists</button>
-    <button class="nav-button" onclick="window.location.href='/releases/'">Releases</button>
-    <button class="nav-button" onclick="window.location.href='/events/'">Events</button>
-    <button class="nav-button" onclick="window.location.href='/merch/'">Merch</button>
-    <button class="nav-button" onclick="window.location.href='/links/'">Links</button>
-    <button class="nav-button" onclick="window.location.href='/wall/'">The Wall</button>
-    <button class="nav-button" onclick="window.location.href='/contact/'">Contact</button>
-  </nav>
-
-  <!-- Centered Logo -->
+{% block body %}
+<div class="home-wrap">
   <img src="{% static 'img/fliphouserecords.png' %}" alt="Flip House Records Logo" class="logo">
+  <div class="tagline">Flip House Records. Michaelflip2. Automatix The Album. Adaptz. Season Premiere. 2026.</div>
+</div>
 
-  <!-- Tagline -->
-<div class="tagline">Flip House Records. Michaelflip2. Automatix The Album. Adaptz. Season Premiere. 2026.</div>
-
-  <!-- JavaScript for Ripple Effect -->
-  <script>
-    const buttons = document.querySelectorAll('.nav-button');
-
-    buttons.forEach(button => {
-      button.addEventListener('click', function (e) {
-        const ripple = document.createElement('span');
-        ripple.classList.add('ripple');
-
-        const rect = this.getBoundingClientRect();
-        ripple.style.left = `${e.clientX - rect.left}px`;
-        ripple.style.top = `${e.clientY - rect.top}px`;
-
-        this.appendChild(ripple);
-
-        setTimeout(() => {
-          ripple.remove();
-        }, 600);
-      });
-    });
-
-    // Add ripple effect styles
-    const style = document.createElement('style');
-    style.innerHTML = `
-      .ripple {
-        position: absolute;
-        width: 100px;
-        height: 100px;
-        background: rgba(255, 255, 255, 0.3);
-        border-radius: 50%;
-        transform: scale(0);
-        animation: ripple-effect 0.6s linear;
-        pointer-events: none;
-      }
-
-      @keyframes ripple-effect {
-        to {
-          transform: scale(4);
-          opacity: 0;
-        }
-      }
-    `;
-    document.head.appendChild(style);
-  </script>
-
-  <footer class="footer">
-    <p>&copy; 2025 Flip House Records</p>
-  </footer>
-</body>
-</html>
+<footer class="footer">
+  <p>&copy; 2025 Flip House Records</p>
+</footer>
+{% endblock %}
