@@ -1,0 +1,217 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flip House Records - Links</title>
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Share+Tech+Mono&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: 'Orbitron', sans-serif;
+      min-height: 100vh;
+    }
+
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: rgba(0,0,0,0.95);
+      backdrop-filter: blur(10px);
+      padding: 20px 0;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      z-index: 1000;
+      border-bottom: 2px solid rgba(255,255,255,0.2);
+    }
+
+    .nav-button {
+      background: none;
+      border: 2px solid white;
+      color: white;
+      padding: 0.5rem 1.2rem;
+      border-radius: 50px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .nav-button:hover, .nav-button.active {
+      background: white;
+      color: black;
+      transform: scale(1.05);
+    }
+
+    .page-wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 130px 20px 80px;
+    }
+
+    .page-title {
+      text-align: center;
+      font-size: 2.8rem;
+      letter-spacing: 4px;
+      margin-bottom: 12px;
+      text-shadow: 0 0 30px rgba(255,255,255,0.4);
+    }
+
+    .page-subtitle {
+      text-align: center;
+      font-family: 'Share Tech Mono', monospace;
+      color: rgba(255,255,255,0.45);
+      font-size: 0.9rem;
+      letter-spacing: 2px;
+      margin-bottom: 60px;
+    }
+
+    .category-block {
+      margin-bottom: 50px;
+    }
+
+    .category-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 4px;
+      color: rgba(255,255,255,0.35);
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+
+    .link-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .link-card {
+      display: block;
+      text-decoration: none;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
+      padding: 20px 22px;
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .link-card::after {
+      content: '→';
+      position: absolute;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%) translateX(5px);
+      opacity: 0;
+      transition: all 0.25s ease;
+      font-size: 1.2rem;
+    }
+
+    .link-card:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.5);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(255,255,255,0.08);
+      padding-right: 42px;
+    }
+
+    .link-card:hover::after {
+      opacity: 1;
+      transform: translateY(-50%) translateX(0);
+    }
+
+    .link-name {
+      color: #fff;
+      font-size: 1rem;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .link-desc {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.45);
+      line-height: 1.5;
+    }
+
+    .link-url {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.25);
+      margin-top: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 80px 20px;
+      font-family: 'Share Tech Mono', monospace;
+      color: rgba(255,255,255,0.3);
+      font-size: 1rem;
+      letter-spacing: 2px;
+    }
+
+    .footer {
+      text-align: center;
+      color: rgba(255,255,255,0.3);
+      padding: 40px 20px;
+      font-size: 0.8rem;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <button class="nav-button" onclick="location.href='/'">Home</button>
+    <button class="nav-button" onclick="location.href='/artists/'">Artists</button>
+    <button class="nav-button" onclick="location.href='/releases/'">Releases</button>
+    <button class="nav-button" onclick="location.href='/events/'">Events</button>
+    <button class="nav-button" onclick="location.href='/merch/'">Merch</button>
+    <button class="nav-button active" onclick="location.href='/links/'">Links</button>
+    <button class="nav-button" onclick="location.href='/wall/'">The Wall</button>
+    <button class="nav-button" onclick="location.href='/contact/'">Contact</button>
+  </nav>
+
+  <div class="page-wrap">
+    <h1 class="page-title">LINKS</h1>
+    <p class="page-subtitle">// AFFILIATES & CONNECTIONS //</p>
+
+    {% if categories %}
+      {% for category, items in categories.items %}
+      <div class="category-block">
+        <div class="category-label">{{ category }}</div>
+        <div class="link-grid">
+          {% for link in items %}
+          <a class="link-card" href="{{ link.url }}" target="_blank" rel="noopener noreferrer">
+            <div class="link-name">{{ link.name }}</div>
+            {% if link.description %}
+            <div class="link-desc">{{ link.description }}</div>
+            {% endif %}
+            <div class="link-url">{{ link.url }}</div>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">NO LINKS YET — CHECK BACK SOON</div>
+    {% endif %}
+  </div>
+
+  <footer class="footer">&copy; 2025 Flip House Records</footer>
+
+</body>
+</html>

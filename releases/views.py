@@ -47,3 +47,41 @@ def events(request, tag=None):
         'events': event_list,
         'active_tag': tag,
     })
+
+def links(request):
+    from .models import AffiliateLink
+    all_links = AffiliateLink.objects.filter(is_active=True)
+    
+    # Group by category
+    categories = {}
+    for link in all_links:
+        cat = link.get_category_display()
+        categories.setdefault(cat, []).append(link)
+    
+    return render(request, 'releases/links.html', {
+        'categories': categories,
+    })
+
+
+def wall(request):
+    from .models import ChatMessage
+    import json
+
+    # Load last 100 messages for initial render
+    messages = list(
+        ChatMessage.objects.order_by('-timestamp')[:100]
+    )
+    messages.reverse()  # oldest first
+
+    messages_json = json.dumps([
+        {
+            "username": m.username,
+            "message": m.message,
+            "timestamp": m.timestamp.strftime("%H:%M"),
+        }
+        for m in messages
+    ])
+
+    return render(request, 'releases/wall.html', {
+        'messages_json': messages_json,
+    })

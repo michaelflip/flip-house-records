@@ -1,0 +1,904 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flip House Records - The Wall</title>
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Share+Tech+Mono&display=swap');
+
+    :root {
+      --white: #ffffff;
+      --dim: rgba(255,255,255,0.5);
+      --faint: rgba(255,255,255,0.08);
+      --border: rgba(255,255,255,0.15);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #000;
+      color: #fff;
+      font-family: 'Orbitron', sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: rgba(0,0,0,0.95);
+      backdrop-filter: blur(10px);
+      padding: 18px 0;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      z-index: 1000;
+      border-bottom: 2px solid rgba(255,255,255,0.2);
+    }
+    .nav-button {
+      background: none;
+      border: 2px solid white;
+      color: white;
+      padding: 0.45rem 1rem;
+      border-radius: 50px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .nav-button:hover, .nav-button.active {
+      background: white; color: black; transform: scale(1.05);
+    }
+
+    /* ── LAYOUT ── */
+    .page-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 110px 16px 80px;
+    }
+
+    .page-title {
+      text-align: center;
+      font-size: 2.6rem;
+      letter-spacing: 5px;
+      margin-bottom: 6px;
+      text-shadow: 0 0 30px rgba(255,255,255,0.4);
+    }
+    .page-sub {
+      text-align: center;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--dim);
+      letter-spacing: 3px;
+      margin-bottom: 50px;
+    }
+
+    /* ── SECTION HEADERS ── */
+    .section-header {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 4px;
+      color: rgba(255,255,255,0.35);
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+      margin-bottom: 22px;
+    }
+
+    /* ═══════════════════════════════════
+       CANVAS SECTION
+    ═══════════════════════════════════ */
+    .canvas-section {
+      margin-bottom: 60px;
+    }
+
+    .canvas-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .tool-btn {
+      background: var(--faint);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 7px 16px;
+      border-radius: 6px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 1px;
+    }
+    .tool-btn:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.4); }
+    .tool-btn.active { background: #fff; color: #000; border-color: #fff; }
+
+    .size-slider-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--dim);
+    }
+    #brushSize { width: 80px; accent-color: #fff; }
+
+    .color-swatch {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.15s;
+      flex-shrink: 0;
+    }
+    .color-swatch:hover { transform: scale(1.15); }
+    .color-swatch.selected { border-color: #fff; transform: scale(1.2); }
+
+    #colorPicker {
+      width: 32px;
+      height: 32px;
+      border: 2px solid var(--border);
+      border-radius: 50%;
+      cursor: pointer;
+      background: none;
+      padding: 0;
+    }
+
+    .canvas-outer {
+      position: relative;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      background: #111;
+      box-shadow: 0 0 40px rgba(255,255,255,0.06);
+      touch-action: none;
+    }
+
+    #wallCanvas {
+      display: block;
+      width: 100%;
+      cursor: crosshair;
+      image-rendering: pixelated;
+    }
+
+    .canvas-status {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.3);
+      margin-top: 10px;
+      letter-spacing: 1px;
+    }
+
+    /* ═══════════════════════════════════
+       CHAT SECTION
+    ═══════════════════════════════════ */
+    .chat-section {}
+
+    /* Username bar */
+    .username-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .username-display {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.9rem;
+      color: var(--white);
+      background: var(--faint);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 7px 14px;
+      letter-spacing: 1px;
+    }
+
+    .username-tag {
+      font-size: 0.68rem;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 1px;
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    /* Chat window */
+    .chat-window {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      height: 320px;
+      overflow-y: auto;
+      padding: 16px;
+      margin-bottom: 14px;
+      scroll-behavior: smooth;
+    }
+
+    .chat-window::-webkit-scrollbar { width: 4px; }
+    .chat-window::-webkit-scrollbar-track { background: transparent; }
+    .chat-window::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+
+    .chat-msg {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.83rem;
+      line-height: 1.6;
+      padding: 4px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .chat-msg:last-child { border-bottom: none; }
+    .chat-msg .ts { color: rgba(255,255,255,0.2); font-size: 0.72rem; margin-right: 6px; }
+    .chat-msg .user { color: #fff; font-weight: bold; margin-right: 6px; }
+    .chat-msg .text { color: rgba(255,255,255,0.8); }
+    .chat-msg.system .text { color: rgba(255,255,255,0.3); font-style: italic; }
+
+    /* Input row */
+    .chat-input-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .chat-input {
+      flex: 1;
+      background: var(--faint);
+      border: 1px solid var(--border);
+      color: #fff;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .chat-input:focus { border-color: rgba(255,255,255,0.45); }
+    .chat-input::placeholder { color: rgba(255,255,255,0.2); }
+
+    .chat-send-btn {
+      background: #fff;
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 22px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.8rem;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: all 0.2s;
+    }
+    .chat-send-btn:hover { background: rgba(255,255,255,0.85); transform: scale(1.03); }
+
+    /* Username modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(6px);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.hidden { display: none; }
+
+    .modal-box {
+      background: #0a0a0a;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 14px;
+      padding: 36px 32px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 0 60px rgba(255,255,255,0.08);
+    }
+
+    .modal-title {
+      font-size: 1.1rem;
+      letter-spacing: 3px;
+      margin-bottom: 8px;
+    }
+    .modal-sub {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--dim);
+      margin-bottom: 24px;
+      letter-spacing: 1px;
+      line-height: 1.6;
+    }
+
+    .modal-input {
+      width: 100%;
+      background: var(--faint);
+      border: 1px solid var(--border);
+      color: #fff;
+      border-radius: 8px;
+      padding: 11px 14px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.9rem;
+      outline: none;
+      margin-bottom: 12px;
+      transition: border-color 0.2s;
+    }
+    .modal-input:focus { border-color: rgba(255,255,255,0.45); }
+    .modal-input::placeholder { color: rgba(255,255,255,0.2); }
+
+    .modal-error {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.78rem;
+      color: #ff6b6b;
+      margin-bottom: 12px;
+      min-height: 18px;
+      letter-spacing: 1px;
+    }
+
+    .modal-btn-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .modal-btn {
+      flex: 1;
+      background: none;
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.78rem;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: all 0.2s;
+    }
+    .modal-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.4); }
+    .modal-btn.primary { background: #fff; color: #000; border-color: #fff; }
+    .modal-btn.primary:hover { background: rgba(255,255,255,0.88); }
+
+    /* password prompt step */
+    #pwStep { display: none; }
+
+    .footer {
+      text-align: center;
+      color: rgba(255,255,255,0.3);
+      padding: 40px 20px;
+      font-size: 0.8rem;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      margin-top: 60px;
+    }
+
+    @media (max-width: 600px) {
+      .page-title { font-size: 1.8rem; }
+      .canvas-toolbar { gap: 6px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <button class="nav-button" onclick="location.href='/'">Home</button>
+  <button class="nav-button" onclick="location.href='/artists/'">Artists</button>
+  <button class="nav-button" onclick="location.href='/releases/'">Releases</button>
+  <button class="nav-button" onclick="location.href='/events/'">Events</button>
+  <button class="nav-button" onclick="location.href='/merch/'">Merch</button>
+  <button class="nav-button" onclick="location.href='/links/'">Links</button>
+  <button class="nav-button active" onclick="location.href='/wall/'">The Wall</button>
+  <button class="nav-button" onclick="location.href='/contact/'">Contact</button>
+</nav>
+
+<!-- ── USERNAME MODAL ── -->
+<div class="modal-overlay" id="usernameModal">
+  <div class="modal-box">
+    <div class="modal-title">ENTER THE WALL</div>
+    <div class="modal-sub" id="modalSub">
+      Type a username or leave blank for a random one.<br>
+      Reserved names require a password.
+    </div>
+
+    <!-- Step 1: pick a name -->
+    <div id="nameStep">
+      <input class="modal-input" type="text" id="usernameInput" placeholder="username (optional)" maxlength="50" autocomplete="off">
+      <div class="modal-error" id="modalError"></div>
+      <div class="modal-btn-row">
+        <button class="modal-btn" id="randomBtn">RANDOM NAME</button>
+        <button class="modal-btn primary" id="enterBtn">ENTER</button>
+      </div>
+    </div>
+
+    <!-- Step 2: password (if name is taken) -->
+    <div id="pwStep">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.82rem;color:var(--dim);margin-bottom:14px;" id="pwLabel"></div>
+      <input class="modal-input" type="password" id="passwordInput" placeholder="password" maxlength="100" autocomplete="off">
+      <div class="modal-error" id="pwError"></div>
+      <div class="modal-btn-row">
+        <button class="modal-btn" id="pwBackBtn">BACK</button>
+        <button class="modal-btn primary" id="pwSubmitBtn">CONFIRM</button>
+        <button class="modal-btn" id="reserveBtn" style="display:none;">RESERVE NAME</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── MAIN ── -->
+<div class="page-wrap">
+  <h1 class="page-title">THE WALL</h1>
+  <p class="page-sub">// LEAVE YOUR MARK //</p>
+
+  <!-- ══ CANVAS ══ -->
+  <div class="canvas-section">
+    <div class="section-header">PAINT — shared canvas, open to all</div>
+
+    <div class="canvas-toolbar">
+      <!-- Tools -->
+      <button class="tool-btn active" id="btnDraw" onclick="setTool('draw')">✏ DRAW</button>
+      <button class="tool-btn" id="btnErase" onclick="setTool('erase')">◻ ERASE</button>
+      <button class="tool-btn" id="btnFill" onclick="setTool('fill')">⬛ FILL</button>
+
+      <!-- Brush size -->
+      <div class="size-slider-wrap">
+        <span>SIZE</span>
+        <input type="range" id="brushSize" min="1" max="20" value="3">
+        <span id="sizeLabel">3</span>
+      </div>
+
+      <!-- Palette swatches -->
+      {% for hex in "#ffffff #ff4444 #ff8c00 #ffd700 #44ff88 #00cfff #7b61ff #ff61d8 #000000 #555555 #c0a060 #1a1a2e" %}{% endfor %}
+      <div id="palette" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
+        <!-- injected by JS -->
+      </div>
+
+      <!-- Custom color picker -->
+      <input type="color" id="colorPicker" value="#ffffff" title="Custom color">
+
+      <!-- Clear -->
+      <button class="tool-btn" id="btnClear" onclick="confirmClear()" style="margin-left:auto;border-color:rgba(255,80,80,0.5);color:rgba(255,100,100,0.9)">✕ CLEAR ALL</button>
+    </div>
+
+    <div class="canvas-outer" id="canvasOuter">
+      <canvas id="wallCanvas"></canvas>
+    </div>
+    <div class="canvas-status" id="canvasStatus">connecting…</div>
+  </div>
+
+  <!-- ══ CHAT ══ -->
+  <div class="chat-section">
+    <div class="section-header">CHAT — anonymous, real-time</div>
+
+    <div class="username-bar">
+      <span class="username-tag">CHATTING AS</span>
+      <span class="username-display" id="usernameTag">—</span>
+      <button class="tool-btn" onclick="openUsernameModal()" style="font-size:0.75rem;padding:6px 12px;">CHANGE</button>
+    </div>
+
+    <div class="chat-window" id="chatWindow">
+      <div class="chat-msg system"><span class="text">// loading messages…</span></div>
+    </div>
+
+    <div class="chat-input-row">
+      <input class="chat-input" type="text" id="chatInput" placeholder="say something…" maxlength="500" autocomplete="off">
+      <button class="chat-send-btn" onclick="sendChat()">SEND</button>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">&copy; 2025 Flip House Records</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// CANVAS SETUP
+// ═══════════════════════════════════════════════════════════════
+const COLS = 160, ROWS = 90;  // grid resolution
+const canvas = document.getElementById('wallCanvas');
+const ctx = canvas.getContext('2d');
+canvas.width = COLS;
+canvas.height = ROWS;
+
+// CSS size via aspect ratio trick
+const outer = document.getElementById('canvasOuter');
+function resizeCanvas() {
+  const w = outer.offsetWidth;
+  canvas.style.width = w + 'px';
+  canvas.style.height = Math.round(w * ROWS / COLS) + 'px';
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+// Pixel state
+let pixelData = {};
+
+function renderAll() {
+  ctx.clearRect(0, 0, COLS, ROWS);
+  ctx.fillStyle = '#111';
+  ctx.fillRect(0, 0, COLS, ROWS);
+  for (const [key, color] of Object.entries(pixelData)) {
+    const [x, y] = key.split(',').map(Number);
+    ctx.fillStyle = color;
+    ctx.fillRect(x, y, 1, 1);
+  }
+}
+
+function applyPixels(pixels) {
+  for (const p of pixels) {
+    const key = `${p.x},${p.y}`;
+    if (p.color === 'erase') delete pixelData[key];
+    else pixelData[key] = p.color;
+  }
+  for (const p of pixels) {
+    if (p.color === 'erase') {
+      ctx.fillStyle = '#111';
+    } else {
+      ctx.fillStyle = p.color;
+    }
+    ctx.fillRect(p.x, p.y, 1, 1);
+  }
+}
+
+// ── Tools ──
+let currentTool = 'draw';
+let currentColor = '#ffffff';
+let brushSz = 3;
+let isDrawing = false;
+let pendingPixels = [];
+let flushTimer = null;
+
+function setTool(t) {
+  currentTool = t;
+  document.querySelectorAll('.tool-btn[id^="btn"]').forEach(b => b.classList.remove('active'));
+  const m = { draw: 'btnDraw', erase: 'btnErase', fill: 'btnFill' };
+  if (m[t]) document.getElementById(m[t]).classList.add('active');
+  canvas.style.cursor = t === 'erase' ? 'cell' : 'crosshair';
+}
+
+// Palette
+const PALETTE = ['#ffffff','#ff4444','#ff8c00','#ffd700','#44ff88','#00cfff','#7b61ff','#ff61d8','#000000','#555555','#c0a060','#1a1a2e'];
+const paletteEl = document.getElementById('palette');
+PALETTE.forEach(hex => {
+  const s = document.createElement('div');
+  s.className = 'color-swatch' + (hex === currentColor ? ' selected' : '');
+  s.style.background = hex;
+  s.title = hex;
+  s.addEventListener('click', () => selectColor(hex, s));
+  paletteEl.appendChild(s);
+});
+
+function selectColor(hex, el) {
+  currentColor = hex;
+  document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+  if (el) el.classList.add('selected');
+  setTool('draw');
+}
+
+document.getElementById('colorPicker').addEventListener('input', e => {
+  selectColor(e.target.value, null);
+  setTool('draw');
+});
+
+document.getElementById('brushSize').addEventListener('input', e => {
+  brushSz = parseInt(e.target.value);
+  document.getElementById('sizeLabel').textContent = brushSz;
+});
+
+// ── Coordinate mapping ──
+function getCellFromEvent(e) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = COLS / rect.width;
+  const scaleY = ROWS / rect.height;
+  let clientX, clientY;
+  if (e.touches) {
+    clientX = e.touches[0].clientX;
+    clientY = e.touches[0].clientY;
+  } else {
+    clientX = e.clientX;
+    clientY = e.clientY;
+  }
+  return {
+    x: Math.floor((clientX - rect.left) * scaleX),
+    y: Math.floor((clientY - rect.top) * scaleY),
+  };
+}
+
+function paintAt(x, y) {
+  const half = Math.floor(brushSz / 2);
+  const batch = [];
+  if (currentTool === 'fill') {
+    // Flood fill
+    const target = pixelData[`${x},${y}`] || null;
+    if (target === currentColor) return;
+    const stack = [[x, y]];
+    const visited = new Set();
+    while (stack.length) {
+      const [cx, cy] = stack.pop();
+      if (cx < 0 || cy < 0 || cx >= COLS || cy >= ROWS) continue;
+      const k = `${cx},${cy}`;
+      if (visited.has(k)) continue;
+      const cur = pixelData[k] || null;
+      if (cur !== target) continue;
+      visited.add(k);
+      batch.push({ x: cx, y: cy, color: currentColor });
+      stack.push([cx+1,cy],[cx-1,cy],[cx,cy+1],[cx,cy-1]);
+    }
+  } else {
+    for (let dx = -half; dx <= half; dx++) {
+      for (let dy = -half; dy <= half; dy++) {
+        const px = x + dx, py = y + dy;
+        if (px < 0 || py < 0 || px >= COLS || py >= ROWS) continue;
+        batch.push({ x: px, y: py, color: currentTool === 'erase' ? 'erase' : currentColor });
+      }
+    }
+  }
+  if (batch.length) {
+    applyPixels(batch);
+    pendingPixels.push(...batch);
+    scheduleFlush();
+  }
+}
+
+function scheduleFlush() {
+  if (flushTimer) return;
+  flushTimer = setTimeout(() => {
+    if (pendingPixels.length && canvasWS && canvasWS.readyState === WebSocket.OPEN) {
+      canvasWS.send(JSON.stringify({ type: 'draw', pixels: pendingPixels }));
+    }
+    pendingPixels = [];
+    flushTimer = null;
+  }, 50);
+}
+
+canvas.addEventListener('mousedown', e => { isDrawing = true; const c = getCellFromEvent(e); paintAt(c.x, c.y); });
+canvas.addEventListener('mousemove', e => { if (!isDrawing) return; const c = getCellFromEvent(e); paintAt(c.x, c.y); });
+canvas.addEventListener('mouseup', () => { isDrawing = false; });
+canvas.addEventListener('mouseleave', () => { isDrawing = false; });
+canvas.addEventListener('touchstart', e => { e.preventDefault(); isDrawing = true; const c = getCellFromEvent(e); paintAt(c.x, c.y); }, { passive: false });
+canvas.addEventListener('touchmove', e => { e.preventDefault(); if (!isDrawing) return; const c = getCellFromEvent(e); paintAt(c.x, c.y); }, { passive: false });
+canvas.addEventListener('touchend', () => { isDrawing = false; });
+
+function confirmClear() {
+  if (confirm('Clear the entire wall? This affects everyone.')) {
+    if (canvasWS && canvasWS.readyState === WebSocket.OPEN) {
+      canvasWS.send(JSON.stringify({ type: 'clear' }));
+    }
+  }
+}
+
+// ── Canvas WebSocket ──
+let canvasWS;
+const canvasStatus = document.getElementById('canvasStatus');
+
+function connectCanvas() {
+  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+  canvasWS = new WebSocket(`${proto}://${location.host}/ws/canvas/`);
+
+  canvasWS.onopen = () => {
+    canvasStatus.textContent = '● connected';
+    canvasStatus.style.color = 'rgba(100,255,150,0.6)';
+  };
+
+  canvasWS.onclose = () => {
+    canvasStatus.textContent = '○ disconnected — retrying…';
+    canvasStatus.style.color = 'rgba(255,100,100,0.5)';
+    setTimeout(connectCanvas, 3000);
+  };
+
+  canvasWS.onerror = () => {
+    canvasStatus.textContent = '○ connection error';
+  };
+
+  canvasWS.onmessage = e => {
+    const msg = JSON.parse(e.data);
+    if (msg.type === 'canvas_init') {
+      pixelData = msg.data || {};
+      renderAll();
+    } else if (msg.type === 'draw') {
+      applyPixels(msg.pixels);
+    } else if (msg.type === 'clear') {
+      pixelData = {};
+      renderAll();
+    }
+  };
+}
+
+connectCanvas();
+renderAll();
+
+
+// ═══════════════════════════════════════════════════════════════
+// CHAT
+// ═══════════════════════════════════════════════════════════════
+let chatWS;
+let myUsername = null;
+const chatWindow = document.getElementById('chatWindow');
+
+// Seed with server-rendered history
+const HISTORY = {{ messages_json|safe }};
+
+function connectChat() {
+  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+  chatWS = new WebSocket(`${proto}://${location.host}/ws/chat/`);
+
+  chatWS.onopen = () => {};
+  chatWS.onclose = () => { setTimeout(connectChat, 3000); };
+  chatWS.onmessage = e => {
+    const msg = JSON.parse(e.data);
+    if (msg.type === 'message') {
+      appendMessage(msg.username, msg.message, msg.timestamp, false);
+    } else if (msg.type === 'username_status') {
+      handleUsernameStatus(msg);
+    } else if (msg.type === 'reserve_result') {
+      handleReserveResult(msg);
+    } else if (msg.type === 'auth_result') {
+      handleAuthResult(msg);
+    }
+  };
+}
+
+connectChat();
+
+function appendMessage(username, message, ts, isSystem) {
+  const div = document.createElement('div');
+  div.className = 'chat-msg' + (isSystem ? ' system' : '');
+  if (isSystem) {
+    div.innerHTML = `<span class="text">${escapeHtml(message)}</span>`;
+  } else {
+    div.innerHTML = `<span class="ts">[${ts}]</span><span class="user">${escapeHtml(username)}:</span><span class="text">${escapeHtml(message)}</span>`;
+  }
+  chatWindow.appendChild(div);
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Load history
+chatWindow.innerHTML = '';
+if (HISTORY.length === 0) {
+  appendMessage('', '// no messages yet — be the first //', '', true);
+} else {
+  for (const m of HISTORY) appendMessage(m.username, m.message, m.timestamp, false);
+}
+
+function sendChat() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text || !myUsername) return;
+  if (!chatWS || chatWS.readyState !== WebSocket.OPEN) return;
+  chatWS.send(JSON.stringify({ type: 'chat_message', username: myUsername, message: text }));
+  input.value = '';
+}
+
+document.getElementById('chatInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') sendChat();
+});
+
+
+// ═══════════════════════════════════════════════════════════════
+// USERNAME MODAL
+// ═══════════════════════════════════════════════════════════════
+const modal = document.getElementById('usernameModal');
+let pendingUsername = null;
+
+function generateRandomName() {
+  // Small client-side random name for instant feel; server generates the real one
+  const adj = ['cosmic','dusty','frozen','neon','glitch','vapor','turbo','indie','lunar','wired'];
+  const noun = ['bass','beat','flip','groove','sample','scratch','synth','vinyl','wave','zone'];
+  return `${adj[Math.floor(Math.random()*adj.length)]}-${noun[Math.floor(Math.random()*noun.length)]}-${Math.floor(Math.random()*90)+10}`;
+}
+
+document.getElementById('randomBtn').addEventListener('click', () => {
+  const name = generateRandomName();
+  document.getElementById('usernameInput').value = name;
+});
+
+document.getElementById('enterBtn').addEventListener('click', () => {
+  let name = document.getElementById('usernameInput').value.trim();
+  if (!name) name = generateRandomName();
+  pendingUsername = name;
+
+  if (!chatWS || chatWS.readyState !== WebSocket.OPEN) {
+    // WS not ready yet, just set it
+    finalizeUsername(name);
+    return;
+  }
+  chatWS.send(JSON.stringify({ type: 'check_username', username: name }));
+});
+
+document.getElementById('usernameInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('enterBtn').click();
+});
+
+function handleUsernameStatus(msg) {
+  if (!msg.taken) {
+    // Free name — offer to reserve it
+    showPwStep(`"${msg.username}" is available. Set a password to reserve it, or skip.`, false);
+  } else {
+    // Taken — need password to use it
+    showPwStep(`"${msg.username}" is reserved. Enter the password to use it.`, true);
+  }
+}
+
+function showPwStep(label, isLogin) {
+  document.getElementById('nameStep').style.display = 'none';
+  document.getElementById('pwStep').style.display = 'block';
+  document.getElementById('pwLabel').textContent = label;
+  document.getElementById('passwordInput').value = '';
+  document.getElementById('pwError').textContent = '';
+  const reserveBtn = document.getElementById('reserveBtn');
+  const submitBtn = document.getElementById('pwSubmitBtn');
+
+  if (isLogin) {
+    submitBtn.textContent = 'LOGIN';
+    reserveBtn.style.display = 'none';
+  } else {
+    submitBtn.textContent = 'SKIP';
+    reserveBtn.style.display = 'block';
+    reserveBtn.textContent = 'RESERVE NAME';
+  }
+}
+
+document.getElementById('pwBackBtn').addEventListener('click', () => {
+  document.getElementById('nameStep').style.display = 'block';
+  document.getElementById('pwStep').style.display = 'none';
+  document.getElementById('modalError').textContent = '';
+});
+
+document.getElementById('pwSubmitBtn').addEventListener('click', () => {
+  const pw = document.getElementById('passwordInput').value;
+  if (document.getElementById('pwSubmitBtn').textContent === 'LOGIN') {
+    // Auth attempt
+    chatWS.send(JSON.stringify({ type: 'auth_username', username: pendingUsername, password: pw }));
+  } else {
+    // Skip — just use the name without reserving
+    finalizeUsername(pendingUsername);
+  }
+});
+
+document.getElementById('reserveBtn').addEventListener('click', () => {
+  const pw = document.getElementById('passwordInput').value;
+  if (!pw) { document.getElementById('pwError').textContent = 'Enter a password to reserve.'; return; }
+  chatWS.send(JSON.stringify({ type: 'reserve_username', username: pendingUsername, password: pw }));
+});
+
+function handleReserveResult(msg) {
+  if (msg.success) {
+    finalizeUsername(pendingUsername);
+  } else {
+    document.getElementById('pwError').textContent = msg.error || 'Error.';
+  }
+}
+
+function handleAuthResult(msg) {
+  if (msg.success) {
+    finalizeUsername(pendingUsername);
+  } else {
+    document.getElementById('pwError').textContent = msg.error || 'Wrong password.';
+  }
+}
+
+function finalizeUsername(name) {
+  myUsername = name;
+  document.getElementById('usernameTag').textContent = name;
+  modal.classList.add('hidden');
+  appendMessage('', `// you joined as ${name} //`, '', true);
+}
+
+function openUsernameModal() {
+  modal.classList.remove('hidden');
+  document.getElementById('nameStep').style.display = 'block';
+  document.getElementById('pwStep').style.display = 'none';
+  document.getElementById('usernameInput').value = myUsername || '';
+  document.getElementById('modalError').textContent = '';
+}
+
+// Show modal on load
+window.addEventListener('load', () => {
+  openUsernameModal();
+});
+</script>
+</body>
+</html>

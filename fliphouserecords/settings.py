@@ -14,17 +14,19 @@ ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost").split(",")
 
 # === Installed Apps ===
 INSTALLED_APPS = [
+    "daphne",                                   # Must be first for ASGI
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "channels",
     "releases",
     "storages",
 ]
 
-# === Middleware (WhiteNoise removed) ===
+# === Middleware ===
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -61,21 +63,15 @@ DATABASES = {
     )
 }
 
-
 # === AWS S3 Config ===
 AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
 AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME", "us-east-1")
-
-AWS_S3_ADDRESSING_STYLE = "virtual"  # Use virtual-hosted–style URLs
-AWS_S3_FILE_OVERWRITE = False        # Don’t overwrite files with same name
-AWS_DEFAULT_ACL = "public-read"      # Make uploaded files public
-AWS_QUERYSTRING_AUTH = False         # Don't append auth tokens to URLs
-
-
-
-
+AWS_S3_ADDRESSING_STYLE = "virtual"
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL = "public-read"
+AWS_QUERYSTRING_AUTH = False
 
 # === Static / Media Files ===
 STATIC_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/static/"
@@ -84,6 +80,20 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/"
 DEFAULT_FILE_STORAGE = "fliphouserecords.storage_backends.MediaStorage"
+
+# === ASGI & Django Channels ===
+ASGI_APPLICATION = "fliphouserecords.asgi.application"
+
+# Redis channel layer — set REDIS_URL env var on Render
+# On Render: add a Redis service and copy its Internal URL as REDIS_URL
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [os.getenv("REDIS_URL", "redis://localhost:6379")],
+        },
+    }
+}
 
 # === Authentication & Passwords ===
 AUTH_PASSWORD_VALIDATORS = [
