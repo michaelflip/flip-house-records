@@ -991,9 +991,9 @@ function connectCanvas() {
   canvasWS.onerror = () => { canvasStatus.textContent = '○ connection error'; };
   canvasWS.onmessage = e => {
     const msg = JSON.parse(e.data);
-    if (msg.type === 'canvas_init') { pixelData = msg.data || {}; renderAll(); }
-    else if (msg.type === 'draw') { applyPixels(msg.pixels); }
-    else if (msg.type === 'clear') { pixelData = {}; renderAll(); }
+    if (msg.type === 'canvas_init') { pixelData = msg.data || {}; renderAll(); if (_expandedOpen) renderExpanded(); }
+    else if (msg.type === 'draw') { applyPixelsAndSyncExpanded(msg.pixels); }
+    else if (msg.type === 'clear') { pixelData = {}; renderAll(); if (_expandedOpen) renderExpanded(); }
   };
 }
 
@@ -1282,17 +1282,18 @@ function renderExpanded() {
   }
 }
 
-// Also update expanded canvas when pixels arrive from WS
-const _origApplyPixels = applyPixels;
-applyPixels = function(pixels) {
-  _origApplyPixels(pixels);
-  if (!document.getElementById('expandedOverlay').classList.contains('hidden')) {
+// Patch applyPixels to also sync expanded canvas when open
+// We do this by monkey-patching after the fact using a wrapper variable
+let _expandedOpen = false;
+function applyPixelsAndSyncExpanded(pixels) {
+  applyPixels(pixels);
+  if (_expandedOpen) {
     for (const p of pixels) {
       expCtx.fillStyle = p.color === 'erase' ? '#111' : p.color;
       expCtx.fillRect(p.x * SCALE, p.y * SCALE, SCALE, SCALE);
     }
   }
-};
+}
 
 // Drawing on expanded canvas maps back to same 160x90 grid
 function getExpCell(e) {
@@ -1375,20 +1376,21 @@ document.getElementById('expBrushSize').addEventListener('input', e => {
 
 function openExpanded() {
   panX = 0; panY = 0;
+  _expandedOpen = true;
   document.getElementById('expandedOverlay').classList.remove('hidden');
   document.body.style.overflow = 'hidden';
   renderExpanded();
   applyExpPan();
-  // sync tool state
   expSetTool(currentTool);
   document.getElementById('expBrushSize').value = brushSz;
   document.getElementById('expSizeLabel').textContent = brushSz;
 }
 
 function closeExpanded() {
+  _expandedOpen = false;
   document.getElementById('expandedOverlay').classList.add('hidden');
   document.body.style.overflow = '';
-  renderAll(); // keep main canvas in sync
+  renderAll();
 }
 </script>
 {% endblock %}

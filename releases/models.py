@@ -104,6 +104,13 @@ class AffiliateLink(models.Model):
     name = models.CharField(max_length=200, help_text="Display name for the link")
     url = models.URLField(max_length=500, help_text="Full URL including https://")
     description = models.CharField(max_length=300, blank=True, null=True, help_text="Short description (optional)")
+    favicon = models.ImageField(
+        upload_to='link_favicons/',
+        storage=MediaStorage(),
+        blank=True,
+        null=True,
+        help_text="Small logo or icon for this link (optional)"
+    )
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, default='other')
     display_order = models.IntegerField(default=0, help_text="Lower numbers appear first")
     is_active = models.BooleanField(default=True)
