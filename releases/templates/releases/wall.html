@@ -362,6 +362,142 @@
     /* password prompt step */
     #pwStep { display: none; }
 
+    /* ── ToS MODAL ── */
+    #tosModal .modal-box { max-width: 520px; }
+
+    .tos-link {
+      color: #fff;
+      text-decoration: underline;
+      text-decoration-style: dotted;
+      cursor: pointer;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.95rem;
+      letter-spacing: 1px;
+      transition: opacity 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .tos-link:hover { opacity: 0.7; }
+    .tos-link::after { content: ' ↗'; font-size: 0.8rem; opacity: 0.6; }
+
+    .tos-agree-btn {
+      width: 100%;
+      margin-top: 20px;
+      background: #fff;
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      padding: 13px 20px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.78rem;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: all 0.2s;
+    }
+    .tos-agree-btn:hover { background: rgba(255,255,255,0.88); transform: scale(1.02); }
+
+    .tos-decline-btn {
+      width: 100%;
+      margin-top: 10px;
+      background: none;
+      color: rgba(255,255,255,0.35);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.78rem;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: all 0.2s;
+    }
+    .tos-decline-btn:hover { color: rgba(255,255,255,0.6); border-color: rgba(255,255,255,0.25); }
+
+    /* Full ToS popup window */
+    #tosPopup {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.92);
+      backdrop-filter: blur(8px);
+      z-index: 3000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    #tosPopup.hidden { display: none; }
+
+    .tos-popup-box {
+      background: #0a0a0a;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 14px;
+      padding: 36px 32px;
+      width: 100%;
+      max-width: 640px;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 0 60px rgba(255,255,255,0.08);
+    }
+    .tos-popup-box::-webkit-scrollbar { width: 4px; }
+    .tos-popup-box::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+
+    .tos-popup-title { font-size: 1rem; letter-spacing: 3px; margin-bottom: 4px; }
+    .tos-popup-date {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 2px;
+      margin-bottom: 24px;
+    }
+    .tos-popup-body {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.8rem;
+      line-height: 1.8;
+      color: rgba(255,255,255,0.75);
+    }
+    .tos-popup-body h3 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.78rem;
+      color: #fff;
+      letter-spacing: 2px;
+      margin: 20px 0 8px;
+    }
+    .tos-popup-body ul { padding-left: 18px; margin: 6px 0; }
+    .tos-popup-body li { margin-bottom: 6px; }
+
+    .tos-close-btn {
+      margin-top: 28px;
+      background: none;
+      border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.6);
+      border-radius: 8px;
+      padding: 10px 24px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.78rem;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: all 0.2s;
+    }
+    .tos-close-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
+
+    /* Lock overlay on canvas until ToS agreed */
+    #canvasLock {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 2px;
+      border-radius: 10px;
+    }
+    #canvasLock.hidden { display: none; }
+
     .footer {
       text-align: center;
       color: rgba(255,255,255,0.3);
@@ -391,8 +527,63 @@
   <button class="nav-button" onclick="location.href='/contact/'">Contact</button>
 </nav>
 
+<!-- ── ToS FULL POPUP ── -->
+<div id="tosPopup" class="hidden">
+  <div class="tos-popup-box">
+    <div class="tos-popup-title">TERMS OF SERVICE: "THE WALL"</div>
+    <div class="tos-popup-date">Last Updated: February 22, 2026</div>
+    <div class="tos-popup-body">
+      <p>Welcome to The Wall at fliphouserecords.com. By clicking "I Agree" or by accessing and using this page, you are entering into a legally binding agreement. If you don't agree to these terms, please head back to the main site.</p>
+
+      <h3>1. COMMUNITY CONDUCT (THE "DON'T BE A JERK" POLICY)</h3>
+      <p>"The Wall" is a shared creative space. To keep it functional and fun, you agree not to:</p>
+      <ul>
+        <li>Post or draw anything illegal, pornographic, or sexually explicit.</li>
+        <li>Engage in hate speech, harassment, or threats against individuals or groups.</li>
+        <li>Post "Doxxing" information (phone numbers, home addresses, or private data).</li>
+        <li>Use bots or scripts to automate drawing or spam the chat room.</li>
+      </ul>
+
+      <h3>2. USER-GENERATED CONTENT & LICENSING</h3>
+      <p>You own what you create, but because this is a public, shared experience, you grant Flip House Records a non-exclusive, royalty-free, worldwide license to display, record, and share snapshots of "The Wall" (including your contributions) for promotional or archival purposes.</p>
+
+      <h3>3. MODERATION & "THE RIGHT TO ERASE"</h3>
+      <p>We don't pre-screen content, but we reserve the right to:</p>
+      <ul>
+        <li>Wipe the canvas at any time (The "Big Reset").</li>
+        <li>Delete specific drawings or chat messages that violate these terms.</li>
+        <li>Ban IP addresses or users who repeatedly disrupt the experience.</li>
+      </ul>
+
+      <h3>4. DISCLAIMER OF LIABILITY</h3>
+      <p>The Wall is provided "As-Is." Flip House Records is not responsible for the content created by users. You understand that you may be exposed to content that is offensive, indecent, or objectionable. We are not liable for any emotional distress, data loss, or technical "glitches" that occur while using this experimental tool.</p>
+
+      <h3>5. AGE REQUIREMENT</h3>
+      <p>By using The Wall, you represent that you are at least 13 years of age. If you are under 18, you represent that you have parental permission to be here.</p>
+
+      <h3>6. PRIVACY NOTE</h3>
+      <p>We may log IP addresses to prevent abuse and spam. We do not sell your data, but we will cooperate with law enforcement if illegal activity is detected on the platform.</p>
+    </div>
+    <button class="tos-close-btn" onclick="closeTosPopup()">← CLOSE</button>
+  </div>
+</div>
+
+<!-- ── ToS AGREEMENT MODAL ── -->
+<div class="modal-overlay" id="tosModal">
+  <div class="modal-box">
+    <div class="modal-title">BEFORE YOU ENTER</div>
+    <div class="modal-sub">
+      This is a shared public space. By continuing, you agree to the rules.<br><br>
+      <span class="tos-link" onclick="openTosPopup()">Terms of Service: "The Wall"</span>
+      <br><small style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:rgba(255,255,255,0.3);letter-spacing:1px;margin-top:6px;display:block;">↑ click to read the full terms in a new window</small>
+    </div>
+    <button class="tos-agree-btn" onclick="agreeTos()">I HAVE READ THE TERMS AND I PROMISE TO BE COOL</button>
+    <button class="tos-decline-btn" onclick="location.href='/'">No thanks, take me back</button>
+  </div>
+</div>
+
 <!-- ── USERNAME MODAL ── -->
-<div class="modal-overlay" id="usernameModal">
+<div class="modal-overlay hidden" id="usernameModal">
   <div class="modal-box">
     <div class="modal-title">ENTER THE WALL</div>
     <div class="modal-sub" id="modalSub">
@@ -462,6 +653,7 @@
 
     <div class="canvas-outer" id="canvasOuter">
       <canvas id="wallCanvas"></canvas>
+      <div id="canvasLock">// AGREE TO TERMS TO UNLOCK //</div>
     </div>
     <div class="canvas-status" id="canvasStatus">connecting…</div>
   </div>
@@ -895,9 +1087,44 @@ function openUsernameModal() {
   document.getElementById('modalError').textContent = '';
 }
 
+// ═══════════════════════════════════════════════════════════════
+// TERMS OF SERVICE
+// ═══════════════════════════════════════════════════════════════
+const tosModal = document.getElementById('tosModal');
+const tosPopup = document.getElementById('tosPopup');
+let tosAgreed = false;
+
+function openTosPopup() {
+  tosPopup.classList.remove('hidden');
+}
+
+function closeTosPopup() {
+  tosPopup.classList.add('hidden');
+}
+
+function agreeTos() {
+  tosAgreed = true;
+  // Store in sessionStorage so it persists for the tab session
+  sessionStorage.setItem('wall_tos_agreed', '1');
+  tosModal.classList.add('hidden');
+  // Unlock canvas
+  document.getElementById('canvasLock').classList.add('hidden');
+  // Now show the username modal
+  openUsernameModal();
+}
+
 // Show modal on load
 window.addEventListener('load', () => {
-  openUsernameModal();
+  // Check if already agreed this session
+  if (sessionStorage.getItem('wall_tos_agreed') === '1') {
+    tosAgreed = true;
+    tosModal.classList.add('hidden');
+    document.getElementById('canvasLock').classList.add('hidden');
+    openUsernameModal();
+  } else {
+    // Show ToS first, keep username modal hidden
+    tosModal.classList.remove('hidden');
+  }
 });
 </script>
 </body>
