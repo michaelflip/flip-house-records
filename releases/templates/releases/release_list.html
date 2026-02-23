@@ -1,163 +1,307 @@
-{% extends "base.html" %}
 {% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+  <meta charset="UTF-8">
+  <title>Flip House Records - Releases</title>
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap');
 
-{% block title %}Flip House Records - Releases{% endblock %}
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-{% block extra_css %}
-<style>
-  .releases-container {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 100px 20px 60px;
-  }
+    html {
+      scroll-behavior: smooth;
+    }
 
-  .page-title {
-    text-align: center;
-    font-size: 3rem;
-    margin-bottom: 50px;
-    text-shadow: 0 0 20px rgba(255,255,255,0.5);
-    letter-spacing: 3px;
-  }
+    body {
+      background-color: black;
+      color: white;
+      font-family: 'Orbitron', sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
 
-  .release-card {
-    background: rgba(255,255,255,0.03);
-    backdrop-filter: blur(10px);
-    border: 3px solid rgba(255,255,255,0.3);
-    border-radius: 15px;
-    padding: 30px;
-    margin-bottom: 40px;
-    transition: all 0.4s ease;
-    box-shadow: 0 0 20px rgba(255,255,255,0.1), inset 0 0 30px rgba(255,255,255,0.02);
-    position: relative;
-    overflow: hidden;
-  }
+    /* Fixed Navigation Bar */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 20px 0;
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      z-index: 1000;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
+    }
 
-  .release-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: -100%;
-    width: 100%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-    transition: left 0.5s ease;
-  }
+    .nav-button {
+      background: none;
+      border: 2px solid white;
+      color: white;
+      padding: 0.5rem 1.2rem;
+      border-radius: 50px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    }
 
-  .release-card:hover::before { left: 100%; }
-  .release-card:hover {
-    border-color: rgba(255,255,255,0.6);
-    box-shadow: 0 0 40px rgba(255,255,255,0.2), inset 0 0 50px rgba(255,255,255,0.05);
-    transform: translateY(-5px);
-  }
+    .nav-button:hover {
+      background: white;
+      color: black;
+      transform: scale(1.05);
+      box-shadow: 0 0 20px white;
+    }
 
-  .release-title {
-    font-size: 2rem;
-    margin-bottom: 20px;
-    text-shadow: 0 0 10px rgba(255,255,255,0.3);
-    letter-spacing: 1px;
-    position: relative;
-    z-index: 1;
-  }
+    /* Main Container */
+    .releases-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 120px 20px 60px 20px;
+    }
 
-  .release-body {
-    font-family: Arial, sans-serif;
-    font-size: 1rem;
-    line-height: 1.7;
-    margin-bottom: 20px;
-    color: rgba(255,255,255,0.9);
-    position: relative;
-    z-index: 1;
-  }
+    .page-title {
+      text-align: center;
+      font-size: 3rem;
+      margin-bottom: 50px;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+      letter-spacing: 3px;
+    }
 
-  .release-tags {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 8px;
-    padding: 12px 15px;
-    margin-bottom: 20px;
-    font-size: 0.85rem;
-    color: rgba(255,255,255,0.7);
-    position: relative;
-    z-index: 1;
-  }
+    /* Release Cards */
+    .release-card {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(10px);
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 15px;
+      padding: 30px;
+      margin-bottom: 40px;
+      transition: all 0.4s ease;
+      box-shadow: 
+        0 0 20px rgba(255, 255, 255, 0.1),
+        inset 0 0 30px rgba(255, 255, 255, 0.02);
+      position: relative;
+      overflow: hidden;
+    }
 
-  .release-tags strong { color: white; }
+    .release-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.05),
+        transparent
+      );
+      transition: left 0.5s ease;
+    }
 
-  .album-art-container {
-    text-align: center;
-    margin: 25px 0;
-    position: relative;
-    z-index: 1;
-  }
+    .release-card:hover::before {
+      left: 100%;
+    }
 
-  .album-art {
-    max-width: 100%;
-    max-height: 400px;
-    border: 3px solid rgba(255,255,255,0.3);
-    border-radius: 10px;
-    box-shadow: 0 0 30px rgba(255,255,255,0.2);
-    transition: all 0.3s ease;
-  }
+    .release-card:hover {
+      border-color: rgba(255, 255, 255, 0.6);
+      box-shadow: 
+        0 0 40px rgba(255, 255, 255, 0.2),
+        inset 0 0 50px rgba(255, 255, 255, 0.05);
+      transform: translateY(-5px);
+    }
 
-  .album-art:hover { transform: scale(1.02); box-shadow: 0 0 50px rgba(255,255,255,0.4); }
+    .release-title {
+      font-size: 2rem;
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+      letter-spacing: 1px;
+      position: relative;
+      z-index: 1;
+    }
 
-  .audio-player {
-    width: 100%;
-    margin: 20px 0;
-    border-radius: 8px;
-    outline: none;
-    position: relative;
-    z-index: 1;
-  }
+    .release-body {
+      font-family: Arial, sans-serif;
+      font-size: 1rem;
+      line-height: 1.7;
+      margin-bottom: 20px;
+      color: rgba(255, 255, 255, 0.9);
+      position: relative;
+      z-index: 1;
+    }
 
-  .release-date {
-    margin-top: 20px;
-    font-size: 0.95rem;
-    color: rgba(255,255,255,0.6);
-    position: relative;
-    z-index: 1;
-  }
+    .release-tags {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 12px 15px;
+      margin-bottom: 20px;
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.7);
+      position: relative;
+      z-index: 1;
+    }
 
-  .release-date strong { color: white; }
+    .release-tags strong {
+      color: white;
+    }
 
-  .no-releases { text-align: center; font-size: 1.5rem; margin-top: 100px; color: rgba(255,255,255,0.5); }
+    .album-art-container {
+      text-align: center;
+      margin: 25px 0;
+      position: relative;
+      z-index: 1;
+    }
 
-  @media (max-width: 768px) {
-    .page-title { font-size: 2rem; }
-    .release-card { padding: 20px; }
-    .release-title { font-size: 1.5rem; }
-  }
-</style>
-{% endblock %}
+    .album-art {
+      max-width: 100%;
+      max-height: 400px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+    }
 
-{% block content %}
-<div class="releases-container">
-  <h1 class="page-title">🎵 RELEASES</h1>
+    .album-art:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 50px rgba(255, 255, 255, 0.4);
+    }
 
-  {% for post in posts %}
-  <div class="release-card">
-    <h3 class="release-title">{{ post.title }}</h3>
-    <div class="release-body">{{ post.body|linebreaks }}</div>
+    .audio-player {
+      width: 100%;
+      margin: 20px 0;
+      border-radius: 8px;
+      outline: none;
+      position: relative;
+      z-index: 1;
+    }
 
-    {% if post.tags %}
-    <div class="release-tags"><strong>Tags:</strong> {{ post.tags }}</div>
-    {% endif %}
+    .audio-player::-webkit-media-controls-panel {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
 
-    {% if post.album_art %}
-    <div class="album-art-container">
-      <img src="{{ post.album_art.url }}" alt="{{ post.title }} album art" class="album-art">
+    .release-date {
+      margin-top: 20px;
+      font-size: 0.95rem;
+      color: rgba(255, 255, 255, 0.6);
+      position: relative;
+      z-index: 1;
+    }
+
+    .release-date strong {
+      color: white;
+    }
+
+    .no-releases {
+      text-align: center;
+      font-size: 1.5rem;
+      margin-top: 100px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .footer {
+      text-align: center;
+      color: rgba(255, 255, 255, 0.6);
+      padding: 40px 20px;
+      border-top: 2px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .page-title {
+        font-size: 2rem;
+      }
+
+      .release-card {
+        padding: 20px;
+      }
+
+      .release-title {
+        font-size: 1.5rem;
+      }
+
+      nav {
+        gap: 0.5rem;
+        padding: 15px 10px;
+      }
+
+      .nav-button {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Fixed Navigation -->
+  <nav>
+    <button class="nav-button" onclick="window.location.href='/'">Home</button>
+    <button class="nav-button" onclick="window.location.href='/artists/'">Artists</button>
+    <button class="nav-button" onclick="window.location.href='/releases/'">Releases</button>
+    <button class="nav-button" onclick="window.location.href='/events/'">Events</button>
+    <button class="nav-button" onclick="window.location.href='/merch/'">Merch</button>
+    <button class="nav-button" onclick="window.location.href='/links/'">Links</button>
+    <button class="nav-button" onclick="window.location.href='/wall/'">The Wall</button>
+    <button class="nav-button" onclick="window.location.href='/contact/'">Contact</button>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="releases-container">
+    <h1 class="page-title">🎵 RELEASES</h1>
+
+    {% for post in posts %}
+    <div class="release-card">
+      <h3 class="release-title"><a href="{% url 'release_detail' post.pk %}" style="color:inherit;text-decoration:none;">{{ post.title }}</a></h3>
+      
+      <div class="release-body">{{ post.body|linebreaks }}</div>
+
+      {% if post.tags %}
+      <div class="release-tags">
+        <strong>Tags:</strong> {{ post.tags }}
+      </div>
+      {% endif %}
+
+      {% if post.album_art %}
+      <div class="album-art-container">
+        <a href="{% url 'release_detail' post.pk %}">
+          <img src="{{ post.album_art.url }}" alt="{{ post.title }} album art" class="album-art">
+        </a>
+      </div>
+      {% endif %}
+
+      {% if post.track_preview %}
+      <audio controls class="audio-player">
+        <source src="{{ post.track_preview.url }}" type="audio/mpeg">
+        Your browser does not support the audio element.
+      </audio>
+      {% endif %}
+
+      <p class="release-date"><strong>Released:</strong> {{ post.release_datetime|date:"F j, Y" }}</p>
     </div>
-    {% endif %}
-
-    {% if post.track_preview %}
-    <audio controls class="audio-player">
-      <source src="{{ post.track_preview.url }}" type="audio/mpeg">
-      Your browser does not support the audio element.
-    </audio>
-    {% endif %}
-
-    <p class="release-date"><strong>Released:</strong> {{ post.release_datetime|date:"F j, Y" }}</p>
+    {% empty %}
+    <div class="no-releases">
+      No releases yet. Check back soon!
+    </div>
+    {% endfor %}
   </div>
-  {% empty %}
-  <div class="no-releases">No releases yet. Check back soon!</div>
-  {% endfor %}
-</div>
-{% endblock %}
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2025 Flip House Records</p>
+  </footer>
+
+</body>
+</html>

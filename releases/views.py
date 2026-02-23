@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import ReleasePost, Artist, Event, AffiliateLink, ChatMessage
 from .forms import ReleaseUploadForm
 import json
@@ -14,6 +14,11 @@ def release_list(request, tag=None):
         'posts': posts,
         'active_tag': tag,
     })
+
+
+def release_detail(request, pk):
+    post = get_object_or_404(ReleasePost, pk=pk)
+    return render(request, 'releases/release_detail.html', {'post': post})
 
 
 def upload_release(request):
