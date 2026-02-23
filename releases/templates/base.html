@@ -32,22 +32,25 @@
 
   nav {
     position: fixed;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
+    top: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 15px 10px;
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
     justify-content: center;
-    padding: 0 10px;
     max-width: 100%;
     z-index: 1000;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
   }
 
   @media (min-width: 768px) {
     nav {
-      top: 20px;
-      gap: 1rem;
+      gap: 0.75rem;
+      padding: 18px 10px;
     }
   }
 
@@ -55,9 +58,10 @@
     background: none;
     border: 2px solid white;
     color: white;
-    padding: 0.5rem 1.2rem;
+    padding: 0.45rem 1rem;
     border-radius: 50px;
-    font-size: 1rem;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.85rem;
     cursor: pointer;
     transition: all 0.3s ease;
   }
@@ -115,6 +119,8 @@
     <button class="nav-button" onclick="window.location.href='/releases/'">Releases</button>
     <button class="nav-button" onclick="window.location.href='/events/'">Events</button>
     <button class="nav-button" onclick="window.location.href='/merch/'">Merch</button>
+    <button class="nav-button" onclick="window.location.href='/links/'">Links</button>
+    <button class="nav-button" onclick="window.location.href='/wall/'">The Wall</button>
     <button class="nav-button" onclick="window.location.href='/contact/'">Contact</button>
   </nav>
 
