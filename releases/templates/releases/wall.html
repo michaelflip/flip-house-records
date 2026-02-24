@@ -53,7 +53,7 @@
     flex-wrap: wrap;
     align-items: center;
     gap: 10px;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
   }
 
   .tool-btn {
@@ -67,6 +67,7 @@
     cursor: pointer;
     transition: all 0.2s;
     letter-spacing: 1px;
+    height: 100%;
   }
   .tool-btn:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.4); }
   .tool-btn.active { background: #fff; color: #000; border-color: #fff; }
@@ -126,38 +127,28 @@
     color: rgba(255,255,255,0.3);
     margin-top: 10px;
     letter-spacing: 1px;
+    text-align: center;
   }
 
-  /* Main canvas D-pad */
-  .main-dpad {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    display: grid;
-    grid-template-columns: repeat(3, 34px);
-    grid-template-rows: repeat(3, 34px);
-    gap: 3px;
-    z-index: 5;
-  }
-  .main-dpad .dpad-btn {
-    background: rgba(0,0,0,0.75);
-    border: 1px solid rgba(255,255,255,0.18);
+  /* ── EXTERNAL DIRECTIONAL BUTTONS (MAIN) ── */
+  .dir-btn {
+    background: var(--faint);
+    border: 1px solid var(--border);
     color: #fff;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    cursor: pointer;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.12s;
+    cursor: pointer;
+    transition: all 0.15s;
     user-select: none;
-    -webkit-user-select: none;
+    flex-shrink: 0;
   }
-  .main-dpad .dpad-btn:hover  { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.5); }
-  .main-dpad .dpad-btn:active { background: rgba(255,255,255,0.28); transform: scale(0.92); }
-  .main-dpad .dpad-btn.empty  { background: none; border: none; pointer-events: none; }
-  .main-dpad .dpad-btn.home   { font-size: 0.5rem; letter-spacing: 0.5px; color: rgba(255,255,255,0.4); font-family: 'Share Tech Mono',monospace; }
-  .main-dpad .dpad-btn.home:hover { color: #fff; background: rgba(255,255,255,0.12); }
+  .dir-btn:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.5); }
+  .dir-btn:active { background: rgba(255,255,255,0.3); transform: scale(0.9); }
 
   .username-bar {
     display: flex;
@@ -530,44 +521,40 @@
     image-rendering: pixelated;
   }
 
-  .dpad {
+  /* ── EXTERNAL DIRECTIONAL BUTTONS (EXPANDED) ── */
+  .exp-dir-btn {
     position: absolute;
-    bottom: 20px;
-    right: 20px;
-    display: grid;
-    grid-template-columns: repeat(3, 44px);
-    grid-template-rows: repeat(3, 44px);
-    gap: 3px;
-    z-index: 10;
-  }
-
-  .dpad-btn {
-    background: rgba(0,0,0,0.8);
-    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(0,0,0,0.65);
+    border: 1px solid rgba(255,255,255,0.25);
     color: #fff;
-    border-radius: 7px;
-    font-size: 1.05rem;
-    cursor: pointer;
+    border-radius: 8px;
+    font-size: 1.5rem;
+    width: 50px;
+    height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.12s;
+    cursor: pointer;
+    transition: all 0.15s;
     user-select: none;
-    -webkit-user-select: none;
+    z-index: 1000;
   }
-  .dpad-btn:hover  { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.5); }
-  .dpad-btn:active { background: rgba(255,255,255,0.28); transform: scale(0.92); }
-  .dpad-btn.empty  { background: none; border: none; pointer-events: none; }
-  .dpad-btn.home   { font-size: 0.58rem; letter-spacing: 0.5px; color: rgba(255,255,255,0.4); font-family: 'Share Tech Mono',monospace; }
-  .dpad-btn.home:hover { color: #fff; background: rgba(255,255,255,0.12); }
+  .exp-dir-btn:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.6); }
+  .exp-dir-btn:active { background: rgba(255,255,255,0.35); transform: scale(0.9); }
+
+  /* Spread N/S/E/W to the screen edges */
+  #dUp    { top: 20px; left: 50%; transform: translateX(-50%); }
+  #dDown  { bottom: 20px; left: 50%; transform: translateX(-50%); }
+  #dLeft  { left: 20px; top: 50%; transform: translateY(-50%); }
+  #dRight { right: 20px; top: 50%; transform: translateY(-50%); }
 
   .exp-coords {
     position: absolute;
     bottom: 22px;
-    left: 18px;
+    left: 22px;
     font-family: 'Share Tech Mono', monospace;
-    font-size: 0.68rem;
-    color: rgba(255,255,255,0.2);
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.3);
     letter-spacing: 1px;
     pointer-events: none;
   }
@@ -679,7 +666,11 @@
 
 <div id="expandedOverlay" class="hidden">
   <div class="exp-toolbar">
-    <button class="tool-btn active" id="expBtnDraw" onclick="expSetTool('draw')">✏ DRAW</button>
+    <div style="display: flex; flex-direction: column; gap: 4px;">
+      <button class="tool-btn active" id="expBtnDraw" onclick="expSetTool('draw')">✏ DRAW</button>
+      <button class="tool-btn" id="dHome" style="font-size: 0.65rem; padding: 3px 8px; text-align: center; line-height: 1;">⌂ HOME</button>
+    </div>
+    
     <button class="tool-btn" id="expBtnErase" onclick="expSetTool('erase')">◻ ERASE</button>
     <button class="tool-btn" id="expBtnFill" onclick="expSetTool('fill')">⬛ FILL</button>
     <div class="size-slider-wrap">
@@ -696,17 +687,10 @@
     <div id="expWrap">
       <canvas id="expCanvas"></canvas>
     </div>
-    <div class="dpad">
-      <div class="dpad-btn empty"></div>
-      <div class="dpad-btn" id="dUp">▲</div>
-      <div class="dpad-btn empty"></div>
-      <div class="dpad-btn" id="dLeft">◀</div>
-      <div class="dpad-btn home" id="dHome">HOME</div>
-      <div class="dpad-btn" id="dRight">▶</div>
-      <div class="dpad-btn empty"></div>
-      <div class="dpad-btn" id="dDown">▼</div>
-      <div class="dpad-btn empty"></div>
-    </div>
+    <button class="exp-dir-btn" id="dUp">▲</button>
+    <button class="exp-dir-btn" id="dDown">▼</button>
+    <button class="exp-dir-btn" id="dLeft">◀</button>
+    <button class="exp-dir-btn" id="dRight">▶</button>
     <div class="exp-coords" id="expCoords">x:0  y:0</div>
   </div>
 </div>
@@ -718,7 +702,11 @@
   <div class="canvas-section">
     <div class="section-header">PAINT — shared canvas, see what the Central Valley has to say.</div>
     <div class="canvas-toolbar">
-      <button class="tool-btn active" id="btnDraw" onclick="setTool('draw')">✏ DRAW</button>
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <button class="tool-btn active" id="btnDraw" onclick="setTool('draw')">✏ DRAW</button>
+        <button class="tool-btn" id="mHome" style="font-size: 0.65rem; padding: 3px 8px; text-align: center; line-height: 1;">⌂ HOME</button>
+      </div>
+
       <button class="tool-btn" id="btnErase" onclick="setTool('erase')">◻ ERASE</button>
       <button class="tool-btn" id="btnFill" onclick="setTool('fill')">⬛ FILL</button>
       <div class="size-slider-wrap">
@@ -731,23 +719,26 @@
       <button class="tool-btn" id="btnClear" onclick="confirmClear()" style="margin-left:auto;border-color:rgba(255,80,80,0.5);color:rgba(255,100,100,0.9)">✕ CLEAR ALL</button>
       <button class="expand-btn" onclick="openExpanded()">⛶ EXPAND</button>
     </div>
-    <div class="canvas-outer" id="canvasOuter" style="overflow:hidden;">
-      <div id="mainWrap" style="position:absolute;top:0;left:0;transform-origin:top left;will-change:transform;">
-        <canvas id="wallCanvas"></canvas>
+
+    <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 14px;">
+      <button class="dir-btn" id="mLeft">◀</button>
+      
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; flex: 1; min-width: 0;">
+        <button class="dir-btn" id="mUp">▲</button>
+        
+        <div class="canvas-outer" id="canvasOuter" style="width: 100%; overflow:hidden;">
+          <div id="mainWrap" style="position:absolute;top:0;left:0;transform-origin:top left;will-change:transform;">
+            <canvas id="wallCanvas"></canvas>
+          </div>
+          <div id="canvasLock">// AGREE TO TERMS TO UNLOCK //</div>
+        </div>
+
+        <button class="dir-btn" id="mDown">▼</button>
       </div>
-      <div id="canvasLock">// AGREE TO TERMS TO UNLOCK //</div>
-      <div class="main-dpad">
-        <div class="dpad-btn empty"></div>
-        <div class="dpad-btn" id="mUp">▲</div>
-        <div class="dpad-btn empty"></div>
-        <div class="dpad-btn" id="mLeft">◀</div>
-        <div class="dpad-btn home" id="mHome">HOME</div>
-        <div class="dpad-btn" id="mRight">▶</div>
-        <div class="dpad-btn empty"></div>
-        <div class="dpad-btn" id="mDown">▼</div>
-        <div class="dpad-btn empty"></div>
-      </div>
+      
+      <button class="dir-btn" id="mRight">▶</button>
     </div>
+    
     <div class="canvas-status" id="canvasStatus">connecting…</div>
   </div>
 
@@ -792,7 +783,6 @@ function resizeCanvas() {
   const h = Math.round(w * ROWS / COLS);
   canvas.style.width = w + 'px';
   canvas.style.height = h + 'px';
-  // set outer to fixed height so overflow:hidden works
   outer.style.height = h + 'px';
   clampMainPan();
   applyMainPan();
@@ -812,7 +802,7 @@ function applyMainPan() {
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
 
-// Main canvas D-pad
+// Main canvas D-pad events
 document.getElementById('mUp').addEventListener('click',    () => { mainPanY -= MAIN_PAN_STEP; clampMainPan(); applyMainPan(); });
 document.getElementById('mDown').addEventListener('click',  () => { mainPanY += MAIN_PAN_STEP; clampMainPan(); applyMainPan(); });
 document.getElementById('mLeft').addEventListener('click',  () => { mainPanX -= MAIN_PAN_STEP; clampMainPan(); applyMainPan(); });
@@ -899,7 +889,6 @@ function getCellFromEvent(e) {
     clientX = e.clientX;
     clientY = e.clientY;
   }
-  // account for pan offset so drawing stays aligned
   return {
     x: Math.max(0, Math.min(COLS-1, Math.floor((clientX - rect.left + mainPanX) * scaleX))),
     y: Math.max(0, Math.min(ROWS-1, Math.floor((clientY - rect.top  + mainPanY) * scaleY))),
@@ -1094,7 +1083,7 @@ function showPwStep(label, isLogin) {
   
   const pwError = document.getElementById('pwError');
   pwError.textContent = '';
-  pwError.style.color = '#ff6b6b'; // Reset to default error color
+  pwError.style.color = '#ff6b6b'; 
   
   const reserveBtn = document.getElementById('reserveBtn');
   const submitBtn = document.getElementById('pwSubmitBtn');
@@ -1103,12 +1092,12 @@ function showPwStep(label, isLogin) {
   if (isLogin) {
     submitBtn.textContent = 'LOGIN';
     reserveBtn.style.display = 'none';
-    forgotWrap.style.display = 'block'; // Show forgot password link
+    forgotWrap.style.display = 'block'; 
   } else {
     submitBtn.textContent = 'SKIP';
     reserveBtn.style.display = 'block';
     reserveBtn.textContent = 'RESERVE NAME';
-    forgotWrap.style.display = 'none'; // Hide forgot password link
+    forgotWrap.style.display = 'none'; 
   }
 }
 
@@ -1133,10 +1122,8 @@ document.getElementById('reserveBtn').addEventListener('click', () => {
   chatWS.send(JSON.stringify({ type: 'reserve_username', username: pendingUsername, password: pw }));
 });
 
-// Added Forgot Password Click Listener
 document.getElementById('forgotPwLink').addEventListener('click', () => {
   if (!pendingUsername) return;
-  // Double quotes used below to prevent syntax bug described in project context
   if (confirm("Send a password reset email to the address on file for " + pendingUsername + "?")) {
     const pwErr = document.getElementById('pwError');
     if (chatWS && chatWS.readyState === WebSocket.OPEN) {
@@ -1153,7 +1140,6 @@ document.getElementById('forgotPwLink').addEventListener('click', () => {
 function handleReserveResult(msg) {
   if (msg.success) {
     finalizeUsername(pendingUsername);
-    // Just reserved — always offer email
     setTimeout(() => openEmailModal(
       'Add your email for password recovery.<br><br>' +
       '<span style="color:rgba(255,255,255,0.4);font-size:0.75rem;">We may also send occasional newsletters — we will never share or sell your information. You can skip this.</span>'
@@ -1167,7 +1153,6 @@ function handleReserveResult(msg) {
 function handleAuthResult(msg) {
   if (msg.success) {
     finalizeUsername(pendingUsername);
-    // If they logged in but have no email on file, prompt them
     if (!msg.has_email) {
       setTimeout(() => openEmailModal(
         "Welcome back! You don't have an email on file.<br><br>" +
@@ -1264,22 +1249,22 @@ window.addEventListener('load', () => {
 });
 
 // ═══════════════════════════════════════════════════
-// EXPANDED CANVAS  (4x pixel size, pannable viewport)
+// EXPANDED CANVAS  (Large scale, pannable viewport)
 // ═══════════════════════════════════════════════════
-const SCALE = 4;  // each 160x90 pixel becomes a 4x4 block
+const SCALE = 20;  // Increased to make expanded view massive (3200 x 1800 physical pixels)
 const expCanvas  = document.getElementById('expCanvas');
 const expCtx     = expCanvas.getContext('2d');
 const expWrap    = document.getElementById('expWrap');
 const expViewport= document.getElementById('expViewport');
 const expCoords  = document.getElementById('expCoords');
 
-expCanvas.width  = COLS * SCALE;   // 640
-expCanvas.height = ROWS * SCALE;   // 360
+expCanvas.width  = COLS * SCALE;
+expCanvas.height = ROWS * SCALE;
 expCanvas.style.width  = (COLS * SCALE) + 'px';
 expCanvas.style.height = (ROWS * SCALE) + 'px';
 
 let panX = 0, panY = 0;
-const PAN_STEP = 100;
+const PAN_STEP = 200; // Increased pan speed for the larger scale
 
 function clampPan() {
   const maxX = Math.max(0, COLS * SCALE - expViewport.offsetWidth);
@@ -1304,8 +1289,6 @@ function renderExpanded() {
   }
 }
 
-// Patch applyPixels to also sync expanded canvas when open
-// We do this by monkey-patching after the fact using a wrapper variable
 let _expandedOpen = false;
 function applyPixelsAndSyncExpanded(pixels) {
   applyPixels(pixels);
@@ -1317,7 +1300,6 @@ function applyPixelsAndSyncExpanded(pixels) {
   }
 }
 
-// Drawing on expanded canvas maps back to same 160x90 grid
 function getExpCell(e) {
   const rect = expCanvas.getBoundingClientRect();
   let cx, cy;
@@ -1344,14 +1326,13 @@ expCanvas.addEventListener('touchstart', e => { e.preventDefault(); expDrawing =
 expCanvas.addEventListener('touchmove',  e => { e.preventDefault(); if (!expDrawing) return; const c = getExpCell(e); paintAt(c.x,c.y); renderExpanded(); }, { passive:false });
 expCanvas.addEventListener('touchend',   () => { expDrawing = false; });
 
-// D-pad buttons
+// Expanded D-pad events
 document.getElementById('dUp').addEventListener('click',    () => { panY -= PAN_STEP; applyExpPan(); });
 document.getElementById('dDown').addEventListener('click',  () => { panY += PAN_STEP; applyExpPan(); });
 document.getElementById('dLeft').addEventListener('click',  () => { panX -= PAN_STEP; applyExpPan(); });
 document.getElementById('dRight').addEventListener('click', () => { panX += PAN_STEP; applyExpPan(); });
 document.getElementById('dHome').addEventListener('click',  () => { panX = 0; panY = 0; applyExpPan(); });
 
-// Keyboard arrows when expanded
 window.addEventListener('keydown', e => {
   if (document.getElementById('expandedOverlay').classList.contains('hidden')) return;
   if (e.key === 'ArrowUp')    { panY -= PAN_STEP; applyExpPan(); e.preventDefault(); }
@@ -1361,7 +1342,6 @@ window.addEventListener('keydown', e => {
   if (e.key === 'Escape')     { closeExpanded(); }
 });
 
-// Expanded toolbar — mirrors main toolbar, shares currentTool/currentColor/brushSz
 function expSetTool(t) {
   setTool(t);
   document.querySelectorAll('#expandedOverlay .tool-btn[id^="expBtn"]').forEach(b => b.classList.remove('active'));
@@ -1370,7 +1350,6 @@ function expSetTool(t) {
   expCanvas.style.cursor = t === 'erase' ? 'cell' : 'crosshair';
 }
 
-// Build expanded palette
 const expPaletteEl = document.getElementById('expPalette');
 PALETTE.forEach(hex => {
   const s = document.createElement('div');
