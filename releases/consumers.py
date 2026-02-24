@@ -131,13 +131,22 @@ class CanvasConsumer(AsyncWebsocketConsumer):
 
 class ChatConsumer(AsyncWebsocketConsumer):
     GROUP = "wall_chat"
+    
+    # Class-level dictionary to track presence: { channel_name: {"username": str, "offline": bool} }
+    active_users = {}
 
     async def connect(self):
         await self.channel_layer.group_add(self.GROUP, self.channel_name)
         await self.accept()
+        # Immediately send the new user the current online list
+        await self.send_presence_to_self()
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.GROUP, self.channel_name)
+        # If the user closes the tab, remove them from active tracking and tell everyone
+        if self.channel_name in ChatConsumer.active_users:
+            del ChatConsumer.active_users[self.channel_name]
+            await self.broadcast_presence()
 
     async def receive(self, text_data):
         msg = json.loads(text_data)
@@ -158,6 +167,19 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 "message": message,
                 "timestamp": timezone.now().strftime("%H:%M"),
             })
+            
+        elif action == "presence_update":
+            username = msg.get("username", "").strip()[:50]
+            offline = bool(msg.get("offline", False))
+            
+            if username:
+                # Update their current connection state
+                ChatConsumer.active_users[self.channel_name] = {
+                    "username": username,
+                    "offline": offline
+                }
+                # Tell the room about the change
+                await self.broadcast_presence()
 
         elif action == "check_username":
             username = msg.get("username", "").strip()
@@ -203,6 +225,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 **result,
             }))
 
+    # ─── Group Handlers ───
     async def chat_broadcast(self, event):
         await self.send(text_data=json.dumps({
             "type": "message",
@@ -210,7 +233,39 @@ class ChatConsumer(AsyncWebsocketConsumer):
             "message": event["message"],
             "timestamp": event["timestamp"],
         }))
+        
+    async def presence_list(self, event):
+        await self.send(text_data=json.dumps({
+            "type": "presence_list",
+            "users": event["users"],
+        }))
 
+    # ─── Presence Helpers ───
+    async def broadcast_presence(self):
+        # Gather all unique usernames where offline is False
+        visible_users = list(set([
+            data["username"] for data in ChatConsumer.active_users.values() if not data.get("offline")
+        ]))
+        visible_users.sort(key=str.lower)
+        
+        await self.channel_layer.group_send(self.GROUP, {
+            "type": "presence_list",
+            "users": visible_users,
+        })
+        
+    async def send_presence_to_self(self):
+        # Used when a user first connects before they have set their own name
+        visible_users = list(set([
+            data["username"] for data in ChatConsumer.active_users.values() if not data.get("offline")
+        ]))
+        visible_users.sort(key=str.lower)
+        
+        await self.send(text_data=json.dumps({
+            "type": "presence_list",
+            "users": visible_users,
+        }))
+
+    # ─── DB Helpers ───
     @database_sync_to_async
     def save_message(self, username, message):
         from releases.models import ChatMessage
@@ -248,6 +303,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return {"success": False, "error": "Wrong password."}
         except ChatUsername.DoesNotExist:
             return {"success": False, "error": "Username not found."}
+
     @database_sync_to_async
     def send_reset_email(self, username):
         from releases.models import ChatUsername, PasswordResetToken
@@ -291,7 +347,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         except Exception:
             return {"success": False, "error": "Failed to send email. Try again later."}
         return generic
-
 
     @database_sync_to_async
     def save_email(self, username, email):
