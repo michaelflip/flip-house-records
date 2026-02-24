@@ -1149,9 +1149,9 @@ function handleAuthResult(msg) {
     // If they logged in but have no email on file, prompt them
     if (!msg.has_email) {
       setTimeout(() => openEmailModal(
-        'Welcome back! You don't have an email on file.<br><br>' +
-        'Add one for password recovery — we may also send occasional newsletters. ' +
-        '<span style="color:rgba(255,255,255,0.4);font-size:0.75rem;">We will never share or sell your information.</span>'
+        "Welcome back! You don't have an email on file.<br><br>" +
+        "Add one for password recovery — we may also send occasional newsletters. " +
+        "<span style='color:rgba(255,255,255,0.4);font-size:0.75rem;'>We will never share or sell your information.</span>"
       ), 400);
     }
   } else {
