@@ -2,6 +2,7 @@ import json
 import hashlib
 import secrets
 import random
+import re
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.utils import timezone
@@ -130,25 +131,31 @@ class ChatConsumer(AsyncWebsocketConsumer):
     active_users = {}
 
     async def connect(self):
-        self.username = None  # Track identity for private messages
+        self.username = None
+        self.private_group = None
         await self.channel_layer.group_add(self.GROUP, self.channel_name)
         await self.accept()
         await self.send_presence_to_self()
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.GROUP, self.channel_name)
-        if self.username:
-            await self.channel_layer.group_discard(f"private_{self.username}", self.channel_name)
+        if self.private_group:
+            await self.channel_layer.group_discard(self.private_group, self.channel_name)
         if self.channel_name in ChatConsumer.active_users:
             del ChatConsumer.active_users[self.channel_name]
             await self.broadcast_presence()
 
     async def set_username(self, username):
-        """Helper to bind this specific socket connection to a private user group"""
-        if self.username:
-            await self.channel_layer.group_discard(f"private_{self.username}", self.channel_name)
+        """Helper to bind this specific socket connection to a private user group safely"""
+        safe = re.sub(r'[^a-zA-Z0-9\-\._]', '_', username)
+        new_group = f"private_{safe}"[:100]
+        
+        if self.private_group:
+            await self.channel_layer.group_discard(self.private_group, self.channel_name)
+        
         self.username = username
-        await self.channel_layer.group_add(f"private_{self.username}", self.channel_name)
+        self.private_group = new_group
+        await self.channel_layer.group_add(self.private_group, self.channel_name)
 
     async def receive(self, text_data):
         msg = json.loads(text_data)
@@ -158,25 +165,41 @@ class ChatConsumer(AsyncWebsocketConsumer):
             username = msg.get("username", "").strip()[:50]
             message = msg.get("message", "").strip()[:500]
             if not message: return
-            await self.save_message(username, message)
-            await self.channel_layer.group_send(self.GROUP, {
-                "type": "chat_broadcast",
-                "username": username,
-                "message": message,
-                "timestamp": timezone.now().strftime("%H:%M"),
-            })
+            
+            success = await self.save_message(username, message)
+            if success:
+                await self.channel_layer.group_send(self.GROUP, {
+                    "type": "chat_broadcast",
+                    "username": username,
+                    "message": message,
+                    "timestamp": timezone.now().strftime("%H:%M"),
+                })
             
         elif action == "private_message":
             if not self.username: return
             target = msg.get("to")
             text = msg.get("message", "").strip()[:500]
             if not text or not target: return
-            
-            await self.save_private_message(self.username, target, text)
+
+            success = await self.save_private_message(self.username, target, text)
+            if not success:
+                # Catch DB error and report directly to sender's UI
+                await self.send(text_data=json.dumps({
+                    "type": "private_message",
+                    "sender": "SYSTEM",
+                    "recipient": self.username,
+                    "target_tab": target,
+                    "message": "DATABASE ERROR: Could not save message. Did you run 'python manage.py migrate'?",
+                    "timestamp": timezone.now().strftime("%H:%M")
+                }))
+                return
+
             ts = timezone.now().strftime("%H:%M")
+            safe_target = re.sub(r'[^a-zA-Z0-9\-\._]', '_', target)
+            target_group = f"private_{safe_target}"[:100]
 
             # Route to the recipient's private group
-            await self.channel_layer.group_send(f"private_{target}", {
+            await self.channel_layer.group_send(target_group, {
                 "type": "private_broadcast",
                 "sender": self.username,
                 "recipient": target,
@@ -186,7 +209,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             
             # Route back to sender's group to keep their tabs synced
             if target != self.username:
-                await self.channel_layer.group_send(f"private_{self.username}", {
+                await self.channel_layer.group_send(self.private_group, {
                     "type": "private_broadcast",
                     "sender": self.username,
                     "recipient": target,
@@ -198,6 +221,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
             if not self.username: return
             target = msg.get("with_user")
             history = await self.fetch_private_history(self.username, target)
+            
+            if history is None:
+                history = [{"sender": "SYSTEM", "message": "ERROR: Could not load history. DB table missing?", "timestamp": "00:00"}]
+                
             await self.send(text_data=json.dumps({
                 "type": "private_history",
                 "with_user": target,
@@ -329,23 +356,36 @@ class ChatConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def save_message(self, username, message):
         from releases.models import ChatMessage
-        ChatMessage.objects.create(username=username, message=message)
+        try:
+            ChatMessage.objects.create(username=username, message=message)
+            return True
+        except Exception:
+            return False
 
     @database_sync_to_async
     def save_private_message(self, sender, recipient, message):
         from releases.models import PrivateMessage
-        PrivateMessage.objects.create(sender=sender, recipient=recipient, message=message)
+        try:
+            PrivateMessage.objects.create(sender=sender, recipient=recipient, message=message)
+            return True
+        except Exception as e:
+            print(f"Error saving PM: {e}")
+            return False
 
     @database_sync_to_async
     def fetch_private_history(self, user1, user2):
         from releases.models import PrivateMessage
         from django.db.models import Q
-        msgs = PrivateMessage.objects.filter(
-            Q(sender=user1, recipient=user2) | Q(sender=user2, recipient=user1)
-        ).order_by('-timestamp')[:50]
-        msgs = list(msgs)
-        msgs.reverse()
-        return [{"sender": m.sender, "message": m.message, "timestamp": m.timestamp.strftime("%H:%M")} for m in msgs]
+        try:
+            msgs = PrivateMessage.objects.filter(
+                Q(sender=user1, recipient=user2) | Q(sender=user2, recipient=user1)
+            ).order_by('-timestamp')[:50]
+            msgs = list(msgs)
+            msgs.reverse()
+            return [{"sender": m.sender, "message": m.message, "timestamp": m.timestamp.strftime("%H:%M")} for m in msgs]
+        except Exception as e:
+            print(f"Error fetching PM history: {e}")
+            return None
 
     @database_sync_to_async
     def stamp_token_login(self, username):

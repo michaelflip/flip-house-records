@@ -363,7 +363,7 @@
         <button class="tool-btn" id="btnFill" onclick="setTool('fill')">⬛ FILL</button>
       </div>
 
-      <div style="display: flex; gap: 4px; margin: left: 10px;">
+      <div style="display: flex; gap: 4px; margin-left: 10px;">
         <button class="tool-btn" onclick="zoomMain(1)" title="Zoom In">➕</button>
         <button class="tool-btn" onclick="zoomMain(-1)" title="Zoom Out">➖</button>
       </div>
@@ -690,7 +690,11 @@ function connectChat() {
     }
   };
   
-  chatWS.onclose = () => { setTimeout(connectChat, 3000); };
+  chatWS.onclose = (e) => { 
+    console.log('Chat WS closed:', e);
+    setTimeout(connectChat, 3000); 
+  };
+  
   chatWS.onmessage = e => {
     const msg = JSON.parse(e.data);
     if (msg.type === 'message') appendMessage(msg.username, msg.message, msg.timestamp, false);
@@ -897,7 +901,6 @@ function updateOnlineUsers(users) {
   });
 }
 
-// Context Menu Setup
 const ctxMenu = document.getElementById('userContextMenu');
 let contextMenuTargetUser = null;
 
@@ -984,7 +987,6 @@ function closeTab(tabKey, event) {
 
 // ── PRIVATE CHAT LOGIC ──
 
-// Helper function to cleanly append a single message to a specific container
 function appendSinglePrivateMessage(container, timestamp, sender, text) {
   const div = document.createElement('div');
   div.className = 'chat-msg';
@@ -1020,39 +1022,39 @@ function createPrivateChatTab(targetUser, autoFocus=true) {
   pane.className = 'tab-pane';
   pane.id = paneId;
   
-  // The inner div must exist immediately so live messages can append to it
   pane.innerHTML = `<div id="pm-msgs-${targetUser}" style="flex: 1; overflow-y: auto; padding: 16px;"></div>`;
   contentArea.appendChild(pane);
 
   if(autoFocus) selectTab(tabKey);
 
-  // Request chat history (this will arrive async a split second later)
   if (chatWS && chatWS.readyState === WebSocket.OPEN) {
     chatWS.send(JSON.stringify({ type: 'get_private_history', with_user: targetUser }));
   }
 }
 
 function handlePrivateMessage(msg) {
-  // If I sent it, the other user is 'recipient'. If they sent it, they are 'sender'
-  const otherUser = msg.sender === myUsername ? msg.recipient : msg.sender;
+  // If backend caught an error (like missing DB), it flags sender as SYSTEM
+  const isSystemError = msg.sender === "SYSTEM";
+  const otherUser = msg.target_tab || (msg.sender === myUsername ? msg.recipient : msg.sender);
 
   if (!document.getElementById('tab-pm-' + otherUser)) {
-    // Open silently in background if they aren't looking at it
     createPrivateChatTab(otherUser, false); 
   }
 
   const box = document.getElementById('pm-msgs-' + otherUser);
   if (box) {
-    appendSinglePrivateMessage(box, msg.timestamp, msg.sender, msg.message);
+    if (isSystemError) {
+        box.innerHTML += `<div class="chat-msg system"><span class="text" style="color:#ff6b6b;">${escapeHtml(msg.message)}</span></div>`;
+    } else {
+        appendSinglePrivateMessage(box, msg.timestamp, msg.sender, msg.message);
+    }
     
-    // Auto-scroll if looking at it
     if (currentActiveTab === 'pm-' + otherUser) {
         box.scrollTop = box.scrollHeight;
     } else {
-        // NOTIFICATION: Flash tab green if they are looking away
         const tab = document.getElementById('tab-pm-' + otherUser);
         if (tab) {
-            tab.style.background = '#44ff88';
+            tab.style.background = isSystemError ? '#ff6b6b' : '#44ff88';
             tab.style.color = '#000';
             tab.style.fontWeight = 'bold';
         }
@@ -1064,27 +1066,26 @@ function handlePrivateHistory(msg) {
   const targetUser = msg.with_user;
   const box = document.getElementById('pm-msgs-' + targetUser);
   
-  // Only process history once per tab session
   if (!box || box.dataset.historyLoaded === "true") return;
 
-  // RACE CONDITION FIX: Save any "live" messages that appended while we waited for history
+  // Race condition fix: save any "live" messages that appended while waiting for DB history
   const liveNodes = [];
   box.querySelectorAll('.chat-msg:not(.system)').forEach(n => liveNodes.push(n));
 
-  // Wipe box and set system header
   box.innerHTML = `<div class="chat-msg system"><span class="text">// Private chat with ${targetUser} //</span></div>`;
 
-  // Track unique strings to avoid duplicates
   const historyStrings = new Set();
 
-  // Append history from database
   msg.messages.forEach(m => {
+    if (m.sender === "SYSTEM") {
+        box.innerHTML += `<div class="chat-msg system"><span class="text" style="color:#ff6b6b;">${escapeHtml(m.message)}</span></div>`;
+        return;
+    }
     const signature = `[${m.timestamp}] ${m.sender}: ${m.message}`;
     historyStrings.add(signature);
     appendSinglePrivateMessage(box, m.timestamp, m.sender, m.message);
   });
 
-  // Re-append any live messages that weren't captured in the history query
   liveNodes.forEach(n => {
     const ts = n.querySelector('.ts')?.textContent || '';
     const usr = n.querySelector('.user')?.textContent || '';
