@@ -5,6 +5,7 @@ import random
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.utils import timezone
+from django.core import signing  # NEW: For generating secure auto-login tokens
 
 
 # ─── Adjective + Noun random username generator ──────────────────────────────
@@ -181,6 +182,24 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 # Tell the room about the change
                 await self.broadcast_presence()
 
+        elif action == "token_login":
+            # Handle automatic login via secure token
+            token = msg.get("token", "")
+            try:
+                # Token expires after 30 days
+                username = signing.loads(token, max_age=60*60*24*30)
+                exists = await self.check_username_exists(username)
+                if exists:
+                    await self.send(text_data=json.dumps({
+                        "type": "token_login_result",
+                        "success": True,
+                        "username": username
+                    }))
+                else:
+                    await self.send(text_data=json.dumps({"type": "token_login_result", "success": False}))
+            except Exception:
+                await self.send(text_data=json.dumps({"type": "token_login_result", "success": False}))
+
         elif action == "check_username":
             username = msg.get("username", "").strip()
             result = await self.check_username(username)
@@ -272,6 +291,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
         ChatMessage.objects.create(username=username, message=message)
 
     @database_sync_to_async
+    def check_username_exists(self, username):
+        from releases.models import ChatUsername
+        return ChatUsername.objects.filter(username__iexact=username).exists()
+
+    @database_sync_to_async
     def check_username(self, username):
         from releases.models import ChatUsername
         try:
@@ -291,7 +315,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             username=username,
             password_hash=hash_password(password),
         )
-        return {"success": True}
+        return {"success": True, "token": signing.dumps(username)}
 
     @database_sync_to_async
     def auth_username(self, username, password):
@@ -299,7 +323,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         try:
             entry = ChatUsername.objects.get(username__iexact=username)
             if verify_password(password, entry.password_hash):
-                return {"success": True, "has_email": bool(entry.email)}
+                return {"success": True, "has_email": bool(entry.email), "token": signing.dumps(username)}
             return {"success": False, "error": "Wrong password."}
         except ChatUsername.DoesNotExist:
             return {"success": False, "error": "Username not found."}

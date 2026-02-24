@@ -327,7 +327,7 @@
 
   .exp-toolbar-content {
     display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; 
-    padding: 24px 14px; /* INCREASED VERTICAL PADDING to make toolbar taller */
+    padding: 24px 14px;
   }
 
   .toggle-toolbar-btn {
@@ -373,11 +373,11 @@
   .exp-dir-btn:active { background: rgba(255,255,255,0.35); transform: scale(0.9); }
 
   #dUp    { top: 20px; left: 50%; transform: translateX(-50%); }
-  #dDown  { bottom: 130px; left: 50%; transform: translateX(-50%); } /* Shifted much higher to completely clear the taller toolbar and toggle button */
+  #dDown  { bottom: 130px; left: 50%; transform: translateX(-50%); } 
   #dLeft  { left: 20px; top: 50%; transform: translateY(-50%); }
   #dRight { right: 20px; top: 50%; transform: translateY(-50%); }
 
-  .exp-coords { position: absolute; bottom: 130px; left: 22px; font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: rgba(255,255,255,0.3); letter-spacing: 1px; pointer-events: none; z-index: 1000; } /* Adjusted coordinates to match */
+  .exp-coords { position: absolute; bottom: 130px; left: 22px; font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: rgba(255,255,255,0.3); letter-spacing: 1px; pointer-events: none; z-index: 1000; } 
 
   @media (max-width: 600px) {
     .page-title { font-size: 1.8rem; }
@@ -461,7 +461,7 @@
       <input class="modal-input" type="password" id="passwordInput" placeholder="password" maxlength="100" autocomplete="off" style="margin-bottom: 8px;">
       
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; min-height: 18px;">
-        <label style="display: none; align-items: center; gap: 6px; font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: var(--dim); cursor: pointer;" id="rememberMeWrap">
+        <label style="display: flex; align-items: center; gap: 6px; font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: var(--dim); cursor: pointer;" id="rememberMeWrap">
           <input type="checkbox" id="rememberMeCheckbox" checked> Remember me
         </label>
         <div class="modal-error" id="pwError"></div>
@@ -862,6 +862,15 @@ const HISTORY = {{ messages_json|safe }};
 function connectChat() {
   const proto = location.protocol === 'https:' ? 'wss' : 'ws';
   chatWS = new WebSocket(`${proto}://${location.host}/ws/chat/`);
+  
+  chatWS.onopen = () => {
+    // Check if we have an auto-login token when we first connect
+    const token = localStorage.getItem('wall_auth_token');
+    if (token && sessionStorage.getItem('wall_tos_agreed') === '1') {
+      chatWS.send(JSON.stringify({ type: 'token_login', token: token }));
+    }
+  };
+  
   chatWS.onclose = () => { setTimeout(connectChat, 3000); };
   chatWS.onmessage = e => {
     const msg = JSON.parse(e.data);
@@ -871,9 +880,23 @@ function connectChat() {
     else if (msg.type === 'auth_result') handleAuthResult(msg);
     else if (msg.type === 'email_result') handleEmailResult(msg);
     else if (msg.type === 'presence_list') updateOnlineUsers(msg.users);
+    else if (msg.type === 'token_login_result') handleTokenLoginResult(msg);
   };
 }
 connectChat();
+
+function handleTokenLoginResult(msg) {
+  if (msg.success) {
+    pendingUsername = msg.username;
+    finalizeUsername(msg.username);
+  } else {
+    // If the token failed (maybe password was changed or it expired), clear it
+    localStorage.removeItem('wall_auth_token');
+    if (sessionStorage.getItem('wall_tos_agreed') === '1') {
+      openUsernameModal();
+    }
+  }
+}
 
 function appendMessage(username, message, ts, isSystem) {
   const div = document.createElement('div');
@@ -919,6 +942,7 @@ function handleUsernameStatus(msg) {
   if (!msg.taken) showPwStep(`"${msg.username}" is available. Set a password to reserve it, or skip.`, false);
   else showPwStep(`"${msg.username}" is reserved. Enter the password to use it.`, true);
 }
+
 function showPwStep(label, isLogin) {
   document.getElementById('nameStep').style.display = 'none';
   document.getElementById('pwStep').style.display = 'block';
@@ -930,19 +954,16 @@ function showPwStep(label, isLogin) {
   const reserveBtn = document.getElementById('reserveBtn');
   const submitBtn = document.getElementById('pwSubmitBtn');
   const forgotWrap = document.getElementById('forgotPwWrap');
-  const remWrap = document.getElementById('rememberMeWrap');
   
   if (isLogin) { 
     submitBtn.textContent = 'LOGIN'; 
     reserveBtn.style.display = 'none'; 
     forgotWrap.style.display = 'block'; 
-    remWrap.style.display = 'flex'; // Show remember me
   } else { 
     submitBtn.textContent = 'SKIP'; 
     reserveBtn.style.display = 'block'; 
     reserveBtn.textContent = 'RESERVE NAME'; 
     forgotWrap.style.display = 'none'; 
-    remWrap.style.display = 'none'; // Hide remember me
   }
 }
 
@@ -971,16 +992,24 @@ document.getElementById('forgotPwLink').addEventListener('click', () => {
 });
 
 function handleReserveResult(msg) {
-  if (msg.success) { finalizeUsername(pendingUsername); setTimeout(() => openEmailModal('Add your email for password recovery.<br><br><span style="color:rgba(255,255,255,0.4);font-size:0.75rem;">We may also send occasional newsletters — we will never share or sell your information. You can skip this.</span>'), 400); }
+  if (msg.success) { 
+    if (document.getElementById('rememberMeCheckbox').checked) {
+      localStorage.setItem('wall_auth_token', msg.token);
+    } else {
+      localStorage.removeItem('wall_auth_token');
+    }
+    finalizeUsername(pendingUsername); 
+    setTimeout(() => openEmailModal('Add your email for password recovery.<br><br><span style="color:rgba(255,255,255,0.4);font-size:0.75rem;">We may also send occasional newsletters — we will never share or sell your information. You can skip this.</span>'), 400); 
+  }
   else { document.getElementById('pwError').style.color = '#ff6b6b'; document.getElementById('pwError').textContent = msg.error || 'Error.'; }
 }
+
 function handleAuthResult(msg) {
   if (msg.success) { 
-    // Handle "Remember Me"
     if (document.getElementById('rememberMeCheckbox').checked) {
-      localStorage.setItem('wall_saved_username', pendingUsername);
+      localStorage.setItem('wall_auth_token', msg.token);
     } else {
-      localStorage.removeItem('wall_saved_username');
+      localStorage.removeItem('wall_auth_token');
     }
     
     finalizeUsername(pendingUsername); 
@@ -989,6 +1018,7 @@ function handleAuthResult(msg) {
   }
   else { document.getElementById('pwError').style.color = '#ff6b6b'; document.getElementById('pwError').textContent = msg.error || 'Wrong password.'; }
 }
+
 function handleEmailResult(msg) {
   if (msg.success) { closeEmailModal(); appendMessage('', '// email saved successfully //', '', true); }
   else { document.getElementById('emailError').textContent = msg.error || 'Could not save email.'; }
@@ -1000,7 +1030,6 @@ function finalizeUsername(name) {
   modal.classList.add('hidden'); 
   appendMessage('', `// you joined as ${name} //`, '', true); 
   
-  // Show the invisible toggle and tell backend we are online
   document.getElementById('offlineToggleWrap').style.display = 'flex';
   if (chatWS && chatWS.readyState === WebSocket.OPEN) {
     chatWS.send(JSON.stringify({ 
@@ -1041,11 +1070,7 @@ function openUsernameModal() {
   modal.classList.remove('hidden'); 
   document.getElementById('nameStep').style.display = 'block'; 
   document.getElementById('pwStep').style.display = 'none'; 
-  
-  // Pre-fill username if remembered
-  const savedName = localStorage.getItem('wall_saved_username');
-  document.getElementById('usernameInput').value = myUsername || savedName || ''; 
-  
+  document.getElementById('usernameInput').value = myUsername || ''; 
   document.getElementById('modalError').textContent = ''; 
 }
 
@@ -1065,10 +1090,33 @@ const tosModal = document.getElementById('tosModal');
 const tosPopup = document.getElementById('tosPopup');
 function openTosPopup() { tosPopup.classList.remove('hidden'); }
 function closeTosPopup() { tosPopup.classList.add('hidden'); }
-function agreeTos() { sessionStorage.setItem('wall_tos_agreed', '1'); tosModal.classList.add('hidden'); document.getElementById('canvasLock').classList.add('hidden'); openUsernameModal(); }
+
+function agreeTos() { 
+  sessionStorage.setItem('wall_tos_agreed', '1'); 
+  tosModal.classList.add('hidden'); 
+  document.getElementById('canvasLock').classList.add('hidden'); 
+  
+  // If they agreed, immediately try auto-login if token is present
+  const token = localStorage.getItem('wall_auth_token');
+  if (token && chatWS && chatWS.readyState === WebSocket.OPEN) {
+    chatWS.send(JSON.stringify({ type: 'token_login', token: token }));
+  } else {
+    openUsernameModal();
+  }
+}
+
 window.addEventListener('load', () => {
-  if (sessionStorage.getItem('wall_tos_agreed') === '1') { tosModal.classList.add('hidden'); document.getElementById('canvasLock').classList.add('hidden'); openUsernameModal(); }
-  else { tosModal.classList.remove('hidden'); }
+  if (sessionStorage.getItem('wall_tos_agreed') === '1') { 
+    tosModal.classList.add('hidden'); 
+    document.getElementById('canvasLock').classList.add('hidden'); 
+    
+    // Only open the manual modal if they don't have a token saved
+    if (!localStorage.getItem('wall_auth_token')) {
+      openUsernameModal(); 
+    }
+  } else { 
+    tosModal.classList.remove('hidden'); 
+  }
 });
 
 // ═══════════════════════════════════════════════════
