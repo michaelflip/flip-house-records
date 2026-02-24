@@ -195,6 +195,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 **result,
             }))
 
+        elif action == "forgot_password":
+            username = msg.get("username", "").strip()[:50]
+            result = await self.send_reset_email(username)
+            await self.send(text_data=json.dumps({
+                "type": "forgot_password_result",
+                **result,
+            }))
+
     async def chat_broadcast(self, event):
         await self.send(text_data=json.dumps({
             "type": "message",
@@ -240,6 +248,50 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return {"success": False, "error": "Wrong password."}
         except ChatUsername.DoesNotExist:
             return {"success": False, "error": "Username not found."}
+    @database_sync_to_async
+    def send_reset_email(self, username):
+        from releases.models import ChatUsername, PasswordResetToken
+        import secrets, os, resend
+        generic = {"success": True, "message": "If that username has an email on file, a reset link has been sent."}
+        try:
+            entry = ChatUsername.objects.get(username__iexact=username)
+        except ChatUsername.DoesNotExist:
+            return generic
+        if not entry.email:
+            return generic
+        PasswordResetToken.objects.filter(username=entry, used=False).update(used=True)
+        token = secrets.token_urlsafe(48)
+        PasswordResetToken.objects.create(username=entry, token=token)
+        base_url = os.environ.get("SITE_URL", "https://fliphouserecords.com")
+        reset_url = f"{base_url}/wall/reset-password/{token}/"
+        resend.api_key = os.environ.get("RESEND_API_KEY", "")
+        email_html = (
+            "<div style='background:#000;color:#fff;font-family:Courier New,monospace;"
+            "padding:40px;max-width:520px;margin:0 auto;border:1px solid rgba(255,255,255,0.2);border-radius:12px;'>"
+            "<h1 style='font-size:1.4rem;letter-spacing:4px;margin-bottom:8px;'>FLIP HOUSE RECORDS</h1>"
+            "<p style='color:rgba(255,255,255,0.4);font-size:0.8rem;letter-spacing:2px;margin-bottom:32px;'>"
+            "// THE WALL - PASSWORD RESET //</p>"
+            "<p style='color:rgba(255,255,255,0.85);line-height:1.7;margin-bottom:24px;'>"
+            f"Someone requested a password reset for the username <strong style='color:#fff;'>{{}}</strong> on The Wall.<br><br>"
+            "If this was you, click the button below. The link expires in <strong>1 hour</strong>.</p>"
+            f"<a href='{reset_url}' style='display:inline-block;background:#fff;color:#000;text-decoration:none;"
+            "padding:14px 28px;border-radius:8px;font-family:Courier New,monospace;font-size:0.9rem;"
+            "letter-spacing:2px;margin-bottom:32px;'>RESET MY PASSWORD</a>"
+            "<p style='color:rgba(255,255,255,0.3);font-size:0.75rem;line-height:1.6;'>"
+            f"If you didn't request this, ignore this email - your password won't change.<br>"
+            f"Link: {reset_url}</p></div>"
+        ).format(entry.username)
+        try:
+            resend.Emails.send({
+                "from": "Flip House Records <noreply@fliphouserecords.com>",
+                "to": entry.email,
+                "subject": "Reset your Wall password",
+                "html": email_html,
+            })
+        except Exception:
+            return {"success": False, "error": "Failed to send email. Try again later."}
+        return generic
+
 
     @database_sync_to_async
     def save_email(self, username, email):

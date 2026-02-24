@@ -148,6 +148,28 @@ class ChatMessage(models.Model):
         return f"[{self.timestamp.strftime('%H:%M')}] {self.username}: {self.message[:40]}"
 
 
+# ─── The Wall: Password Reset ─────────────────────────────────────────────
+
+class PasswordResetToken(models.Model):
+    username = models.ForeignKey(
+        'ChatUsername',
+        on_delete=models.CASCADE,
+        related_name='reset_tokens'
+    )
+    token = models.CharField(max_length=64, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    used = models.BooleanField(default=False)
+
+    def is_valid(self):
+        from django.utils import timezone
+        import datetime
+        age = timezone.now() - self.created_at
+        return not self.used and age < datetime.timedelta(hours=1)
+
+    def __str__(self):
+        return f"Reset token for {self.username.username}"
+
+
 # ─── The Wall: Canvas ─────────────────────────────────────────────────────────
 
 class WallCanvas(models.Model):

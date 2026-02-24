@@ -657,6 +657,11 @@
         <button class="modal-btn primary" id="pwSubmitBtn">CONFIRM</button>
         <button class="modal-btn" id="reserveBtn" style="display:none;">RESERVE NAME</button>
       </div>
+      <div style="text-align:center;margin-top:14px;">
+        <button id="forgotPwBtn" style="background:none;border:none;color:rgba(255,255,255,0.3);font-family:'Share Tech Mono',monospace;font-size:0.72rem;letter-spacing:1px;cursor:pointer;transition:color 0.2s;display:none;" onmouseover="this.style.color='rgba(255,255,255,0.7)'" onmouseout="this.style.color='rgba(255,255,255,0.3)'">
+          Forgot password?
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -674,6 +679,33 @@
     <div class="modal-btn-row">
       <button class="modal-btn" id="emailSkipBtn">SKIP</button>
       <button class="modal-btn primary" id="emailSaveBtn">SAVE EMAIL</button>
+    </div>
+  </div>
+</div>
+
+<!-- Forgot Password Modal -->
+<div class="modal-overlay hidden" id="forgotModal">
+  <div class="modal-box">
+    <div class="modal-title">FORGOT PASSWORD</div>
+    <div class="modal-sub">
+      Enter your username and we'll send a reset link to the email address on file.
+    </div>
+    <div id="forgotStep1">
+      <input class="modal-input" type="text" id="forgotUsernameInput" placeholder="your username" maxlength="50" autocomplete="off">
+      <div class="modal-error" id="forgotError"></div>
+      <div class="modal-btn-row">
+        <button class="modal-btn" id="forgotCancelBtn">CANCEL</button>
+        <button class="modal-btn primary" id="forgotSubmitBtn">SEND RESET LINK</button>
+      </div>
+    </div>
+    <div id="forgotStep2" style="display:none;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.85rem;color:rgba(100,255,150,0.9);line-height:1.7;letter-spacing:1px;margin-bottom:20px;">
+        // reset link sent //<br><br>
+        If that username has an email on file, you'll receive a link shortly. Check your spam folder too.
+      </div>
+      <div class="modal-btn-row">
+        <button class="modal-btn primary" id="forgotDoneBtn">DONE</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1017,6 +1049,7 @@ function connectChat() {
     else if (msg.type === 'reserve_result') { handleReserveResult(msg); }
     else if (msg.type === 'auth_result') { handleAuthResult(msg); }
     else if (msg.type === 'email_result') { handleEmailResult(msg); }
+    else if (msg.type === 'forgot_password_result') { handleForgotResult(msg); }
   };
 }
 
@@ -1149,13 +1182,75 @@ function handleAuthResult(msg) {
     // If they logged in but have no email on file, prompt them
     if (!msg.has_email) {
       setTimeout(() => openEmailModal(
-        'Welcome back! You don\'t have an email on file.<br><br>' +
+        'Welcome back! You don't have an email on file.<br><br>' +
         'Add one for password recovery — we may also send occasional newsletters. ' +
         '<span style="color:rgba(255,255,255,0.4);font-size:0.75rem;">We will never share or sell your information.</span>'
       ), 400);
     }
   } else {
     document.getElementById('pwError').textContent = msg.error || 'Wrong password.';
+  }
+}
+
+// ── Forgot Password modal ───────────────────────────────────
+const forgotModal = document.getElementById('forgotModal');
+
+function openForgotModal() {
+  document.getElementById('usernameModal').classList.add('hidden');
+  document.getElementById('forgotUsernameInput').value = pendingUsername || '';
+  document.getElementById('forgotError').textContent = '';
+  document.getElementById('forgotStep1').style.display = 'block';
+  document.getElementById('forgotStep2').style.display = 'none';
+  forgotModal.classList.remove('hidden');
+}
+
+function closeForgotModal() {
+  forgotModal.classList.add('hidden');
+}
+
+document.getElementById('forgotCancelBtn').addEventListener('click', () => {
+  closeForgotModal();
+  openUsernameModal();
+});
+
+document.getElementById('forgotDoneBtn').addEventListener('click', closeForgotModal);
+
+document.getElementById('forgotSubmitBtn').addEventListener('click', () => {
+  const username = document.getElementById('forgotUsernameInput').value.trim();
+  if (!username) {
+    document.getElementById('forgotError').textContent = 'Please enter your username.';
+    return;
+  }
+  if (!chatWS || chatWS.readyState !== WebSocket.OPEN) {
+    document.getElementById('forgotError').textContent = 'Not connected. Try again.';
+    return;
+  }
+  document.getElementById('forgotSubmitBtn').textContent = 'SENDING…';
+  document.getElementById('forgotSubmitBtn').disabled = true;
+  chatWS.send(JSON.stringify({ type: 'forgot_password', username }));
+});
+
+document.getElementById('forgotUsernameInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('forgotSubmitBtn').click();
+});
+
+// Show "Forgot password?" only on the login step (taken username)
+const _origShowPwStep = showPwStep;
+showPwStep = function(label, isLogin) {
+  _origShowPwStep(label, isLogin);
+  document.getElementById('forgotPwBtn').style.display = isLogin ? 'inline' : 'none';
+};
+
+document.getElementById('forgotPwBtn').addEventListener('click', openForgotModal);
+
+function handleForgotResult(msg) {
+  document.getElementById('forgotSubmitBtn').textContent = 'SEND RESET LINK';
+  document.getElementById('forgotSubmitBtn').disabled = false;
+  if (msg.success) {
+    document.getElementById('forgotStep1').style.display = 'none';
+    document.getElementById('forgotStep2').style.display = 'block';
+  } else {
+    document.getElementById('forgotError').textContent = msg.error || 'Something went wrong.';
   }
 }
 

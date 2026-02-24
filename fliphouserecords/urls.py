@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from releases.views import homepage, artists, contact, merch, events, links, wall
+from releases.views import homepage, artists, contact, merch, events, links, wall, password_reset_confirm
 
 urlpatterns = [
     path('', homepage, name='home'),
@@ -14,6 +14,7 @@ urlpatterns = [
     path('events/', events, name='events'),
     path('links/', links, name='links'),
     path('wall/', wall, name='wall'),
+    path('wall/reset-password/<str:token>/', password_reset_confirm, name='password_reset_confirm'),
 ]
 
 if settings.DEBUG:
