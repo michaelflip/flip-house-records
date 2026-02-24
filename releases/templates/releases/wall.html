@@ -45,15 +45,38 @@
   .dir-btn:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.5); }
   .dir-btn:active { background: rgba(255,255,255,0.3); transform: scale(0.9); }
 
-  .username-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+  /* ── TABS & USERNAME BAR ── */
+  .username-bar { display: flex; align-items: flex-end; gap: 14px; margin-bottom: 12px; flex-wrap: wrap; border-bottom: 1px solid var(--border); padding-bottom: 0px; }
   .username-display { font-family: 'Share Tech Mono', monospace; font-size: 0.9rem; color: var(--white); background: var(--faint); border: 1px solid var(--border); border-radius: 6px; padding: 7px 14px; letter-spacing: 1px; }
   .username-tag { font-size: 0.68rem; color: rgba(255,255,255,0.3); letter-spacing: 1px; font-family: 'Share Tech Mono', monospace; }
 
-  .chat-layout { display: flex; gap: 14px; margin-bottom: 14px; height: 320px; }
-  .chat-window { flex: 1; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 10px; overflow-y: auto; padding: 16px; scroll-behavior: smooth; }
-  .chat-window::-webkit-scrollbar { width: 4px; }
-  .chat-window::-webkit-scrollbar-track { background: transparent; }
-  .chat-window::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+  .chat-tabs-container { display: flex; gap: 4px; overflow-x: auto; flex: 1; min-width: 200px; padding-bottom: 0; margin-bottom: -1px; }
+  .chat-tabs-container::-webkit-scrollbar { height: 0px; }
+
+  .chat-tab {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-bottom: none;
+    border-radius: 8px 8px 0 0; padding: 8px 16px; font-family: 'Share Tech Mono', monospace; font-size: 0.75rem;
+    color: rgba(255,255,255,0.5); cursor: pointer; display: flex; align-items: center; gap: 10px;
+    transition: all 0.2s; white-space: nowrap; z-index: 1;
+  }
+  .chat-tab:hover { background: rgba(255,255,255,0.08); color: #fff; }
+  .chat-tab.active { background: #111; color: #fff; border-color: var(--border); border-top: 2px solid #fff; border-bottom: 1px solid #111; z-index: 3; }
+  
+  .chat-tab-close { font-size: 0.75rem; color: rgba(255,100,100,0.6); line-height: 1; padding: 2px; border-radius: 4px; transition: all 0.2s; }
+  .chat-tab-close:hover { color: #fff; background: rgba(255,100,100,0.8); }
+
+  /* ── CHAT LAYOUT UPDATES ── */
+  .chat-layout { display: flex; gap: 14px; margin-bottom: 14px; height: 360px; }
+  
+  .chat-window { 
+    flex: 1; background: rgba(255,255,255,0.02); border: 1px solid var(--border); 
+    border-radius: 0 10px 10px 10px; position: relative; overflow: hidden;
+  }
+  
+  .tab-pane { display: none; height: 100%; width: 100%; flex-direction: column; overflow-y: auto; }
+  .tab-pane.active { display: flex; }
+  .tab-pane::-webkit-scrollbar { width: 4px; }
+  .tab-pane::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
 
   .online-panel { width: 180px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 10px; display: flex; flex-direction: column; padding: 12px; }
   .online-panel-header { font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: var(--dim); border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 8px; text-align: center; letter-spacing: 1px; }
@@ -65,7 +88,7 @@
   .online-user:hover { color: rgba(100,255,150,0.8); }
   .online-user::before { content: ''; display: inline-block; width: 6px; height: 6px; background: rgba(100,255,150,0.8); border-radius: 50%; }
 
-  .offline-toggle-wrap { margin-left: auto; display: none; align-items: center; gap: 6px; font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: var(--dim); cursor: pointer; }
+  .offline-toggle-wrap { margin-left: auto; display: none; align-items: center; gap: 6px; font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: var(--dim); cursor: pointer; margin-bottom: 10px; }
   .offline-toggle-wrap input { cursor: pointer; }
 
   .chat-msg { font-family: 'Share Tech Mono', monospace; font-size: 0.83rem; line-height: 1.6; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
@@ -173,44 +196,6 @@
 <div id="userContextMenu" class="context-menu hidden">
   <div class="context-menu-item" id="ctxViewBtn">View Profile</div>
   <div class="context-menu-item" id="ctxEditBtn">Edit Profile</div>
-</div>
-
-<div class="modal-overlay hidden" id="profileModal">
-  <div class="modal-box" style="max-width: 500px;">
-    
-    <div style="display:flex; gap: 24px; margin-bottom: 20px;">
-      
-      <div style="text-align: center; flex-shrink: 0; width: 120px;">
-        <img id="profAvatar" src="" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); display: block; margin-bottom: 12px; background: #111;">
-        <label id="profAvatarLabel" style="display:none; font-family:'Share Tech Mono', monospace; font-size: 0.75rem; color: var(--dim); cursor: pointer; text-decoration: underline; letter-spacing: 1px;">
-          UPLOAD PNG
-          <input type="file" id="profAvatarInput" accept="image/png" style="display:none;">
-        </label>
-      </div>
-      
-      <div style="flex: 1; min-width: 0;">
-        <div id="profUsername" style="font-size: 1.4rem; letter-spacing: 2px; margin-bottom: 6px; word-wrap: break-word;"></div>
-        <div style="font-family:'Share Tech Mono', monospace; font-size: 0.7rem; color: rgba(255,255,255,0.3); margin-bottom: 16px; letter-spacing: 1px;">LAST SEEN: <span id="profLastLogin" style="color:var(--dim);"></span></div>
-        
-        <div style="margin-bottom: 16px;">
-          <div style="font-family:'Share Tech Mono', monospace; font-size: 0.65rem; color: rgba(255,255,255,0.4); margin-bottom: 4px; letter-spacing: 1px;">LOCATION</div>
-          <div id="profLocDisplay" style="font-family:'Share Tech Mono', monospace; font-size: 0.85rem; color: #fff; min-height: 18px;"></div>
-          <input class="modal-input" type="text" id="profLocInput" maxlength="100" placeholder="Where are you?" style="display:none; margin-bottom:0; padding: 8px 12px;">
-        </div>
-
-        <div>
-          <div style="font-family:'Share Tech Mono', monospace; font-size: 0.65rem; color: rgba(255,255,255,0.4); margin-bottom: 4px; letter-spacing: 1px;">BIO</div>
-          <div id="profBioDisplay" style="font-family:'Share Tech Mono', monospace; font-size: 0.85rem; color: #fff; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word;"></div>
-          <textarea class="modal-input" id="profBioInput" maxlength="500" placeholder="Tell us about yourself..." style="display:none; resize:vertical; min-height:80px; font-family: sans-serif; padding: 8px 12px; line-height: 1.4;"></textarea>
-        </div>
-      </div>
-    </div>
-    
-    <div class="modal-btn-row" style="margin-top: 24px;">
-      <button class="modal-btn" onclick="closeProfileModal()">CLOSE</button>
-      <button class="modal-btn primary" id="profSaveBtn" style="display:none;" onclick="saveProfile()">SAVE PROFILE</button>
-    </div>
-  </div>
 </div>
 
 <div id="tosPopup" class="hidden">
@@ -330,7 +315,7 @@
   </div>
 
   <div id="expToolbarContainer" class="collapsible-toolbar">
-    <button id="toggleToolbarBtn" class="toggleToolbarBtn" onclick="toggleExpToolbar()">▼ HIDE TOOLS</button>
+    <button id="toggleToolbarBtn" class="toggle-toolbar-btn" onclick="toggleExpToolbar()">▼ HIDE TOOLS</button>
     <div class="exp-toolbar-content">
       
       <div style="display: flex; gap: 8px;">
@@ -416,10 +401,17 @@
 
   <div class="chat-section">
     <div class="section-header">CHAT — anonymous, real-time</div>
+    
     <div class="username-bar">
-      <span class="username-tag">CHATTING AS</span>
-      <span class="username-display" id="usernameTag">—</span>
-      <button class="tool-btn" onclick="openUsernameModal()" style="font-size:0.75rem;padding:6px 12px;">CHANGE</button>
+      <div style="display:flex; align-items: center; gap: 10px;">
+        <span class="username-tag">CHATTING AS</span>
+        <span class="username-display" id="usernameTag">—</span>
+        <button class="tool-btn" onclick="openUsernameModal()" style="font-size:0.75rem;padding:6px 12px;">CHANGE</button>
+      </div>
+      
+      <div class="chat-tabs-container" id="chatTabsContainer">
+        <div class="chat-tab active" id="tab-chat" onclick="selectTab('chat')">MAIN CHAT</div>
+      </div>
       
       <label class="offline-toggle-wrap" id="offlineToggleWrap">
         <input type="checkbox" id="offlineToggle" onchange="toggleOffline()"> SHOW OFFLINE
@@ -427,9 +419,15 @@
     </div>
     
     <div class="chat-layout">
-      <div class="chat-window" id="chatWindow">
-        <div class="chat-msg system"><span class="text">// loading messages…</span></div>
-      </div>
+      <div class="chat-window" id="chatWindow" style="padding: 0;">
+        
+        <div class="tab-pane active" id="pane-chat">
+          <div id="chatMessages" style="flex: 1; overflow-y: auto; padding: 16px;">
+            <div class="chat-msg system"><span class="text">// loading messages…</span></div>
+          </div>
+        </div>
+
+        </div>
       
       <div class="online-panel">
         <div class="online-panel-header">ONLINE NOW</div>
@@ -438,7 +436,7 @@
       </div>
     </div>
 
-    <div class="chat-input-row">
+    <div class="chat-input-row" id="chatInputRow">
       <input class="chat-input" type="text" id="chatInput" placeholder="say something…" maxlength="500" autocomplete="off">
       <button class="chat-send-btn" onclick="sendChat()">SEND</button>
     </div>
@@ -632,7 +630,7 @@ function paintAt(x, y) {
     }
   }
   if (batch.length) {
-    applyPixelsAndSyncExpanded(batch); 
+    applyPixelsAndSyncExpanded(batch); // Instant visual feedback locally
     pendingPixels.push(...batch);
     scheduleFlush();
   }
@@ -678,7 +676,7 @@ renderAll();
 
 let chatWS;
 let myUsername = null;
-const chatWindow = document.getElementById('chatWindow');
+const chatMessages = document.getElementById('chatMessages');
 const HISTORY = {{ messages_json|safe }};
 
 function connectChat() {
@@ -723,12 +721,15 @@ function appendMessage(username, message, ts, isSystem) {
   div.className = 'chat-msg' + (isSystem ? ' system' : '');
   if (isSystem) div.innerHTML = `<span class="text">${escapeHtml(message)}</span>`;
   else div.innerHTML = `<span class="ts">[${ts}]</span><span class="user">${escapeHtml(username)}:</span><span class="text">${escapeHtml(message)}</span>`;
-  chatWindow.appendChild(div);
-  chatWindow.scrollTop = chatWindow.scrollHeight;
+  chatMessages.appendChild(div);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
 }
-function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escapeHtml(s) { 
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); 
+}
 
-chatWindow.innerHTML = '';
+chatMessages.innerHTML = '';
 if (HISTORY.length === 0) appendMessage('', '// no messages yet — be the first //', '', true);
 else for (const m of HISTORY) appendMessage(m.username, m.message, m.timestamp, false);
 
@@ -860,7 +861,7 @@ function finalizeUsername(name) {
   }
 }
 
-// ── ONLINE NOW & PROFILE LOGIC ──
+// ── ONLINE NOW & TAB/PROFILE LOGIC ──
 function toggleOffline() {
   if (!myUsername || !chatWS || chatWS.readyState !== WebSocket.OPEN) return;
   const isOffline = document.getElementById('offlineToggle').checked;
@@ -898,12 +899,10 @@ document.getElementById('onlineUsersList').addEventListener('contextmenu', e => 
   
   contextMenuTargetUser = userDiv.getAttribute('data-username');
   
-  // Position menu
   ctxMenu.style.left = e.pageX + 'px';
   ctxMenu.style.top = e.pageY + 'px';
   ctxMenu.classList.remove('hidden');
   
-  // Toggle buttons based on ownership
   if (contextMenuTargetUser === myUsername) {
     document.getElementById('ctxEditBtn').style.display = 'block';
     document.getElementById('ctxViewBtn').style.display = 'none';
@@ -913,98 +912,153 @@ document.getElementById('onlineUsersList').addEventListener('contextmenu', e => 
   }
 });
 
-// Hide context menu when clicking anywhere else
-document.addEventListener('click', () => {
-  ctxMenu.classList.add('hidden');
-});
+document.addEventListener('click', () => { ctxMenu.classList.add('hidden'); });
 
-// Default Avatar SVG
 const DEFAULT_AVATAR = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23222'/><text x='50' y='55' font-size='40' fill='%23555' font-family='monospace' text-anchor='middle' dominant-baseline='middle'>?</text></svg>";
 
 document.getElementById('ctxViewBtn').addEventListener('click', () => fetchAndOpenProfile(contextMenuTargetUser, false));
 document.getElementById('ctxEditBtn').addEventListener('click', () => fetchAndOpenProfile(contextMenuTargetUser, true));
 
+// Tab Logic
+function selectTab(targetTab) {
+  document.querySelectorAll('.chat-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  
+  const tab = document.getElementById('tab-' + targetTab);
+  const pane = document.getElementById('pane-' + targetTab);
+  if (tab) tab.classList.add('active');
+  if (pane) pane.classList.add('active');
+  
+  const inputRow = document.getElementById('chatInputRow');
+  if (targetTab === 'chat') {
+    inputRow.style.display = 'flex';
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  } else {
+    inputRow.style.display = 'none';
+  }
+}
+
+function closeTab(targetUser, event) {
+  event.stopPropagation();
+  const tab = document.getElementById('tab-' + targetUser);
+  const pane = document.getElementById('pane-' + targetUser);
+  const wasActive = tab && tab.classList.contains('active');
+  
+  if (tab) tab.remove();
+  if (pane) pane.remove();
+  
+  if (wasActive) {
+    selectTab('chat');
+  }
+}
+
+function renderProfilePane(paneId, targetUser, data, isEditMode) {
+  const pane = document.getElementById(paneId);
+  const avatarSrc = data.avatar_url || DEFAULT_AVATAR;
+  
+  const locHtml = isEditMode 
+    ? `<input class="modal-input" type="text" id="loc-${targetUser}" maxlength="100" placeholder="Where are you?" value="${escapeHtml(data.location)}" style="margin-bottom:0; padding: 8px 12px; background:rgba(255,255,255,0.04);">` 
+    : `<div style="font-family:'Share Tech Mono', monospace; font-size: 0.85rem; color: #fff; min-height: 18px;">${escapeHtml(data.location) || 'Location not set.'}</div>`;
+    
+  const bioHtml = isEditMode 
+    ? `<textarea class="modal-input" id="bio-${targetUser}" maxlength="500" placeholder="Tell us about yourself..." style="resize:vertical; min-height:80px; font-family: sans-serif; padding: 8px 12px; line-height: 1.4; background:rgba(255,255,255,0.04);">${escapeHtml(data.bio)}</textarea>` 
+    : `<div style="font-family:'Share Tech Mono', monospace; font-size: 0.85rem; color: #fff; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word;">${escapeHtml(data.bio) || 'No bio available.'}</div>`;
+
+  let html = `
+    <div style="padding: 24px; height: 100%; box-sizing: border-box; display: flex; flex-direction: column;">
+      <div style="display:flex; gap: 24px; margin-bottom: 20px;">
+        <div style="text-align: center; flex-shrink: 0; width: 120px;">
+          <img id="img-${targetUser}" src="${avatarSrc}" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); display: block; margin-bottom: 12px; background: #111;">
+          ${isEditMode ? `<label style="font-family:'Share Tech Mono', monospace; font-size: 0.75rem; color: var(--dim); cursor: pointer; text-decoration: underline; letter-spacing: 1px;">UPLOAD PNG<input type="file" accept="image/png" style="display:none;" id="file-${targetUser}" onchange="previewAvatar(this, '${targetUser}')"></label>` : ''}
+        </div>
+        <div style="flex: 1; min-width: 0;">
+          <div style="font-size: 1.4rem; letter-spacing: 2px; margin-bottom: 6px; word-wrap: break-word; text-shadow: 0 0 10px rgba(255,255,255,0.2);">${escapeHtml(data.username)}</div>
+          <div style="font-family:'Share Tech Mono', monospace; font-size: 0.7rem; color: rgba(255,255,255,0.3); margin-bottom: 16px; letter-spacing: 1px;">LAST SEEN: <span style="color:var(--dim);">${data.last_login}</span></div>
+          
+          <div style="margin-bottom: 16px;">
+            <div style="font-family:'Share Tech Mono', monospace; font-size: 0.65rem; color: rgba(255,255,255,0.4); margin-bottom: 4px; letter-spacing: 1px;">LOCATION</div>
+            ${locHtml}
+          </div>
+
+          <div>
+            <div style="font-family:'Share Tech Mono', monospace; font-size: 0.65rem; color: rgba(255,255,255,0.4); margin-bottom: 4px; letter-spacing: 1px;">BIO</div>
+            ${bioHtml}
+          </div>
+        </div>
+      </div>
+      ${isEditMode ? `<div style="margin-top: auto; display:flex; justify-content: flex-end; padding-top:10px;"><button class="modal-btn primary" style="flex:none; padding:10px 24px;" id="btn-save-${targetUser}" onclick="saveProfile('${targetUser}')">SAVE PROFILE</button></div>` : ''}
+    </div>
+  `;
+  pane.innerHTML = html;
+}
+
+function previewAvatar(input, targetUser) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('img-' + targetUser).src = e.target.result;
+    }
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
 async function fetchAndOpenProfile(targetUser, isEditMode) {
+  const tabId = 'tab-' + targetUser;
+  const paneId = 'pane-' + targetUser;
+
+  if (document.getElementById(tabId)) {
+    selectTab(targetUser);
+    return;
+  }
+
+  const tabsContainer = document.getElementById('chatTabsContainer');
+  const tab = document.createElement('div');
+  tab.className = 'chat-tab';
+  tab.id = tabId;
+  const title = isEditMode ? 'EDIT: ' + targetUser : targetUser;
+  
+  tab.innerHTML = `<span>${title}</span>`;
+  const closeBtn = document.createElement('span');
+  closeBtn.className = 'chat-tab-close';
+  closeBtn.textContent = '✕';
+  closeBtn.onclick = (e) => closeTab(targetUser, e);
+  tab.appendChild(closeBtn);
+  tab.onclick = () => selectTab(targetUser);
+  tabsContainer.appendChild(tab);
+
+  const contentArea = document.getElementById('chatWindow');
+  const pane = document.createElement('div');
+  pane.className = 'tab-pane';
+  pane.id = paneId;
+  pane.innerHTML = `<div style="padding: 40px; color:var(--dim); font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; text-align: center;">Loading...</div>`;
+  contentArea.appendChild(pane);
+
+  selectTab(targetUser);
+
   try {
     const res = await fetch(`/api/profile/${targetUser}/`);
     const data = await res.json();
     if (data.success) {
-      populateProfileModal(data, isEditMode);
+      renderProfilePane(paneId, targetUser, data, isEditMode);
     } else {
-      alert("Could not load profile.");
+      pane.innerHTML = `<div style="padding: 40px; color:#ff6b6b; font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; text-align: center;">Error loading profile.</div>`;
     }
   } catch (err) {
     console.error(err);
+    pane.innerHTML = `<div style="padding: 40px; color:#ff6b6b; font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; text-align: center;">Network error.</div>`;
   }
 }
 
-function populateProfileModal(data, isEditMode) {
-  document.getElementById('profUsername').textContent = data.username;
-  document.getElementById('profLastLogin').textContent = data.last_login;
-  document.getElementById('profAvatar').src = data.avatar_url || DEFAULT_AVATAR;
-
-  const locDisplay = document.getElementById('profLocDisplay');
-  const locInput = document.getElementById('profLocInput');
-  const bioDisplay = document.getElementById('profBioDisplay');
-  const bioInput = document.getElementById('profBioInput');
-  const saveBtn = document.getElementById('profSaveBtn');
-  const avatarLabel = document.getElementById('profAvatarLabel');
-
-  if (isEditMode) {
-    locDisplay.style.display = 'none';
-    bioDisplay.style.display = 'none';
-    
-    locInput.style.display = 'block';
-    locInput.value = data.location || '';
-    
-    bioInput.style.display = 'block';
-    bioInput.value = data.bio || '';
-    
-    avatarLabel.style.display = 'block';
-    saveBtn.style.display = 'block';
-  } else {
-    locInput.style.display = 'none';
-    bioInput.style.display = 'none';
-    avatarLabel.style.display = 'none';
-    saveBtn.style.display = 'none';
-    
-    locDisplay.style.display = 'block';
-    locDisplay.textContent = data.location || "Location not set.";
-    
-    bioDisplay.style.display = 'block';
-    bioDisplay.textContent = data.bio || "No bio available.";
-  }
-
-  document.getElementById('profileModal').classList.remove('hidden');
-}
-
-function closeProfileModal() {
-  document.getElementById('profileModal').classList.add('hidden');
-  document.getElementById('profAvatarInput').value = ''; // clear file selection
-}
-
-// Live preview Avatar on selection
-document.getElementById('profAvatarInput').addEventListener('change', function(e) {
-  const file = e.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function(evt) {
-      document.getElementById('profAvatar').src = evt.target.result;
-    }
-    reader.readAsDataURL(file);
-  }
-});
-
-async function saveProfile() {
-  const saveBtn = document.getElementById('profSaveBtn');
+async function saveProfile(targetUser) {
+  const saveBtn = document.getElementById('btn-save-' + targetUser);
   saveBtn.textContent = 'SAVING...';
   
   const formData = new FormData();
   formData.append('token', localStorage.getItem('wall_auth_token'));
-  formData.append('location', document.getElementById('profLocInput').value);
-  formData.append('bio', document.getElementById('profBioInput').value);
+  formData.append('location', document.getElementById('loc-' + targetUser).value);
+  formData.append('bio', document.getElementById('bio-' + targetUser).value);
   
-  const avatarFile = document.getElementById('profAvatarInput').files[0];
+  const avatarFile = document.getElementById('file-' + targetUser).files[0];
   if (avatarFile) {
     formData.append('avatar', avatarFile);
   }
@@ -1016,19 +1070,27 @@ async function saveProfile() {
     });
     const data = await res.json();
     if (data.success) {
-      closeProfileModal();
+      saveBtn.textContent = 'SAVED!';
+      saveBtn.style.background = '#44ff88';
+      setTimeout(() => {
+        saveBtn.textContent = 'SAVE PROFILE';
+        saveBtn.style.background = '#fff';
+      }, 2000);
+      
+      if (data.avatar_url) {
+        document.getElementById('img-' + targetUser).src = data.avatar_url;
+      }
     } else {
       alert(data.error || 'Failed to save profile.');
+      saveBtn.textContent = 'SAVE PROFILE';
     }
   } catch (err) {
     console.error(err);
     alert('Network error while saving profile.');
-  } finally {
     saveBtn.textContent = 'SAVE PROFILE';
   }
 }
-
-// ── END ONLINE NOW & PROFILE LOGIC ──
+// ── END ONLINE NOW & TAB/PROFILE LOGIC ──
 
 function openUsernameModal() { 
   modal.classList.remove('hidden'); 
