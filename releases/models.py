@@ -159,6 +159,17 @@ class ChatMessage(models.Model):
     def __str__(self):
         return f"[{self.timestamp.strftime('%H:%M')}] {self.username}: {self.message[:40]}"
 
+class PrivateMessage(models.Model):
+    sender = models.CharField(max_length=50)
+    recipient = models.CharField(max_length=50)
+    message = models.TextField(max_length=500)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['timestamp']
+
+    def __str__(self):
+        return f"[{self.timestamp.strftime('%H:%M')}] {self.sender} -> {self.recipient}: {self.message[:30]}"
 
 # ─── The Wall: Password Reset ─────────────────────────────────────────────
 
