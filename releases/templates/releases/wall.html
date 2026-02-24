@@ -235,8 +235,8 @@
   }
 
   .offline-toggle-wrap {
-    margin-left: auto; /* Pushes to the right side of the username bar */
-    display: none; /* Hidden until username is set */
+    margin-left: auto;
+    display: none; 
     align-items: center;
     gap: 6px;
     font-family: 'Share Tech Mono', monospace;
@@ -268,7 +268,10 @@
   .modal-sub { font-family: 'Share Tech Mono', monospace; font-size: 0.78rem; color: var(--dim); margin-bottom: 24px; letter-spacing: 1px; line-height: 1.6; }
   .modal-input { width: 100%; background: var(--faint); border: 1px solid var(--border); color: #fff; border-radius: 8px; padding: 11px 14px; font-family: 'Share Tech Mono', monospace; font-size: 0.9rem; outline: none; margin-bottom: 12px; transition: border-color 0.2s; }
   .modal-input:focus { border-color: rgba(255,255,255,0.45); }
-  .modal-error { font-family: 'Share Tech Mono', monospace; font-size: 0.78rem; color: #ff6b6b; margin-bottom: 12px; min-height: 18px; letter-spacing: 1px; }
+  
+  /* Adjusted for remember me layout */
+  .modal-error { font-family: 'Share Tech Mono', monospace; font-size: 0.78rem; color: #ff6b6b; margin-bottom: 0; min-height: 18px; letter-spacing: 1px; flex: 1; text-align: right; }
+  
   .modal-btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
   .modal-btn { flex: 1; background: none; border: 1px solid var(--border); color: #fff; padding: 10px 16px; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-size: 0.78rem; cursor: pointer; letter-spacing: 1px; transition: all 0.2s; }
   .modal-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.4); }
@@ -323,7 +326,8 @@
   .collapsible-toolbar.collapsed { transform: translateY(100%); }
 
   .exp-toolbar-content {
-    display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; padding: 14px;
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; 
+    padding: 24px 14px; /* INCREASED VERTICAL PADDING to make toolbar taller */
   }
 
   .toggle-toolbar-btn {
@@ -369,11 +373,11 @@
   .exp-dir-btn:active { background: rgba(255,255,255,0.35); transform: scale(0.9); }
 
   #dUp    { top: 20px; left: 50%; transform: translateX(-50%); }
-  #dDown  { bottom: 80px; left: 50%; transform: translateX(-50%); } /* Shifted up so toolbar doesn't hide it */
+  #dDown  { bottom: 130px; left: 50%; transform: translateX(-50%); } /* Shifted much higher to completely clear the taller toolbar and toggle button */
   #dLeft  { left: 20px; top: 50%; transform: translateY(-50%); }
   #dRight { right: 20px; top: 50%; transform: translateY(-50%); }
 
-  .exp-coords { position: absolute; bottom: 80px; left: 22px; font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: rgba(255,255,255,0.3); letter-spacing: 1px; pointer-events: none; z-index: 1000; }
+  .exp-coords { position: absolute; bottom: 130px; left: 22px; font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: rgba(255,255,255,0.3); letter-spacing: 1px; pointer-events: none; z-index: 1000; } /* Adjusted coordinates to match */
 
   @media (max-width: 600px) {
     .page-title { font-size: 1.8rem; }
@@ -453,8 +457,16 @@
     </div>
     <div id="pwStep">
       <div style="font-family:'Share Tech Mono',monospace;font-size:0.82rem;color:var(--dim);margin-bottom:14px;" id="pwLabel"></div>
-      <input class="modal-input" type="password" id="passwordInput" placeholder="password" maxlength="100" autocomplete="off">
-      <div class="modal-error" id="pwError"></div>
+      
+      <input class="modal-input" type="password" id="passwordInput" placeholder="password" maxlength="100" autocomplete="off" style="margin-bottom: 8px;">
+      
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; min-height: 18px;">
+        <label style="display: none; align-items: center; gap: 6px; font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: var(--dim); cursor: pointer;" id="rememberMeWrap">
+          <input type="checkbox" id="rememberMeCheckbox" checked> Remember me
+        </label>
+        <div class="modal-error" id="pwError"></div>
+      </div>
+
       <div class="modal-btn-row">
         <button class="modal-btn" id="pwBackBtn">BACK</button>
         <button class="modal-btn primary" id="pwSubmitBtn">CONFIRM</button>
@@ -858,7 +870,7 @@ function connectChat() {
     else if (msg.type === 'reserve_result') handleReserveResult(msg);
     else if (msg.type === 'auth_result') handleAuthResult(msg);
     else if (msg.type === 'email_result') handleEmailResult(msg);
-    else if (msg.type === 'presence_list') updateOnlineUsers(msg.users); // NEW: Updates the MySpace online list
+    else if (msg.type === 'presence_list') updateOnlineUsers(msg.users);
   };
 }
 connectChat();
@@ -914,12 +926,26 @@ function showPwStep(label, isLogin) {
   document.getElementById('passwordInput').value = '';
   const pwError = document.getElementById('pwError');
   pwError.textContent = ''; pwError.style.color = '#ff6b6b'; 
+  
   const reserveBtn = document.getElementById('reserveBtn');
   const submitBtn = document.getElementById('pwSubmitBtn');
   const forgotWrap = document.getElementById('forgotPwWrap');
-  if (isLogin) { submitBtn.textContent = 'LOGIN'; reserveBtn.style.display = 'none'; forgotWrap.style.display = 'block'; }
-  else { submitBtn.textContent = 'SKIP'; reserveBtn.style.display = 'block'; reserveBtn.textContent = 'RESERVE NAME'; forgotWrap.style.display = 'none'; }
+  const remWrap = document.getElementById('rememberMeWrap');
+  
+  if (isLogin) { 
+    submitBtn.textContent = 'LOGIN'; 
+    reserveBtn.style.display = 'none'; 
+    forgotWrap.style.display = 'block'; 
+    remWrap.style.display = 'flex'; // Show remember me
+  } else { 
+    submitBtn.textContent = 'SKIP'; 
+    reserveBtn.style.display = 'block'; 
+    reserveBtn.textContent = 'RESERVE NAME'; 
+    forgotWrap.style.display = 'none'; 
+    remWrap.style.display = 'none'; // Hide remember me
+  }
 }
+
 document.getElementById('pwBackBtn').addEventListener('click', () => { document.getElementById('nameStep').style.display = 'block'; document.getElementById('pwStep').style.display = 'none'; document.getElementById('modalError').textContent = ''; });
 document.getElementById('pwSubmitBtn').addEventListener('click', () => {
   const pw = document.getElementById('passwordInput').value;
@@ -943,12 +969,24 @@ document.getElementById('forgotPwLink').addEventListener('click', () => {
     }
   }
 });
+
 function handleReserveResult(msg) {
   if (msg.success) { finalizeUsername(pendingUsername); setTimeout(() => openEmailModal('Add your email for password recovery.<br><br><span style="color:rgba(255,255,255,0.4);font-size:0.75rem;">We may also send occasional newsletters — we will never share or sell your information. You can skip this.</span>'), 400); }
   else { document.getElementById('pwError').style.color = '#ff6b6b'; document.getElementById('pwError').textContent = msg.error || 'Error.'; }
 }
 function handleAuthResult(msg) {
-  if (msg.success) { finalizeUsername(pendingUsername); if (!msg.has_email) setTimeout(() => openEmailModal("Welcome back! You don't have an email on file.<br><br>Add one for password recovery — we may also send occasional newsletters. <span style='color:rgba(255,255,255,0.4);font-size:0.75rem;'>We will never share or sell your information.</span>"), 400); }
+  if (msg.success) { 
+    // Handle "Remember Me"
+    if (document.getElementById('rememberMeCheckbox').checked) {
+      localStorage.setItem('wall_saved_username', pendingUsername);
+    } else {
+      localStorage.removeItem('wall_saved_username');
+    }
+    
+    finalizeUsername(pendingUsername); 
+    
+    if (!msg.has_email) setTimeout(() => openEmailModal("Welcome back! You don't have an email on file.<br><br>Add one for password recovery — we may also send occasional newsletters. <span style='color:rgba(255,255,255,0.4);font-size:0.75rem;'>We will never share or sell your information.</span>"), 400); 
+  }
   else { document.getElementById('pwError').style.color = '#ff6b6b'; document.getElementById('pwError').textContent = msg.error || 'Wrong password.'; }
 }
 function handleEmailResult(msg) {
@@ -999,7 +1037,17 @@ function updateOnlineUsers(users) {
   });
 }
 
-function openUsernameModal() { modal.classList.remove('hidden'); document.getElementById('nameStep').style.display = 'block'; document.getElementById('pwStep').style.display = 'none'; document.getElementById('usernameInput').value = myUsername || ''; document.getElementById('modalError').textContent = ''; }
+function openUsernameModal() { 
+  modal.classList.remove('hidden'); 
+  document.getElementById('nameStep').style.display = 'block'; 
+  document.getElementById('pwStep').style.display = 'none'; 
+  
+  // Pre-fill username if remembered
+  const savedName = localStorage.getItem('wall_saved_username');
+  document.getElementById('usernameInput').value = myUsername || savedName || ''; 
+  
+  document.getElementById('modalError').textContent = ''; 
+}
 
 const emailModal = document.getElementById('emailModal');
 function openEmailModal(subText) { if (subText) document.getElementById('emailModalSub').innerHTML = subText; document.getElementById('emailInput').value = ''; document.getElementById('emailError').textContent = ''; emailModal.classList.remove('hidden'); }
