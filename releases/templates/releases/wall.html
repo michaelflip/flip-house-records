@@ -581,7 +581,6 @@
 
 {% block body %}
 
-<!-- ToS Full Popup -->
 <div id="tosPopup" class="hidden">
   <div class="tos-popup-box">
     <div class="tos-popup-title">TERMS OF SERVICE: "THE WALL"</div>
@@ -618,7 +617,6 @@
   </div>
 </div>
 
-<!-- ToS Agreement Modal -->
 <div class="modal-overlay" id="tosModal">
   <div class="modal-box">
     <div class="modal-title">BEFORE YOU ENTER</div>
@@ -632,7 +630,6 @@
   </div>
 </div>
 
-<!-- Username Modal -->
 <div class="modal-overlay hidden" id="usernameModal">
   <div class="modal-box">
     <div class="modal-title">ENTER THE WALL</div>
@@ -657,11 +654,13 @@
         <button class="modal-btn primary" id="pwSubmitBtn">CONFIRM</button>
         <button class="modal-btn" id="reserveBtn" style="display:none;">RESERVE NAME</button>
       </div>
+      <div style="text-align: center; margin-top: 16px; display: none;" id="forgotPwWrap">
+        <span id="forgotPwLink" style="font-family:'Share Tech Mono',monospace; font-size:0.75rem; color:rgba(255,255,255,0.4); cursor:pointer; text-decoration:underline; letter-spacing: 1px;">Forgot password?</span>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- Email Prompt Modal -->
 <div class="modal-overlay hidden" id="emailModal">
   <div class="modal-box">
     <div class="modal-title">ADD YOUR EMAIL?</div>
@@ -678,7 +677,6 @@
   </div>
 </div>
 
-<!-- Expanded Canvas Overlay -->
 <div id="expandedOverlay" class="hidden">
   <div class="exp-toolbar">
     <button class="tool-btn active" id="expBtnDraw" onclick="expSetTool('draw')">✏ DRAW</button>
@@ -698,7 +696,6 @@
     <div id="expWrap">
       <canvas id="expCanvas"></canvas>
     </div>
-    <!-- D-pad: 3x3 grid, corners empty -->
     <div class="dpad">
       <div class="dpad-btn empty"></div>
       <div class="dpad-btn" id="dUp">▲</div>
@@ -714,7 +711,6 @@
   </div>
 </div>
 
-<!-- Main Content -->
 <div class="page-wrap">
   <h1 class="page-title">THE WALL</h1>
   <p class="page-sub">// LEAVE YOUR MARK //</p>
@@ -740,7 +736,6 @@
         <canvas id="wallCanvas"></canvas>
       </div>
       <div id="canvasLock">// AGREE TO TERMS TO UNLOCK //</div>
-      <!-- Main canvas D-pad -->
       <div class="main-dpad">
         <div class="dpad-btn empty"></div>
         <div class="dpad-btn" id="mUp">▲</div>
@@ -966,7 +961,7 @@ canvas.addEventListener('touchmove', e => { e.preventDefault(); if (!isDrawing) 
 canvas.addEventListener('touchend', () => { isDrawing = false; });
 
 function confirmClear() {
-  if (confirm('Clear the entire wall? This affects everyone.')) {
+  if (confirm("Clear the entire wall? This affects everyone.")) {
     if (canvasWS && canvasWS.readyState === WebSocket.OPEN) {
       canvasWS.send(JSON.stringify({ type: 'clear' }));
     }
@@ -1096,16 +1091,24 @@ function showPwStep(label, isLogin) {
   document.getElementById('pwStep').style.display = 'block';
   document.getElementById('pwLabel').textContent = label;
   document.getElementById('passwordInput').value = '';
-  document.getElementById('pwError').textContent = '';
+  
+  const pwError = document.getElementById('pwError');
+  pwError.textContent = '';
+  pwError.style.color = '#ff6b6b'; // Reset to default error color
+  
   const reserveBtn = document.getElementById('reserveBtn');
   const submitBtn = document.getElementById('pwSubmitBtn');
+  const forgotWrap = document.getElementById('forgotPwWrap');
+
   if (isLogin) {
     submitBtn.textContent = 'LOGIN';
     reserveBtn.style.display = 'none';
+    forgotWrap.style.display = 'block'; // Show forgot password link
   } else {
     submitBtn.textContent = 'SKIP';
     reserveBtn.style.display = 'block';
     reserveBtn.textContent = 'RESERVE NAME';
+    forgotWrap.style.display = 'none'; // Hide forgot password link
   }
 }
 
@@ -1130,6 +1133,23 @@ document.getElementById('reserveBtn').addEventListener('click', () => {
   chatWS.send(JSON.stringify({ type: 'reserve_username', username: pendingUsername, password: pw }));
 });
 
+// Added Forgot Password Click Listener
+document.getElementById('forgotPwLink').addEventListener('click', () => {
+  if (!pendingUsername) return;
+  // Double quotes used below to prevent syntax bug described in project context
+  if (confirm("Send a password reset email to the address on file for " + pendingUsername + "?")) {
+    const pwErr = document.getElementById('pwError');
+    if (chatWS && chatWS.readyState === WebSocket.OPEN) {
+      chatWS.send(JSON.stringify({ type: 'forgot_password', username: pendingUsername }));
+      pwErr.style.color = "rgba(100,255,150,0.8)";
+      pwErr.textContent = "Reset request sent. Check your email.";
+    } else {
+      pwErr.style.color = "#ff6b6b";
+      pwErr.textContent = "Not connected. Try again.";
+    }
+  }
+});
+
 function handleReserveResult(msg) {
   if (msg.success) {
     finalizeUsername(pendingUsername);
@@ -1139,6 +1159,7 @@ function handleReserveResult(msg) {
       '<span style="color:rgba(255,255,255,0.4);font-size:0.75rem;">We may also send occasional newsletters — we will never share or sell your information. You can skip this.</span>'
     ), 400);
   } else {
+    document.getElementById('pwError').style.color = '#ff6b6b';
     document.getElementById('pwError').textContent = msg.error || 'Error.';
   }
 }
@@ -1155,6 +1176,7 @@ function handleAuthResult(msg) {
       ), 400);
     }
   } else {
+    document.getElementById('pwError').style.color = '#ff6b6b';
     document.getElementById('pwError').textContent = msg.error || 'Wrong password.';
   }
 }
