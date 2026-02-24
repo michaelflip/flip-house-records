@@ -5,7 +5,7 @@ import random
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.utils import timezone
-from django.core import signing  # NEW: For generating secure auto-login tokens
+from django.core import signing
 
 
 # ─── Adjective + Noun random username generator ──────────────────────────────
@@ -53,8 +53,6 @@ class CanvasConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         await self.channel_layer.group_add(self.GROUP, self.channel_name)
         await self.accept()
-
-        # Send the current canvas state to the newly connected client
         canvas_data = await self.load_canvas()
         await self.send(text_data=json.dumps({
             "type": "canvas_init",
@@ -69,7 +67,6 @@ class CanvasConsumer(AsyncWebsocketConsumer):
         action = msg.get("type")
 
         if action == "draw":
-            # msg: { type, pixels: [{x, y, color}, ...] }
             pixels = msg.get("pixels", [])
             await self.save_pixels(pixels)
             await self.channel_layer.group_send(self.GROUP, {
@@ -83,7 +80,6 @@ class CanvasConsumer(AsyncWebsocketConsumer):
                 "type": "canvas_clear",
             })
 
-    # Group message handlers
     async def canvas_draw(self, event):
         await self.send(text_data=json.dumps({
             "type": "draw",
@@ -93,7 +89,6 @@ class CanvasConsumer(AsyncWebsocketConsumer):
     async def canvas_clear(self, event):
         await self.send(text_data=json.dumps({"type": "clear"}))
 
-    # DB helpers
     @database_sync_to_async
     def load_canvas(self):
         from releases.models import WallCanvas
@@ -132,19 +127,15 @@ class CanvasConsumer(AsyncWebsocketConsumer):
 
 class ChatConsumer(AsyncWebsocketConsumer):
     GROUP = "wall_chat"
-    
-    # Class-level dictionary to track presence: { channel_name: {"username": str, "offline": bool} }
     active_users = {}
 
     async def connect(self):
         await self.channel_layer.group_add(self.GROUP, self.channel_name)
         await self.accept()
-        # Immediately send the new user the current online list
         await self.send_presence_to_self()
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.GROUP, self.channel_name)
-        # If the user closes the tab, remove them from active tracking and tell everyone
         if self.channel_name in ChatConsumer.active_users:
             del ChatConsumer.active_users[self.channel_name]
             await self.broadcast_presence()
@@ -156,12 +147,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if action == "chat_message":
             username = msg.get("username", "").strip()[:50]
             message = msg.get("message", "").strip()[:500]
-            if not message:
-                return
-
-            # Save to DB
+            if not message: return
             await self.save_message(username, message)
-
             await self.channel_layer.group_send(self.GROUP, {
                 "type": "chat_broadcast",
                 "username": username,
@@ -172,23 +159,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
         elif action == "presence_update":
             username = msg.get("username", "").strip()[:50]
             offline = bool(msg.get("offline", False))
-            
             if username:
-                # Update their current connection state
                 ChatConsumer.active_users[self.channel_name] = {
                     "username": username,
                     "offline": offline
                 }
-                # Tell the room about the change
                 await self.broadcast_presence()
 
         elif action == "token_login":
-            # Handle automatic login via secure token
             token = msg.get("token", "")
             try:
-                # Token expires after 30 days
                 username = signing.loads(token, max_age=60*60*24*30)
-                exists = await self.check_username_exists(username)
+                exists = await self.stamp_token_login(username)
                 if exists:
                     await self.send(text_data=json.dumps({
                         "type": "token_login_result",
@@ -261,24 +243,20 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     # ─── Presence Helpers ───
     async def broadcast_presence(self):
-        # Gather all unique usernames where offline is False
         visible_users = list(set([
             data["username"] for data in ChatConsumer.active_users.values() if not data.get("offline")
         ]))
         visible_users.sort(key=str.lower)
-        
         await self.channel_layer.group_send(self.GROUP, {
             "type": "presence_list",
             "users": visible_users,
         })
         
     async def send_presence_to_self(self):
-        # Used when a user first connects before they have set their own name
         visible_users = list(set([
             data["username"] for data in ChatConsumer.active_users.values() if not data.get("offline")
         ]))
         visible_users.sort(key=str.lower)
-        
         await self.send(text_data=json.dumps({
             "type": "presence_list",
             "users": visible_users,
@@ -291,9 +269,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
         ChatMessage.objects.create(username=username, message=message)
 
     @database_sync_to_async
-    def check_username_exists(self, username):
+    def stamp_token_login(self, username):
         from releases.models import ChatUsername
-        return ChatUsername.objects.filter(username__iexact=username).exists()
+        try:
+            entry = ChatUsername.objects.get(username__iexact=username)
+            entry.last_login = timezone.now()
+            entry.save(update_fields=['last_login'])
+            return True
+        except ChatUsername.DoesNotExist:
+            return False
 
     @database_sync_to_async
     def check_username(self, username):
@@ -314,6 +298,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         ChatUsername.objects.create(
             username=username,
             password_hash=hash_password(password),
+            last_login=timezone.now()
         )
         return {"success": True, "token": signing.dumps(username)}
 
@@ -323,6 +308,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         try:
             entry = ChatUsername.objects.get(username__iexact=username)
             if verify_password(password, entry.password_hash):
+                entry.last_login = timezone.now()
+                entry.save(update_fields=['last_login'])
                 return {"success": True, "has_email": bool(entry.email), "token": signing.dumps(username)}
             return {"success": False, "error": "Wrong password."}
         except ChatUsername.DoesNotExist:
@@ -376,7 +363,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def save_email(self, username, email):
         from releases.models import ChatUsername
         import re
-        # Basic email validation
         if email and not re.match(r'^[^@]+@[^@]+\.[^@]+$', email):
             return {"success": False, "error": "Invalid email address."}
         try:

@@ -130,6 +130,18 @@ class ChatUsername(models.Model):
     username = models.CharField(max_length=50, unique=True)
     password_hash = models.CharField(max_length=128, help_text="bcrypt hash of the password")
     email = models.EmailField(max_length=254, blank=True, null=True, help_text="Optional email for password reset and newsletter")
+    
+    # Profile Data
+    location = models.CharField(max_length=100, blank=True, null=True)
+    bio = models.TextField(max_length=500, blank=True, null=True)
+    avatar = models.ImageField(
+        upload_to='chat_avatars/',
+        storage=MediaStorage(),
+        blank=True,
+        null=True
+    )
+    last_login = models.DateTimeField(blank=True, null=True)
+    
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

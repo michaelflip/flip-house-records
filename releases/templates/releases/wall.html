@@ -12,152 +12,36 @@
     --border: rgba(255,255,255,0.15);
   }
 
-  .page-wrap {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 110px 16px 80px;
-  }
+  .page-wrap { max-width: 1100px; margin: 0 auto; padding: 110px 16px 80px; }
 
-  .page-title {
-    text-align: center;
-    font-size: 2.6rem;
-    letter-spacing: 5px;
-    margin-bottom: 6px;
-    text-shadow: 0 0 30px rgba(255,255,255,0.4);
-  }
+  .page-title { text-align: center; font-size: 2.6rem; letter-spacing: 5px; margin-bottom: 6px; text-shadow: 0 0 30px rgba(255,255,255,0.4); }
+  .page-sub { text-align: center; font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; color: var(--dim); letter-spacing: 3px; margin-bottom: 50px; }
 
-  .page-sub {
-    text-align: center;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.8rem;
-    color: var(--dim);
-    letter-spacing: 3px;
-    margin-bottom: 50px;
-  }
-
-  .section-header {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.7rem;
-    letter-spacing: 4px;
-    color: rgba(255,255,255,0.35);
-    text-transform: uppercase;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 10px;
-    margin-bottom: 22px;
-  }
+  .section-header { font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; letter-spacing: 4px; color: rgba(255,255,255,0.35); text-transform: uppercase; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 22px; }
 
   .canvas-section { margin-bottom: 60px; }
+  .canvas-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 20px; }
 
-  .canvas-toolbar {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-
-  .tool-group-vertical {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .tool-btn {
-    background: var(--faint);
-    border: 1px solid var(--border);
-    color: #fff;
-    padding: 7px 16px;
-    border-radius: 6px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.82rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    letter-spacing: 1px;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+  .tool-group-vertical { display: flex; flex-direction: column; gap: 4px; }
+  .tool-btn { background: var(--faint); border: 1px solid var(--border); color: #fff; padding: 7px 16px; border-radius: 6px; font-family: 'Share Tech Mono', monospace; font-size: 0.82rem; cursor: pointer; transition: all 0.2s; letter-spacing: 1px; height: 100%; display: flex; align-items: center; justify-content: center; }
   .tool-btn:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.4); }
   .tool-btn.active { background: #fff; color: #000; border-color: #fff; }
   .tool-btn.sub-btn { font-size: 0.65rem; padding: 4px 8px; line-height: 1; }
 
-  .size-slider-wrap {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.78rem;
-    color: var(--dim);
-    margin-left: 8px;
-  }
+  .size-slider-wrap { display: flex; align-items: center; gap: 8px; font-family: 'Share Tech Mono', monospace; font-size: 0.78rem; color: var(--dim); margin-left: 8px; }
   #brushSize { width: 80px; accent-color: #fff; }
 
-  .color-swatch {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    border: 2px solid transparent;
-    cursor: pointer;
-    transition: transform 0.15s, border-color 0.15s;
-    flex-shrink: 0;
-  }
+  .color-swatch { width: 28px; height: 28px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; transition: transform 0.15s, border-color 0.15s; flex-shrink: 0; }
   .color-swatch:hover { transform: scale(1.15); }
   .color-swatch.selected { border-color: #fff; transform: scale(1.2); }
+  #colorPicker { width: 32px; height: 32px; border: 2px solid var(--border); border-radius: 50%; cursor: pointer; background: none; padding: 0; }
 
-  #colorPicker {
-    width: 32px;
-    height: 32px;
-    border: 2px solid var(--border);
-    border-radius: 50%;
-    cursor: pointer;
-    background: none;
-    padding: 0;
-  }
+  .canvas-outer { position: relative; border: 2px solid var(--border); border-radius: 10px; overflow: hidden; background: #111; box-shadow: 0 0 40px rgba(255,255,255,0.06); touch-action: none; height: 400px; width: 100%; }
+  #wallCanvas, #expCanvas { display: block; cursor: crosshair; image-rendering: pixelated; }
 
-  .canvas-outer {
-    position: relative;
-    border: 2px solid var(--border);
-    border-radius: 10px;
-    overflow: hidden;
-    background: #111;
-    box-shadow: 0 0 40px rgba(255,255,255,0.06);
-    touch-action: none;
-    height: 400px;
-    width: 100%;
-  }
+  .canvas-status { font-family: 'Share Tech Mono', monospace; font-size: 0.72rem; color: rgba(255,255,255,0.3); margin-top: 10px; letter-spacing: 1px; text-align: center; }
 
-  #wallCanvas, #expCanvas {
-    display: block;
-    cursor: crosshair;
-    image-rendering: pixelated;
-  }
-
-  .canvas-status {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.72rem;
-    color: rgba(255,255,255,0.3);
-    margin-top: 10px;
-    letter-spacing: 1px;
-    text-align: center;
-  }
-
-  .dir-btn {
-    background: var(--faint);
-    border: 1px solid var(--border);
-    color: #fff;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.15s;
-    user-select: none;
-    flex-shrink: 0;
-  }
+  .dir-btn { background: var(--faint); border: 1px solid var(--border); color: #fff; border-radius: 8px; font-size: 1.1rem; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; user-select: none; flex-shrink: 0; }
   .dir-btn:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.5); }
   .dir-btn:active { background: rgba(255,255,255,0.3); transform: scale(0.9); }
 
@@ -165,85 +49,23 @@
   .username-display { font-family: 'Share Tech Mono', monospace; font-size: 0.9rem; color: var(--white); background: var(--faint); border: 1px solid var(--border); border-radius: 6px; padding: 7px 14px; letter-spacing: 1px; }
   .username-tag { font-size: 0.68rem; color: rgba(255,255,255,0.3); letter-spacing: 1px; font-family: 'Share Tech Mono', monospace; }
 
-  /* ── CHAT LAYOUT UPDATES ── */
-  .chat-layout {
-    display: flex;
-    gap: 14px;
-    margin-bottom: 14px;
-    height: 320px;
-  }
-
-  .chat-window { 
-    flex: 1;
-    background: rgba(255,255,255,0.02); 
-    border: 1px solid var(--border); 
-    border-radius: 10px; 
-    overflow-y: auto; 
-    padding: 16px; 
-    scroll-behavior: smooth; 
-  }
+  .chat-layout { display: flex; gap: 14px; margin-bottom: 14px; height: 320px; }
+  .chat-window { flex: 1; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 10px; overflow-y: auto; padding: 16px; scroll-behavior: smooth; }
   .chat-window::-webkit-scrollbar { width: 4px; }
   .chat-window::-webkit-scrollbar-track { background: transparent; }
   .chat-window::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
 
-  .online-panel {
-    width: 180px;
-    background: rgba(255,255,255,0.02);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    padding: 12px;
-  }
-
-  .online-panel-header {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.75rem;
-    color: var(--dim);
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 8px;
-    margin-bottom: 8px;
-    text-align: center;
-    letter-spacing: 1px;
-  }
-
-  .online-list {
-    flex: 1;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
+  .online-panel { width: 180px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 10px; display: flex; flex-direction: column; padding: 12px; }
+  .online-panel-header { font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: var(--dim); border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 8px; text-align: center; letter-spacing: 1px; }
+  .online-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
   .online-list::-webkit-scrollbar { width: 4px; }
   .online-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
 
-  .online-user {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.8rem;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .online-user::before {
-    content: '';
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    background: rgba(100,255,150,0.8);
-    border-radius: 50%;
-  }
+  .online-user { font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; color: #fff; display: flex; align-items: center; gap: 6px; cursor: context-menu; transition: color 0.15s; }
+  .online-user:hover { color: rgba(100,255,150,0.8); }
+  .online-user::before { content: ''; display: inline-block; width: 6px; height: 6px; background: rgba(100,255,150,0.8); border-radius: 50%; }
 
-  .offline-toggle-wrap {
-    margin-left: auto;
-    display: none; 
-    align-items: center;
-    gap: 6px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.75rem;
-    color: var(--dim);
-    cursor: pointer;
-  }
+  .offline-toggle-wrap { margin-left: auto; display: none; align-items: center; gap: 6px; font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: var(--dim); cursor: pointer; }
   .offline-toggle-wrap input { cursor: pointer; }
 
   .chat-msg { font-family: 'Share Tech Mono', monospace; font-size: 0.83rem; line-height: 1.6; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
@@ -260,19 +82,24 @@
   .chat-send-btn { background: #fff; color: #000; border: none; border-radius: 8px; padding: 10px 22px; font-family: 'Orbitron', sans-serif; font-size: 0.8rem; cursor: pointer; letter-spacing: 1px; transition: all 0.2s; }
   .chat-send-btn:hover { background: rgba(255,255,255,0.85); transform: scale(1.03); }
 
+  /* Right Click Context Menu */
+  .context-menu { position: absolute; background: #0a0a0a; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 6px 0; z-index: 6000; box-shadow: 0 8px 24px rgba(0,0,0,0.8); min-width: 140px; }
+  .context-menu.hidden { display: none; }
+  .context-menu-item { padding: 10px 16px; font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; color: #fff; cursor: pointer; transition: background 0.2s; letter-spacing: 1px; }
+  .context-menu-item:hover { background: rgba(255,255,255,0.1); }
+
   /* Modals */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(6px); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; }
   .modal-overlay.hidden { display: none; }
-  .modal-box { background: #0a0a0a; border: 1px solid rgba(255,255,255,0.2); border-radius: 14px; padding: 36px 32px; width: 100%; max-width: 420px; box-shadow: 0 0 60px rgba(255,255,255,0.08); }
+  .modal-box { background: #0a0a0a; border: 1px solid rgba(255,255,255,0.2); border-radius: 14px; padding: 36px 32px; width: 100%; max-width: 420px; box-shadow: 0 0 60px rgba(255,255,255,0.08); position: relative; }
+  
   .modal-title { font-size: 1.1rem; letter-spacing: 3px; margin-bottom: 8px; }
   .modal-sub { font-family: 'Share Tech Mono', monospace; font-size: 0.78rem; color: var(--dim); margin-bottom: 24px; letter-spacing: 1px; line-height: 1.6; }
-  .modal-input { width: 100%; background: var(--faint); border: 1px solid var(--border); color: #fff; border-radius: 8px; padding: 11px 14px; font-family: 'Share Tech Mono', monospace; font-size: 0.9rem; outline: none; margin-bottom: 12px; transition: border-color 0.2s; }
+  .modal-input { width: 100%; background: var(--faint); border: 1px solid var(--border); color: #fff; border-radius: 8px; padding: 11px 14px; font-family: 'Share Tech Mono', monospace; font-size: 0.9rem; outline: none; margin-bottom: 12px; transition: border-color 0.2s; box-sizing: border-box; }
   .modal-input:focus { border-color: rgba(255,255,255,0.45); }
-  
-  /* Adjusted for remember me layout */
   .modal-error { font-family: 'Share Tech Mono', monospace; font-size: 0.78rem; color: #ff6b6b; margin-bottom: 0; min-height: 18px; letter-spacing: 1px; flex: 1; text-align: right; }
   
-  .modal-btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .modal-btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
   .modal-btn { flex: 1; background: none; border: 1px solid var(--border); color: #fff; padding: 10px 16px; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-size: 0.78rem; cursor: pointer; letter-spacing: 1px; transition: all 0.2s; }
   .modal-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.4); }
   .modal-btn.primary { background: #fff; color: #000; border-color: #fff; }
@@ -313,62 +140,15 @@
   #expViewport { flex: 1; position: relative; background: #111; overflow: hidden; }
   #expWrap { position: absolute; top: 0; left: 0; transform-origin: top left; will-change: transform; line-height: 0; }
 
-  .collapsible-toolbar {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    background: rgba(10,10,10,0.95);
-    border-top: 1px solid var(--border);
-    transition: transform 0.3s ease-in-out;
-    display: flex;
-    flex-direction: column;
-    z-index: 5000;
-  }
+  .collapsible-toolbar { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(10,10,10,0.95); border-top: 1px solid var(--border); transition: transform 0.3s ease-in-out; display: flex; flex-direction: column; z-index: 5000; }
   .collapsible-toolbar.collapsed { transform: translateY(100%); }
-
-  .exp-toolbar-content {
-    display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; 
-    padding: 24px 14px;
-  }
-
-  .toggle-toolbar-btn {
-    position: absolute;
-    top: -28px; left: 50%;
-    transform: translateX(-50%);
-    background: rgba(10,10,10,0.95);
-    border: 1px solid var(--border);
-    border-bottom: none;
-    color: rgba(255,255,255,0.6);
-    padding: 4px 16px;
-    border-radius: 8px 8px 0 0;
-    cursor: pointer;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.75rem;
-    letter-spacing: 1px;
-    transition: color 0.2s;
-  }
+  .exp-toolbar-content { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; padding: 24px 14px; }
+  .toggle-toolbar-btn { position: absolute; top: -28px; left: 50%; transform: translateX(-50%); background: rgba(10,10,10,0.95); border: 1px solid var(--border); border-bottom: none; color: rgba(255,255,255,0.6); padding: 4px 16px; border-radius: 8px 8px 0 0; cursor: pointer; font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; letter-spacing: 1px; transition: color 0.2s; }
   .toggle-toolbar-btn:hover { color: #fff; }
-
   .exp-close { background: none; border: 1px solid rgba(255,80,80,0.5); color: rgba(255,120,120,0.9); padding: 7px 16px; border-radius: 6px; font-family: 'Share Tech Mono', monospace; font-size: 0.82rem; cursor: pointer; transition: all 0.2s; letter-spacing: 1px; margin-left: auto; height: 100%; }
   .exp-close:hover { background: rgba(255,60,60,0.15); border-color: rgba(255,100,100,0.9); }
 
-  /* ── EXTERNAL DIRECTIONAL BUTTONS (EXPANDED) ── */
-  .exp-dir-btn {
-    position: absolute;
-    background: rgba(0,0,0,0.65);
-    border: 1px solid rgba(255,255,255,0.25);
-    color: #fff;
-    border-radius: 8px;
-    font-size: 1.5rem;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.15s;
-    user-select: none;
-    z-index: 1000;
-  }
+  .exp-dir-btn { position: absolute; background: rgba(0,0,0,0.65); border: 1px solid rgba(255,255,255,0.25); color: #fff; border-radius: 8px; font-size: 1.5rem; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; user-select: none; z-index: 1000; }
   .exp-dir-btn:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.6); }
   .exp-dir-btn:active { background: rgba(255,255,255,0.35); transform: scale(0.9); }
 
@@ -376,7 +156,6 @@
   #dDown  { bottom: 130px; left: 50%; transform: translateX(-50%); } 
   #dLeft  { left: 20px; top: 50%; transform: translateY(-50%); }
   #dRight { right: 20px; top: 50%; transform: translateY(-50%); }
-
   .exp-coords { position: absolute; bottom: 130px; left: 22px; font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: rgba(255,255,255,0.3); letter-spacing: 1px; pointer-events: none; z-index: 1000; } 
 
   @media (max-width: 600px) {
@@ -390,6 +169,49 @@
 {% endblock %}
 
 {% block body %}
+
+<div id="userContextMenu" class="context-menu hidden">
+  <div class="context-menu-item" id="ctxViewBtn">View Profile</div>
+  <div class="context-menu-item" id="ctxEditBtn">Edit Profile</div>
+</div>
+
+<div class="modal-overlay hidden" id="profileModal">
+  <div class="modal-box" style="max-width: 500px;">
+    
+    <div style="display:flex; gap: 24px; margin-bottom: 20px;">
+      
+      <div style="text-align: center; flex-shrink: 0; width: 120px;">
+        <img id="profAvatar" src="" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); display: block; margin-bottom: 12px; background: #111;">
+        <label id="profAvatarLabel" style="display:none; font-family:'Share Tech Mono', monospace; font-size: 0.75rem; color: var(--dim); cursor: pointer; text-decoration: underline; letter-spacing: 1px;">
+          UPLOAD PNG
+          <input type="file" id="profAvatarInput" accept="image/png" style="display:none;">
+        </label>
+      </div>
+      
+      <div style="flex: 1; min-width: 0;">
+        <div id="profUsername" style="font-size: 1.4rem; letter-spacing: 2px; margin-bottom: 6px; word-wrap: break-word;"></div>
+        <div style="font-family:'Share Tech Mono', monospace; font-size: 0.7rem; color: rgba(255,255,255,0.3); margin-bottom: 16px; letter-spacing: 1px;">LAST SEEN: <span id="profLastLogin" style="color:var(--dim);"></span></div>
+        
+        <div style="margin-bottom: 16px;">
+          <div style="font-family:'Share Tech Mono', monospace; font-size: 0.65rem; color: rgba(255,255,255,0.4); margin-bottom: 4px; letter-spacing: 1px;">LOCATION</div>
+          <div id="profLocDisplay" style="font-family:'Share Tech Mono', monospace; font-size: 0.85rem; color: #fff; min-height: 18px;"></div>
+          <input class="modal-input" type="text" id="profLocInput" maxlength="100" placeholder="Where are you?" style="display:none; margin-bottom:0; padding: 8px 12px;">
+        </div>
+
+        <div>
+          <div style="font-family:'Share Tech Mono', monospace; font-size: 0.65rem; color: rgba(255,255,255,0.4); margin-bottom: 4px; letter-spacing: 1px;">BIO</div>
+          <div id="profBioDisplay" style="font-family:'Share Tech Mono', monospace; font-size: 0.85rem; color: #fff; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word;"></div>
+          <textarea class="modal-input" id="profBioInput" maxlength="500" placeholder="Tell us about yourself..." style="display:none; resize:vertical; min-height:80px; font-family: sans-serif; padding: 8px 12px; line-height: 1.4;"></textarea>
+        </div>
+      </div>
+    </div>
+    
+    <div class="modal-btn-row" style="margin-top: 24px;">
+      <button class="modal-btn" onclick="closeProfileModal()">CLOSE</button>
+      <button class="modal-btn primary" id="profSaveBtn" style="display:none;" onclick="saveProfile()">SAVE PROFILE</button>
+    </div>
+  </div>
+</div>
 
 <div id="tosPopup" class="hidden">
   <div class="tos-popup-box">
@@ -508,7 +330,7 @@
   </div>
 
   <div id="expToolbarContainer" class="collapsible-toolbar">
-    <button id="toggleToolbarBtn" class="toggle-toolbar-btn" onclick="toggleExpToolbar()">▼ HIDE TOOLS</button>
+    <button id="toggleToolbarBtn" class="toggleToolbarBtn" onclick="toggleExpToolbar()">▼ HIDE TOOLS</button>
     <div class="exp-toolbar-content">
       
       <div style="display: flex; gap: 8px;">
@@ -810,7 +632,7 @@ function paintAt(x, y) {
     }
   }
   if (batch.length) {
-    applyPixelsAndSyncExpanded(batch); // Instant visual feedback locally
+    applyPixelsAndSyncExpanded(batch); 
     pendingPixels.push(...batch);
     scheduleFlush();
   }
@@ -864,7 +686,6 @@ function connectChat() {
   chatWS = new WebSocket(`${proto}://${location.host}/ws/chat/`);
   
   chatWS.onopen = () => {
-    // Check if we have an auto-login token when we first connect
     const token = localStorage.getItem('wall_auth_token');
     if (token && sessionStorage.getItem('wall_tos_agreed') === '1') {
       chatWS.send(JSON.stringify({ type: 'token_login', token: token }));
@@ -890,7 +711,6 @@ function handleTokenLoginResult(msg) {
     pendingUsername = msg.username;
     finalizeUsername(msg.username);
   } else {
-    // If the token failed (maybe password was changed or it expired), clear it
     localStorage.removeItem('wall_auth_token');
     if (sessionStorage.getItem('wall_tos_agreed') === '1') {
       openUsernameModal();
@@ -1040,7 +860,7 @@ function finalizeUsername(name) {
   }
 }
 
-// ── ONLINE NOW LOGIC ──
+// ── ONLINE NOW & PROFILE LOGIC ──
 function toggleOffline() {
   if (!myUsername || !chatWS || chatWS.readyState !== WebSocket.OPEN) return;
   const isOffline = document.getElementById('offlineToggle').checked;
@@ -1062,15 +882,162 @@ function updateOnlineUsers(users) {
     const div = document.createElement('div');
     div.className = 'online-user';
     div.textContent = user;
+    div.setAttribute('data-username', user);
     listEl.appendChild(div);
   });
 }
+
+// Context Menu Setup
+const ctxMenu = document.getElementById('userContextMenu');
+let contextMenuTargetUser = null;
+
+document.getElementById('onlineUsersList').addEventListener('contextmenu', e => {
+  const userDiv = e.target.closest('.online-user');
+  if (!userDiv) return;
+  e.preventDefault();
+  
+  contextMenuTargetUser = userDiv.getAttribute('data-username');
+  
+  // Position menu
+  ctxMenu.style.left = e.pageX + 'px';
+  ctxMenu.style.top = e.pageY + 'px';
+  ctxMenu.classList.remove('hidden');
+  
+  // Toggle buttons based on ownership
+  if (contextMenuTargetUser === myUsername) {
+    document.getElementById('ctxEditBtn').style.display = 'block';
+    document.getElementById('ctxViewBtn').style.display = 'none';
+  } else {
+    document.getElementById('ctxEditBtn').style.display = 'none';
+    document.getElementById('ctxViewBtn').style.display = 'block';
+  }
+});
+
+// Hide context menu when clicking anywhere else
+document.addEventListener('click', () => {
+  ctxMenu.classList.add('hidden');
+});
+
+// Default Avatar SVG
+const DEFAULT_AVATAR = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23222'/><text x='50' y='55' font-size='40' fill='%23555' font-family='monospace' text-anchor='middle' dominant-baseline='middle'>?</text></svg>";
+
+document.getElementById('ctxViewBtn').addEventListener('click', () => fetchAndOpenProfile(contextMenuTargetUser, false));
+document.getElementById('ctxEditBtn').addEventListener('click', () => fetchAndOpenProfile(contextMenuTargetUser, true));
+
+async function fetchAndOpenProfile(targetUser, isEditMode) {
+  try {
+    const res = await fetch(`/api/profile/${targetUser}/`);
+    const data = await res.json();
+    if (data.success) {
+      populateProfileModal(data, isEditMode);
+    } else {
+      alert("Could not load profile.");
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+function populateProfileModal(data, isEditMode) {
+  document.getElementById('profUsername').textContent = data.username;
+  document.getElementById('profLastLogin').textContent = data.last_login;
+  document.getElementById('profAvatar').src = data.avatar_url || DEFAULT_AVATAR;
+
+  const locDisplay = document.getElementById('profLocDisplay');
+  const locInput = document.getElementById('profLocInput');
+  const bioDisplay = document.getElementById('profBioDisplay');
+  const bioInput = document.getElementById('profBioInput');
+  const saveBtn = document.getElementById('profSaveBtn');
+  const avatarLabel = document.getElementById('profAvatarLabel');
+
+  if (isEditMode) {
+    locDisplay.style.display = 'none';
+    bioDisplay.style.display = 'none';
+    
+    locInput.style.display = 'block';
+    locInput.value = data.location || '';
+    
+    bioInput.style.display = 'block';
+    bioInput.value = data.bio || '';
+    
+    avatarLabel.style.display = 'block';
+    saveBtn.style.display = 'block';
+  } else {
+    locInput.style.display = 'none';
+    bioInput.style.display = 'none';
+    avatarLabel.style.display = 'none';
+    saveBtn.style.display = 'none';
+    
+    locDisplay.style.display = 'block';
+    locDisplay.textContent = data.location || "Location not set.";
+    
+    bioDisplay.style.display = 'block';
+    bioDisplay.textContent = data.bio || "No bio available.";
+  }
+
+  document.getElementById('profileModal').classList.remove('hidden');
+}
+
+function closeProfileModal() {
+  document.getElementById('profileModal').classList.add('hidden');
+  document.getElementById('profAvatarInput').value = ''; // clear file selection
+}
+
+// Live preview Avatar on selection
+document.getElementById('profAvatarInput').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      document.getElementById('profAvatar').src = evt.target.result;
+    }
+    reader.readAsDataURL(file);
+  }
+});
+
+async function saveProfile() {
+  const saveBtn = document.getElementById('profSaveBtn');
+  saveBtn.textContent = 'SAVING...';
+  
+  const formData = new FormData();
+  formData.append('token', localStorage.getItem('wall_auth_token'));
+  formData.append('location', document.getElementById('profLocInput').value);
+  formData.append('bio', document.getElementById('profBioInput').value);
+  
+  const avatarFile = document.getElementById('profAvatarInput').files[0];
+  if (avatarFile) {
+    formData.append('avatar', avatarFile);
+  }
+
+  try {
+    const res = await fetch('/api/profile/update/', { 
+      method: 'POST', 
+      body: formData 
+    });
+    const data = await res.json();
+    if (data.success) {
+      closeProfileModal();
+    } else {
+      alert(data.error || 'Failed to save profile.');
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Network error while saving profile.');
+  } finally {
+    saveBtn.textContent = 'SAVE PROFILE';
+  }
+}
+
+// ── END ONLINE NOW & PROFILE LOGIC ──
 
 function openUsernameModal() { 
   modal.classList.remove('hidden'); 
   document.getElementById('nameStep').style.display = 'block'; 
   document.getElementById('pwStep').style.display = 'none'; 
-  document.getElementById('usernameInput').value = myUsername || ''; 
+  
+  const savedName = localStorage.getItem('wall_saved_username');
+  document.getElementById('usernameInput').value = myUsername || savedName || ''; 
+  
   document.getElementById('modalError').textContent = ''; 
 }
 
@@ -1096,7 +1063,6 @@ function agreeTos() {
   tosModal.classList.add('hidden'); 
   document.getElementById('canvasLock').classList.add('hidden'); 
   
-  // If they agreed, immediately try auto-login if token is present
   const token = localStorage.getItem('wall_auth_token');
   if (token && chatWS && chatWS.readyState === WebSocket.OPEN) {
     chatWS.send(JSON.stringify({ type: 'token_login', token: token }));
@@ -1110,7 +1076,6 @@ window.addEventListener('load', () => {
     tosModal.classList.add('hidden'); 
     document.getElementById('canvasLock').classList.add('hidden'); 
     
-    // Only open the manual modal if they don't have a token saved
     if (!localStorage.getItem('wall_auth_token')) {
       openUsernameModal(); 
     }
@@ -1132,7 +1097,7 @@ expCanvas.width  = COLS;
 expCanvas.height = ROWS;
 
 let panX = 0, panY = 0;
-let expZoom = 6; // Start zoomed in for expanded view
+let expZoom = 6; 
 const EXP_PAN_STEP = 200; 
 
 function resizeExpCanvas() {
@@ -1191,7 +1156,6 @@ expCanvas.addEventListener('touchstart', e => { e.preventDefault(); expDrawing =
 expCanvas.addEventListener('touchmove',  e => { e.preventDefault(); if (!expDrawing) return; const c = getCellFromEvent(e, true); paintAt(c.x,c.y); }, { passive:false });
 expCanvas.addEventListener('touchend',   () => { expDrawing = false; });
 
-// Expanded D-pad events
 document.getElementById('dUp').addEventListener('click',    () => { panY -= EXP_PAN_STEP; clampPan(); applyExpPan(); });
 document.getElementById('dDown').addEventListener('click',  () => { panY += EXP_PAN_STEP; clampPan(); applyExpPan(); });
 document.getElementById('dLeft').addEventListener('click',  () => { panX -= EXP_PAN_STEP; clampPan(); applyExpPan(); });
@@ -1226,7 +1190,6 @@ document.getElementById('expBrushSize').addEventListener('input', e => {
   document.getElementById('sizeLabel').textContent = brushSz;
 });
 
-// Toolbar Collapsing
 function toggleExpToolbar() {
   const tb = document.getElementById('expToolbarContainer');
   const btn = document.getElementById('toggleToolbarBtn');

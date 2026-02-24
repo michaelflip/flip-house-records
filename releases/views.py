@@ -1,6 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import ReleasePost, Artist, Event, AffiliateLink, ChatMessage
+from .models import ReleasePost, Artist, Event, AffiliateLink, ChatMessage, ChatUsername
 from .forms import ReleaseUploadForm
+from django.http import JsonResponse
+from django.core import signing
+from django.views.decorators.csrf import csrf_exempt
+from django.core.files.base import ContentFile
+from PIL import Image
+import io
 import json
 
 
@@ -124,3 +130,71 @@ def password_reset_confirm(request, token):
         return render(request, 'releases/password_reset_confirm.html', {'success': True, 'username': entry.username})
 
     return render(request, 'releases/password_reset_confirm.html', {'token': token})
+
+
+# ─── Wall Profile Endpoints ───────────────────────────────────────────────────
+
+def get_profile(request, username):
+    """Read-only endpoint to fetch a user's profile data for the Wall."""
+    try:
+        entry = ChatUsername.objects.get(username__iexact=username)
+        return JsonResponse({
+            'success': True,
+            'username': entry.username,
+            'location': entry.location or '',
+            'bio': entry.bio or '',
+            'avatar_url': entry.avatar.url if entry.avatar else None,
+            'last_login': entry.last_login.strftime('%b %d, %Y %I:%M %p') if entry.last_login else 'Never'
+        })
+    except ChatUsername.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'User not found'}, status=404)
+
+
+@csrf_exempt
+def update_profile(request):
+    """Authenticated endpoint to update bio, location, and handle Avatar uploads."""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST required'}, status=405)
+
+    # Authenticate via the same token stored in localStorage
+    token = request.POST.get('token')
+    if not token:
+        return JsonResponse({'error': 'Not authenticated'}, status=401)
+
+    try:
+        username = signing.loads(token, max_age=60*60*24*30)
+        entry = ChatUsername.objects.get(username__iexact=username)
+    except Exception:
+        return JsonResponse({'error': 'Invalid or expired token'}, status=401)
+
+    # Update text fields
+    location = request.POST.get('location')
+    bio = request.POST.get('bio')
+    
+    if location is not None:
+        entry.location = location[:100]
+    if bio is not None:
+        entry.bio = bio[:500]
+
+    # Handle Avatar Image Resizing
+    if 'avatar' in request.FILES:
+        avatar_file = request.FILES['avatar']
+        try:
+            img = Image.open(avatar_file)
+            img = img.convert('RGBA')  # Preserve transparency
+            img.thumbnail((120, 120))  # Crush to a small square
+            
+            thumb_io = io.BytesIO()
+            img.save(thumb_io, format='PNG')
+            
+            filename = f"{entry.username}_avatar.png"
+            entry.avatar.save(filename, ContentFile(thumb_io.getvalue()), save=False)
+        except Exception as e:
+            return JsonResponse({'error': 'Invalid image file.'}, status=400)
+
+    entry.save()
+    
+    return JsonResponse({
+        'success': True, 
+        'avatar_url': entry.avatar.url if entry.avatar else None
+    })
